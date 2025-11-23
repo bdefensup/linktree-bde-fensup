@@ -10,10 +10,16 @@ export default function Home() {
     { name: "TikTok", url: "https://BDE-FENSUP.short.gy/TikTok", icon: "🎵" },
     {
       name: "Billetterie",
-      url: "https://BDE-FENSUP.short.gy/Billetterie",
+      url: "#",
       icon: "🎟️",
+      comingSoon: true,
     },
-    { name: "Discord", url: "https://BDE-FENSUP.short.gy/Discord", icon: "💬" },
+    {
+      name: "Discord",
+      url: "#",
+      icon: "💬",
+      comingSoon: true,
+    },
     {
       name: "Site Web",
       url: "https://BDE-FENSUP.short.gy/SiteWeb",
@@ -63,11 +69,21 @@ export default function Home() {
             <a
               key={link.name}
               href={link.url}
-              className="group relative flex items-center justify-center w-full p-4 bg-card hover:bg-secondary text-foreground hover:text-white border border-border/50 rounded-xl shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md overflow-hidden"
+              className={`group relative flex items-center justify-center w-full p-4 bg-card text-foreground border border-border/50 rounded-xl shadow-sm transition-all duration-300 overflow-hidden ${
+                link.comingSoon
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:bg-secondary hover:text-white hover:scale-[1.02] hover:shadow-md"
+              }`}
+              onClick={(e) => link.comingSoon && e.preventDefault()}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               <span className="absolute left-6 text-2xl">{link.icon}</span>
               <span className="font-semibold text-lg">{link.name}</span>
+              {link.comingSoon && (
+                <span className="absolute right-4 text-xs px-2 py-1 rounded-full bg-accent/20 text-accent border border-accent/30">
+                  Bientôt
+                </span>
+              )}
             </a>
           ))}
         </div>
