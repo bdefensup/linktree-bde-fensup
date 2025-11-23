@@ -15,10 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "BDE FEN'SUP",
   description: "Bureau des Étudiants de FEN'SUP - Retrouvez tous nos liens",
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  },
 };
 
 export default function RootLayout({
