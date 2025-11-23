@@ -1,26 +1,51 @@
 @import "tailwindcss";
 
 :root {
+  /* Base Colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #292758; /* Deep Blue for text */
+
+  /* Brand Colors */
+  --primary: #f47231; /* Orange */
+  --secondary: #292758; /* Blue */
+  --accent: #2a9d8f; /* Persian Green */
+  --neutral: #e9c46a; /* Sandy Brown */
+
+  /* UI Colors */
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-neutral: var(--neutral);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a; /* Dark Slate */
+    --foreground: #f8fafc;
+
+    --primary: #f47231;
+    --secondary: #818cf8; /* Lighter Blue for dark mode visibility */
+    --accent: #2dd4bf; /* Brighter Green */
+    --neutral: #fbbf24; /* Brighter Yellow/Orange */
+
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
