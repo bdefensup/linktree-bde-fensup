@@ -26,6 +26,7 @@ export default function Home() {
       name: "Site Web",
       url: "https://BDE-FENSUP.short.gy/SiteWeb",
       icon: "🌐",
+      comingSoon: true,
     },
   ];
 
