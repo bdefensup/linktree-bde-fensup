@@ -76,26 +76,47 @@ export function AdminSidebar() {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage
-                      src={session?.user?.image || ""}
-                      alt={session?.user?.name || "Admin"}
-                    />
-                    <AvatarFallback className="rounded-lg">AD</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {session?.user?.name || "Admin"}
-                    </span>
-                    <span className="truncate text-xs">
-                      {session?.user?.email || "admin@bdefensup.fr"}
-                    </span>
-                  </div>
-                  <ChevronDown className="ml-auto size-4" />
+                  {session?.user ? (
+                    <>
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarImage
+                          src={session.user.image || ""}
+                          alt={session.user.name || "User"}
+                        />
+                        <AvatarFallback className="rounded-lg">
+                          {session.user.name?.slice(0, 2).toUpperCase() || "AD"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">
+                          {session.user.name}
+                        </span>
+                        <span className="truncate text-xs">
+                          {session.user.email}
+                        </span>
+                      </div>
+                      <ChevronDown className="ml-auto size-4" />
+                    </>
+                  ) : (
+                    <>
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarImage src="/logo.png" alt="BDE FEN'SUP" />
+                        <AvatarFallback className="rounded-lg">
+                          BDE
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">
+                          BDE FEN'SUP
+                        </span>
+                        <span className="truncate text-xs">Administration</span>
+                      </div>
+                    </>
+                  )}
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-64 rounded-lg"
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                 align="start"
                 side="bottom"
                 sideOffset={4}
