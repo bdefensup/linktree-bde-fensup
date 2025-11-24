@@ -52,6 +52,9 @@ export default function EventDetailPage() {
     e.preventDefault();
     setSubmitting(true);
 
+    // Open new tab immediately to avoid popup blockers
+    const paymentWindow = window.open("", "_blank");
+
     try {
       const response = await fetch("/api/bookings", {
         method: "POST",
@@ -67,15 +70,23 @@ export default function EventDetailPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Open Revolut payment in new tab
-        window.open(data.revolutLink, "_blank");
+        // Set URL of the already opened tab
+        if (paymentWindow) {
+          paymentWindow.location.href = data.revolutLink;
+        } else {
+          // Fallback if window failed to open
+          window.location.href = data.revolutLink;
+        }
+
         // Redirect current tab to confirmation page
         router.push(`/billetterie/confirmation/${data.bookingId}`);
       } else {
+        if (paymentWindow) paymentWindow.close();
         alert(data.error || "Une erreur est survenue");
         setSubmitting(false);
       }
     } catch (error) {
+      if (paymentWindow) paymentWindow.close();
       console.error("Error creating booking:", error);
       alert("Une erreur est survenue");
       setSubmitting(false);
@@ -316,7 +327,7 @@ export default function EventDetailPage() {
                     htmlFor="isMember"
                     className="text-sm font-medium cursor-pointer"
                   >
-                    Je suis membre cotisant FEN'SUP ({event.memberPrice}€ au
+                    Je suis membre cotisant FEN&#39;SUP ({event.memberPrice}€ au
                     lieu de {event.price}€)
                   </label>
                 </div>
