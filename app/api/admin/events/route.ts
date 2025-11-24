@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         price: parseFloat(price),
         memberPrice: memberPrice ? parseFloat(memberPrice) : null,
         image,
-        capacity: parseInt(capacity),
+        maxSeats: parseInt(capacity),
       },
     });
 

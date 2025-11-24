@@ -56,7 +56,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
+    <div suppressHydrationWarning>
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filtrer par titre..."

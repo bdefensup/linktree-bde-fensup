@@ -29,7 +29,7 @@ export async function PUT(
         price: parseFloat(price),
         memberPrice: memberPrice ? parseFloat(memberPrice) : null,
         image,
-        capacity: parseInt(capacity),
+        maxSeats: parseInt(capacity),
       },
     });
 

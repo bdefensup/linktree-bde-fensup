@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { EventForm } from "@/components/admin/event-form";
 import { notFound } from "next/navigation";
+import { format } from "date-fns";
 
 export default async function EditEventPage(props: {
   params: Promise<{ id: string }>;
@@ -23,6 +24,8 @@ export default async function EditEventPage(props: {
           date: event.date,
           memberPrice: event.memberPrice || undefined,
           image: event.image || undefined,
+          capacity: event.maxSeats,
+          time: format(event.date, "HH:mm"),
         }}
       />
     </div>

@@ -85,7 +85,7 @@ export function EventForm({ initialData }: EventFormProps) {
       };
 
   const form = useForm<EventFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues,
   });
 
@@ -243,7 +243,12 @@ export function EventForm({ initialData }: EventFormProps) {
               <FormItem>
                 <FormLabel>Prix Standard (€)</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -256,7 +261,12 @@ export function EventForm({ initialData }: EventFormProps) {
               <FormItem>
                 <FormLabel>Prix Adhérent (€) (Optionnel)</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -269,7 +279,7 @@ export function EventForm({ initialData }: EventFormProps) {
               <FormItem>
                 <FormLabel>Capacité</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} />
+                  <Input type="number" {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

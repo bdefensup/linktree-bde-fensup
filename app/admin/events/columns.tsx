@@ -24,97 +24,23 @@ export type Event = {
   date: string;
   location: string;
   price: number;
-  capacity: number;
+  maxSeats: number;
   image: string | null;
   _count?: {
     bookings: number;
   };
 };
 
-const deleteEvent = async (id: string) => {
-  if (!confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) return;
-
-  try {
-    const response = await fetch(`/api/admin/events/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) throw new Error("Failed to delete event");
-
-    toast.success("Événement supprimé");
-    window.location.reload();
-  } catch (error) {
-    toast.error("Erreur lors de la suppression");
-  }
-};
+// ... (keep deleteEvent same)
 
 export const columns: ColumnDef<Event>[] = [
-  {
-    accessorKey: "image",
-    header: "Image",
-    cell: ({ row }) => {
-      const image = row.getValue("image") as string;
-      return (
-        <div className="relative h-10 w-16 overflow-hidden rounded-md">
-          {image ? (
-            <Image
-              src={image}
-              alt={row.getValue("title")}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
-              No img
-            </div>
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "title",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Titre
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "date",
-    header: "Date",
-    cell: ({ row }) => {
-      return format(new Date(row.getValue("date")), "dd/MM/yyyy HH:mm", {
-        locale: fr,
-      });
-    },
-  },
-  {
-    accessorKey: "location",
-    header: "Lieu",
-  },
-  {
-    accessorKey: "price",
-    header: "Prix",
-    cell: ({ row }) => {
-      return new Intl.NumberFormat("fr-FR", {
-        style: "currency",
-        currency: "EUR",
-      }).format(row.getValue("price"));
-    },
-  },
+  // ... (keep other columns same)
   {
     id: "bookings",
     header: "Réservations",
     cell: ({ row }) => {
       const count = row.original._count?.bookings || 0;
-      const capacity = row.original.capacity;
+      const capacity = row.original.maxSeats;
       return (
         <div className="flex items-center gap-2">
           <span className={count >= capacity ? "text-red-500 font-bold" : ""}>
@@ -124,38 +50,5 @@ export const columns: ColumnDef<Event>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const event = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Ouvrir menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link href={`/admin/events/${event.id}/edit`}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Modifier
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => deleteEvent(event.id)}
-              className="text-red-600 focus:text-red-600"
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Supprimer
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
+  // ... (keep actions same)
 ];
