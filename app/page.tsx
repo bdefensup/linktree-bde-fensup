@@ -199,7 +199,7 @@ export default function Home() {
                     >
                       <div className="relative w-12 h-8 mb-1">
                         <Image
-                          src="/png-clipart-international-committee-of-the-red-cross-international-red-cross-and-red-crescent-movement-american-red-cross-organization-indian-red-cross-society-cruz-roja-text-trademark.png"
+                          src="/croix rouge francaise unite locale de suresnes-ee9b063c1a1a4c38b4828f3aa26440e6.png"
                           alt="Croix-Rouge"
                           fill
                           className="object-contain"
@@ -224,7 +224,7 @@ export default function Home() {
                     >
                       <div className="relative w-12 h-8 mb-1">
                         <Image
-                          src="/hu1963h69c-human-appeal-logo-human-appeal-logo-jli.webp"
+                          src="/hu1963h69c-human-appeal-logo-human-appeal-logo-jli-removebg-preview.png"
                           alt="Human Appeal"
                           fill
                           className="object-contain"
