@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@/lib/generated/prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
 import BookingConfirmationEmail from "@/components/emails/booking-confirmation";
-
-const connectionString = process.env.DIRECT_URL;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {

@@ -119,6 +119,17 @@ model Booking {
   @@map("booking")
 }
 
+model Donation {
+  id        String   @id @default(cuid())
+  amount    Float
+  message   String?  @db.Text
+  donorName String?
+  status    String   @default("PENDING") // PENDING, CONFIRMED
+  createdAt DateTime @default(now())
+
+  @@map("donation")
+}
+
 enum BookingStatus {
   PENDING
   CONFIRMED

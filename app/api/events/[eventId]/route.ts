@@ -1,12 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@/lib/generated/prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
-
-const connectionString = process.env.DIRECT_URL;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
