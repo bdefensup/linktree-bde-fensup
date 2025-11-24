@@ -33,6 +33,13 @@ export const BookingConfirmationEmail = ({
       <Container style={container}>
         {/* Header with Logo Placeholder and Brand Name */}
         <Section style={header}>
+          <Img
+            src={`${baseUrl}/logo.png`}
+            width="80"
+            height="80"
+            alt="BDE FEN'SUP"
+            style={logo}
+          />
           <Heading style={brandName}>BDE FEN'SUP</Heading>
         </Section>
 
@@ -72,11 +79,11 @@ export const BookingConfirmationEmail = ({
           <Text style={footer}>
             © {new Date().getFullYear()} BDE FEN'SUP - Bureau des Étudiants
             <br />
-            <Link href="https://instagram.com" style={link}>
+            <Link href="https://BDE-FENSUP.short.gy/Instagram" style={link}>
               Instagram
             </Link>{" "}
             •{" "}
-            <Link href="https://tiktok.com" style={link}>
+            <Link href="https://BDE-FENSUP.short.gy/TikTok" style={link}>
               TikTok
             </Link>
           </Text>
@@ -195,6 +202,15 @@ const footer = {
 const link = {
   color: "#f47231",
   textDecoration: "none",
+};
+
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+  ? process.env.NEXT_PUBLIC_APP_URL
+  : "";
+
+const logo = {
+  margin: "0 auto 20px",
+  display: "block",
 };
 
 export default BookingConfirmationEmail;
