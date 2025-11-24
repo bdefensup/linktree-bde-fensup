@@ -125,29 +125,28 @@ export default function Home() {
                 </p>
               </div>
 
-              <form
-                onSubmit={handleQuickDonate}
-                className="flex w-full max-w-xs items-center space-x-2"
-              >
-                <div className="relative flex-1">
-                  <Input
-                    type="number"
-                    placeholder="Montant"
-                    className="pr-8 text-center font-medium border-amber-500/30 focus-visible:ring-amber-500/50"
-                    value={donationAmount}
-                    onChange={(e) => setDonationAmount(e.target.value)}
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                    €
-                  </span>
-                </div>
+              <div className="flex w-full max-w-sm items-center justify-center gap-3">
                 <Button
-                  type="submit"
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20"
+                  asChild
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20"
                 >
-                  Donner
+                  <a
+                    href="https://BDE-FENSUP.short.gy/Dons"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Faire un don
+                  </a>
                 </Button>
-              </form>
+
+                <Button
+                  asChild
+                  variant="outline"
+                  className="flex-1 border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-600 text-foreground"
+                >
+                  <Link href="/don">Personnaliser</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
