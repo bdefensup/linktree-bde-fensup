@@ -74,3 +74,47 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  description String    @db.Text
+  date        DateTime
+  location    String
+  price       Float
+  maxSeats    Int
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+
+  @@map("event")
+}
+
+model Booking {
+  id        String        @id @default(cuid())
+  eventId   String
+  event     Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  
+  status    BookingStatus @default(PENDING)
+  
+  revolutLink String?
+  
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([eventId])
+  @@index([email])
+  @@map("booking")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
