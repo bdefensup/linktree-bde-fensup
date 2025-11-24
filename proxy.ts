@@ -5,7 +5,14 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Liste des chemins autorisés
-  const allowedPaths = ["/", "/_next", "/favicon.ico", "/logo.png", "/api"];
+  const allowedPaths = [
+    "/",
+    "/_next",
+    "/favicon.ico",
+    "/logo.png",
+    "/api",
+    "/billetterie",
+  ];
 
   // Vérifier si le chemin commence par un des chemins autorisés
   const isAllowed = allowedPaths.some((path) => pathname.startsWith(path));
