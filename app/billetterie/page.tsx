@@ -11,6 +11,7 @@ interface Event {
   date: string;
   location: string;
   price: number;
+  memberPrice?: number;
   maxSeats: number;
   image: string | null;
   _count?: {
@@ -150,9 +151,16 @@ export default function BilletteriePage() {
                     </div>
 
                     <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-                      <span className="text-2xl font-bold text-primary">
-                        {event.price}€
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-2xl font-bold text-primary">
+                          {event.price}€
+                        </span>
+                        {event.memberPrice && (
+                          <span className="text-xs text-accent font-medium">
+                            {event.memberPrice}€ (Membres)
+                          </span>
+                        )}
+                      </div>
                       <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">
                         Voir détails →
                       </span>
