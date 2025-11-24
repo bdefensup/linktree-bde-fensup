@@ -55,11 +55,16 @@ export default function BilletteriePage() {
       <div className="max-w-7xl mx-auto px-4 py-16 relative z-10">
         {/* Header */}
         <div className="text-center mb-16 space-y-4 relative">
-          <div className="absolute left-0 top-0">
-            <Button variant="ghost" asChild className="hover:bg-muted/50">
+          <div className="flex justify-start md:absolute md:left-0 md:top-0 mb-4 md:mb-0">
+            <Button
+              variant="ghost"
+              asChild
+              className="hover:bg-muted/50 -ml-4 md:ml-0"
+            >
               <Link href="/" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                Retour à l'accueil
+                <span className="hidden md:inline">Retour à l'accueil</span>
+                <span className="md:hidden">Retour</span>
               </Link>
             </Button>
           </div>
