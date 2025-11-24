@@ -30,6 +30,13 @@ export default function Home() {
       highlight: true,
     },
     {
+      name: "Faire un don",
+      url: "/don",
+      icon: "❤️",
+      description: "Soutenez les projets du BDE",
+      highlight: false,
+    },
+    {
       name: "Discord",
       url: "#",
       icon: "💬",
