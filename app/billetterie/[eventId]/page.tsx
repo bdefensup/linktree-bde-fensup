@@ -67,8 +67,10 @@ export default function EventDetailPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Redirect to Revolut payment
-        window.location.href = data.revolutLink;
+        // Open Revolut payment in new tab
+        window.open(data.revolutLink, "_blank");
+        // Redirect current tab to confirmation page
+        router.push(`/billetterie/confirmation/${data.bookingId}`);
       } else {
         alert(data.error || "Une erreur est survenue");
         setSubmitting(false);
