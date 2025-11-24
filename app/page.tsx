@@ -107,16 +107,12 @@ export default function Home() {
         <div className="w-full mb-10 relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
           <Card className="relative border-amber-500/30 bg-card/80 backdrop-blur-sm overflow-hidden">
-            <div className="absolute top-0 right-0 p-3 opacity-10">
-              <Heart className="w-24 h-24 text-amber-500 fill-amber-500" />
-            </div>
-
             <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-              <div className="relative">
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce duration-[2000ms]">
-                  <Heart className="w-6 h-6 text-red-500 fill-red-500 drop-shadow-lg" />
+              <div className="relative mt-4 mb-2">
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 animate-bounce duration-[1500ms]">
+                  <span className="text-4xl drop-shadow-lg filter">❤️</span>
                 </div>
-                <HandHeart className="w-12 h-12 text-amber-500" />
+                <span className="text-6xl">🫴🏻</span>
               </div>
 
               <div className="space-y-1">
@@ -124,7 +120,7 @@ export default function Home() {
                   Soutenir le BDE
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  Votre aide est précieuse ❤️
+                  Votre aide est précieuse
                 </p>
               </div>
 
