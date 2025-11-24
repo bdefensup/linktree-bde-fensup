@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Resend } from "resend";
+import PaymentReceivedEmail from "@/components/emails/payment-received";
+import BookingCancelledEmail from "@/components/emails/booking-cancelled";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function PATCH(
   request: Request,
@@ -13,10 +18,47 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
+    // Update booking and fetch related data for email
     const booking = await prisma.booking.update({
       where: { id },
       data: { status },
+      include: {
+        event: {
+          select: {
+            title: true,
+          },
+        },
+      },
     });
+
+    // Send email based on status
+    if (process.env.RESEND_API_KEY) {
+      if (status === "CONFIRMED") {
+        await resend.emails.send({
+          from: "BDE FEN'SUP <no-reply@bdefensup.fr>",
+          to: booking.email,
+          subject: `Paiement validé - ${booking.event.title}`,
+          react: PaymentReceivedEmail({
+            firstName: booking.firstName,
+            eventName: booking.event.title,
+            bookingId: booking.id,
+          }),
+        });
+      } else if (status === "CANCELLED") {
+        await resend.emails.send({
+          from: "BDE FEN'SUP <no-reply@bdefensup.fr>",
+          to: booking.email,
+          subject: `Mise à jour réservation - ${booking.event.title}`,
+          react: BookingCancelledEmail({
+            firstName: booking.firstName,
+            eventName: booking.event.title,
+            bookingId: booking.id,
+          }),
+        });
+      }
+    } else {
+      console.warn("RESEND_API_KEY is missing, skipping email sending.");
+    }
 
     return NextResponse.json(booking);
   } catch (error) {
