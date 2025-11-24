@@ -108,11 +108,11 @@ export default function Home() {
           <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
           <Card className="relative border-amber-500/30 bg-card/80 backdrop-blur-sm overflow-hidden">
             <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-              <div className="relative mt-4 mb-2">
+              <div className="relative mt-2 mb-2">
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 animate-bounce duration-[1500ms]">
-                  <span className="text-4xl drop-shadow-lg filter">❤️</span>
+                  <Heart className="w-8 h-8 text-red-500 fill-red-500 drop-shadow-lg" />
                 </div>
-                <span className="text-6xl">🫴🏻</span>
+                <HandHeart className="w-16 h-16 text-amber-500 stroke-[1.5]" />
               </div>
 
               <div className="space-y-1">
