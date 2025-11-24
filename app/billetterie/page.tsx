@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, MapPin, Ticket, ArrowRight } from "lucide-react";
+import { Calendar, MapPin, Ticket, ArrowRight, ArrowLeft } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -54,7 +54,15 @@ export default function BilletteriePage() {
 
       <div className="max-w-7xl mx-auto px-4 py-16 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16 space-y-4">
+        <div className="text-center mb-16 space-y-4 relative">
+          <div className="absolute left-0 top-0">
+            <Button variant="ghost" asChild className="hover:bg-muted/50">
+              <Link href="/" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Retour à l'accueil
+              </Link>
+            </Button>
+          </div>
           <Link
             href="/"
             className="inline-block mb-4 hover:opacity-80 transition-opacity"
