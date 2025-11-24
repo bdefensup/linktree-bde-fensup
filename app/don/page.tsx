@@ -113,23 +113,22 @@ function DonationForm() {
           </Button>
         </div>
 
-        <div className="text-center mb-10 space-y-4">
-          <div className="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 mb-4 animate-pulse">
-            <Heart className="w-8 h-8 text-primary fill-primary" />
+        <div className="text-center mb-6 space-y-2">
+          <div className="inline-flex items-center justify-center p-2 rounded-full bg-primary/10 mb-2 animate-pulse">
+            <Heart className="w-6 h-6 text-primary fill-primary" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
-            Soutenir le BDE FEN'SUP
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
+            Soutenir le BDE
           </h1>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Votre soutien nous aide à organiser des événements inoubliables et à
-            améliorer la vie étudiante. Merci pour votre générosité ! ❤️
+          <p className="text-sm text-muted-foreground max-w-lg mx-auto">
+            Votre soutien nous aide à améliorer la vie étudiante. Merci ! ❤️
           </p>
         </div>
 
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-yellow-500" />
+        <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl max-w-2xl mx-auto">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Sparkles className="w-4 h-4 text-yellow-500" />
               Faire un don
             </CardTitle>
             <CardDescription>
@@ -137,20 +136,22 @@ function DonationForm() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <CardContent className="pt-2">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Preset Amounts */}
-              <div className="space-y-3">
-                <Label>Montant du don</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Montant
+                </Label>
+                <div className="grid grid-cols-4 gap-2">
                   {PRESET_AMOUNTS.map((val) => (
                     <Button
                       key={val}
                       type="button"
                       variant={amount === val ? "default" : "outline"}
-                      className={`h-12 text-lg font-medium transition-all ${
+                      className={`h-9 text-sm font-medium transition-all ${
                         amount === val
-                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105"
                           : "hover:border-primary/50 hover:text-primary"
                       }`}
                       onClick={() => handlePresetClick(val)}
@@ -162,55 +163,63 @@ function DonationForm() {
               </div>
 
               {/* Donor Info */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="donorName">Votre nom (optionnel)</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="donorName"
+                    className="text-xs uppercase tracking-wider text-muted-foreground"
+                  >
+                    Nom (Optionnel)
+                  </Label>
                   <Input
                     id="donorName"
-                    placeholder="Anonyme ou votre nom"
+                    placeholder="Anonyme"
                     value={donorName}
                     onChange={(e) => setDonorName(e.target.value)}
-                    className="bg-background/50"
+                    className="bg-background/50 h-9"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="message">
-                    Un petit message ? (optionnel)
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label
+                    htmlFor="message"
+                    className="text-xs uppercase tracking-wider text-muted-foreground"
+                  >
+                    Message (Optionnel)
                   </Label>
                   <Textarea
                     id="message"
-                    placeholder="Force à vous pour l'orga ! 💪"
+                    placeholder="Un petit mot ?"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="bg-background/50 min-h-[100px]"
+                    className="bg-background/50 min-h-[60px] h-16 resize-none"
                   />
                 </div>
               </div>
 
               <Button
                 type="submit"
-                size="lg"
-                className="w-full text-lg font-bold shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all"
+                size="default"
+                className="w-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all"
                 disabled={!amount || loading}
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Redirection...
                   </>
                 ) : (
                   <>
                     Faire un don de {amount ? amount : "..."}€
-                    <Heart className="ml-2 h-5 w-5 fill-current" />
+                    <Heart className="ml-2 h-4 w-4 fill-current" />
                   </>
                 )}
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="justify-center border-t border-border/50 pt-6">
-            <p className="text-xs text-muted-foreground text-center">
-              Paiement sécurisé via Revolut.me. Aucun frais caché.
+          <CardFooter className="justify-center border-t border-border/50 pt-4 pb-4">
+            <p className="text-[10px] text-muted-foreground text-center">
+              Paiement sécurisé via Revolut.me.
             </p>
           </CardFooter>
         </Card>
