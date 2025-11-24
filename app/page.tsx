@@ -170,9 +170,16 @@ export default function Home() {
                       href="https://donner.actioncontrelafaim.org/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-center"
+                      className="text-center flex flex-col items-center"
                     >
-                      <span className="text-lg">🥣</span>
+                      <div className="relative w-8 h-8 mb-1">
+                        <Image
+                          src="/Logo_Action_contre_la_faim.svg.png"
+                          alt="Action contre la Faim"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                       <span className="text-[9px] leading-tight text-muted-foreground">
                         Action contre la Faim
                       </span>
@@ -188,9 +195,16 @@ export default function Home() {
                       href="https://donner.croix-rouge.fr/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-center"
+                      className="text-center flex flex-col items-center"
                     >
-                      <span className="text-lg">⛑️</span>
+                      <div className="relative w-8 h-8 mb-1">
+                        <Image
+                          src="/png-clipart-international-committee-of-the-red-cross-international-red-cross-and-red-crescent-movement-american-red-cross-organization-indian-red-cross-society-cruz-roja-text-trademark.png"
+                          alt="Croix-Rouge"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                       <span className="text-[9px] leading-tight text-muted-foreground">
                         Croix-Rouge
                       </span>
@@ -206,9 +220,16 @@ export default function Home() {
                       href="https://humanappeal.fr/faire-un-don"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-center"
+                      className="text-center flex flex-col items-center"
                     >
-                      <span className="text-lg">🌍</span>
+                      <div className="relative w-8 h-8 mb-1">
+                        <Image
+                          src="/hu1963h69c-human-appeal-logo-human-appeal-logo-jli.webp"
+                          alt="Human Appeal"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                       <span className="text-[9px] leading-tight text-muted-foreground">
                         Human Appeal
                       </span>
