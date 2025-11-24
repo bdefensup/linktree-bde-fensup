@@ -66,7 +66,7 @@ export default function Home() {
               alt="Logo BDE FEN'SUP"
               width={200}
               height={200}
-              className="object-contain drop-shadow-md translate-y-2"
+              className="object-contain drop-shadow-md translate-y-4"
               priority
             />
           </div>
