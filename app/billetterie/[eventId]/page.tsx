@@ -4,6 +4,37 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Calendar,
+  MapPin,
+  Ticket,
+  ArrowLeft,
+  Loader2,
+  Check,
+  AlertCircle,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface Event {
   id: string;
@@ -95,10 +126,12 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Chargement...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="space-y-4 text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground animate-pulse">
+            Chargement de l'événement...
+          </p>
         </div>
       </div>
     );
@@ -106,13 +139,15 @@ export default function EventDetailPage() {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Événement introuvable</h1>
-          <Link href="/billetterie" className="text-primary hover:underline">
-            Retour à la billetterie
-          </Link>
-        </div>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <AlertCircle className="h-16 w-16 text-destructive mb-4" />
+        <h1 className="text-2xl font-bold mb-2">Événement introuvable</h1>
+        <p className="text-muted-foreground mb-6">
+          L'événement que vous cherchez n'existe pas ou a été supprimé.
+        </p>
+        <Button asChild>
+          <Link href="/billetterie">Retour à la billetterie</Link>
+        </Button>
       </div>
     );
   }
@@ -123,229 +158,296 @@ export default function EventDetailPage() {
     formData.isMember && event.memberPrice ? event.memberPrice : event.price;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto px-4 py-12 relative z-10">
         {/* Back Button */}
-        <Link
-          href="/billetterie"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors"
+        <Button
+          variant="ghost"
+          asChild
+          className="mb-8 hover:bg-muted/50 -ml-4"
         >
-          ← Retour à la billetterie
-        </Link>
+          <Link href="/billetterie" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Retour aux événements
+          </Link>
+        </Button>
 
-        {/* Event Details */}
-        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-lg">
-          {/* Event Image */}
-          {event.image ? (
-            <div className="relative h-64 md:h-96 w-full">
-              <Image
-                src={event.image}
-                alt={event.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-          ) : (
-            <div className="h-64 md:h-96 w-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-              <span className="text-9xl">🎉</span>
-            </div>
-          )}
-
-          <div className="p-8">
-            <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-              {event.title}
-            </h1>
-
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">📅</span>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Date</p>
-                    <p className="font-semibold">
-                      {new Date(event.date).toLocaleDateString("fr-FR", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="relative h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl border border-border/50">
+              {event.image ? (
+                <Image
+                  src={event.image}
+                  alt={event.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="h-full w-full bg-gradient-to-br from-primary/20 via-background to-secondary/20 flex items-center justify-center">
+                  <Ticket className="w-32 h-32 text-primary/20" />
                 </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
 
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">📍</span>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Lieu</p>
-                    <p className="font-semibold">{event.location}</p>
-                  </div>
+              <div className="absolute bottom-0 left-0 p-8 w-full">
+                <Badge className="mb-4 bg-primary/90 hover:bg-primary text-primary-foreground border-none">
+                  {new Date(event.date).getFullYear()}
+                </Badge>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-2 drop-shadow-sm">
+                  {event.title}
+                </h1>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="h-5 w-5 text-primary" />
+                  <span className="font-medium">{event.location}</span>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">💰</span>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Prix</p>
-                    <div className="flex flex-col">
-                      <span className="text-3xl font-bold text-primary">
-                        {event.price}€
-                      </span>
-                      {event.memberPrice && (
-                        <span className="text-sm text-accent font-medium">
-                          {event.memberPrice}€ pour les membres
+            <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-sm">
+              <CardHeader>
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                  À propos de l'événement
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed text-lg">
+                  {event.description}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar / Booking Card */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <Card className="border-border/50 bg-card/80 backdrop-blur-md shadow-xl overflow-hidden">
+                <CardHeader className="bg-muted/30 pb-6 border-b border-border/50">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">
+                        Prix du billet
+                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-bold text-primary">
+                          {event.price}€
                         </span>
-                      )}
+                        {event.memberPrice && (
+                          <Badge
+                            variant="outline"
+                            className="border-accent text-accent"
+                          >
+                            {event.memberPrice}€ Membres
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </CardHeader>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">🎫</span>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Places disponibles
-                    </p>
-                    <p
-                      className={`font-semibold ${
-                        isSoldOut ? "text-red-500" : "text-accent"
-                      }`}
-                    >
-                      {availableSeats} / {event.maxSeats}
-                    </p>
+                <CardContent className="pt-6 space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="p-2 rounded-full bg-primary/10 text-primary">
+                        <Calendar className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">
+                          Date et heure
+                        </p>
+                        <p className="text-muted-foreground">
+                          {new Date(event.date).toLocaleDateString("fr-FR", {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                          {" à "}
+                          {new Date(event.date).toLocaleTimeString("fr-FR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="p-2 rounded-full bg-secondary/10 text-secondary">
+                        <MapPin className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">Lieu</p>
+                        <p className="text-muted-foreground">
+                          {event.location}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Places restantes
+                      </span>
+                      <span
+                        className={`font-bold ${isSoldOut ? "text-destructive" : "text-green-500"}`}
+                      >
+                        {availableSeats} / {event.maxSeats}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
 
-            <div className="mb-8">
-              <h2 className="text-xl font-bold mb-3">Description</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {event.description}
-              </p>
-            </div>
+                  <Dialog open={showModal} onOpenChange={setShowModal}>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="lg"
+                        className="w-full text-lg font-semibold shadow-lg shadow-primary/20"
+                        disabled={isSoldOut}
+                      >
+                        {isSoldOut ? "Complet" : "Réserver ma place"}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Réserver pour {event.title}</DialogTitle>
+                        <DialogDescription>
+                          Remplissez le formulaire ci-dessous pour procéder au
+                          paiement.
+                        </DialogDescription>
+                      </DialogHeader>
 
-            <button
-              onClick={() => setShowModal(true)}
-              disabled={isSoldOut}
-              className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
-                isSoldOut
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-primary text-white hover:bg-accent hover:scale-[1.02]"
-              }`}
-            >
-              {isSoldOut ? "Complet" : "Réserver ma place"}
-            </button>
+                      <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="firstName">Prénom</Label>
+                            <Input
+                              id="firstName"
+                              required
+                              value={formData.firstName}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  firstName: e.target.value,
+                                })
+                              }
+                              placeholder="Jean"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="lastName">Nom</Label>
+                            <Input
+                              id="lastName"
+                              required
+                              value={formData.lastName}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  lastName: e.target.value,
+                                })
+                              }
+                              placeholder="Dupont"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                email: e.target.value,
+                              })
+                            }
+                            placeholder="jean.dupont@example.com"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Téléphone</Label>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            required
+                            value={formData.phone}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                phone: e.target.value,
+                              })
+                            }
+                            placeholder="06 12 34 56 78"
+                          />
+                        </div>
+
+                        {event.memberPrice && (
+                          <div className="flex items-start space-x-3 p-4 border rounded-lg bg-muted/50">
+                            <Checkbox
+                              id="isMember"
+                              checked={formData.isMember}
+                              onCheckedChange={(checked) =>
+                                setFormData({
+                                  ...formData,
+                                  isMember: checked as boolean,
+                                })
+                              }
+                            />
+                            <div className="grid gap-1.5 leading-none">
+                              <Label
+                                htmlFor="isMember"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                Je suis membre cotisant FEN'SUP
+                              </Label>
+                              <p className="text-sm text-muted-foreground">
+                                Bénéficiez du tarif réduit à{" "}
+                                <span className="font-bold text-primary">
+                                  {event.memberPrice}€
+                                </span>{" "}
+                                au lieu de {event.price}€.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="pt-4">
+                          <Button
+                            type="submit"
+                            className="w-full"
+                            size="lg"
+                            disabled={submitting}
+                          >
+                            {submitting ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Redirection...
+                              </>
+                            ) : (
+                              `Payer ${currentPrice}€`
+                            )}
+                          </Button>
+                          <p className="text-xs text-center text-muted-foreground mt-3">
+                            Paiement sécurisé via Revolut.me
+                          </p>
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Booking Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-card border border-border rounded-xl max-w-md w-full p-6 relative">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
-            >
-              ✕
-            </button>
-
-            <h2 className="text-2xl font-bold mb-6">
-              Réserver pour {event.title}
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Prénom</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Nom</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Téléphone
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              {event.memberPrice && (
-                <div className="flex items-center gap-3 p-3 bg-secondary/10 rounded-lg border border-secondary/20">
-                  <input
-                    type="checkbox"
-                    id="isMember"
-                    checked={formData.isMember}
-                    onChange={(e) =>
-                      setFormData({ ...formData, isMember: e.target.checked })
-                    }
-                    className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <label
-                    htmlFor="isMember"
-                    className="text-sm font-medium cursor-pointer"
-                  >
-                    Je suis membre cotisant FEN&#39;SUP ({event.memberPrice}€ au
-                    lieu de {event.price}€)
-                  </label>
-                </div>
-              )}
-
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submitting ? "Redirection..." : `Payer ${currentPrice}€`}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
