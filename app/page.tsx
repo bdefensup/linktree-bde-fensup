@@ -197,7 +197,7 @@ export default function Home() {
                       rel="noopener noreferrer"
                       className="text-center flex flex-col items-center"
                     >
-                      <div className="relative w-12 h-8 mb-1">
+                      <div className="relative w-24 h-16 mb-1">
                         <Image
                           src="/croix rouge francaise unite locale de suresnes-ee9b063c1a1a4c38b4828f3aa26440e6.png"
                           alt="Croix-Rouge"
