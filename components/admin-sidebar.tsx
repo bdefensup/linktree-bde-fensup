@@ -100,10 +100,6 @@ export function AdminSidebar() {
                 side="bottom"
                 sideOffset={4}
               >
-                <DropdownMenuItem onClick={handleLogout}>
-                  <Users className="mr-2 h-4 w-4" />
-                  Changer de compte
-                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleLogout}
                   className="text-red-500 focus:text-red-500"
