@@ -135,7 +135,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Faire un don
+                    Faire un don personnalisé
                   </a>
                 </Button>
 
@@ -144,7 +144,7 @@ export default function Home() {
                   variant="outline"
                   className="flex-1 border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-600 text-foreground"
                 >
-                  <Link href="/don">Personnaliser</Link>
+                  <Link href="/don">Dons</Link>
                 </Button>
               </div>
             </CardContent>
