@@ -88,7 +88,28 @@ export async function POST(request: Request) {
       data: { revolutLink },
     });
 
-    // TODO: Send confirmation email to user
+    // Send confirmation email
+    if (process.env.RESEND_API_KEY) {
+      console.log("Attempting to send email to:", email);
+      try {
+        const emailResult = await resend.emails.send({
+          from: "BDE FEN'SUP <onboarding@resend.dev>", // Default Resend testing domain
+          to: email,
+          subject: `Confirmation de réservation - ${event.title}`,
+          react: BookingConfirmationEmail({
+            firstName,
+            eventName: event.title,
+            bookingId: booking.id,
+          }),
+        });
+        console.log("Email sent successfully:", emailResult);
+      } catch (emailError) {
+        console.error("Error sending email:", emailError);
+        // Don't fail the request if email fails
+      }
+    } else {
+      console.warn("RESEND_API_KEY is missing, skipping email.");
+    }
 
     return NextResponse.json({
       bookingId: booking.id,
