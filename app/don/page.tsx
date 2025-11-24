@@ -18,14 +18,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-const PRESET_AMOUNTS = [5, 10, 15, 20, 50, 80, 100];
+const PRESET_AMOUNTS = [5, 10, 15, 20, 50, 80, 100, 150];
 
 function DonationForm() {
   const searchParams = useSearchParams();
   const initialAmount = searchParams.get("amount");
 
   const [amount, setAmount] = useState<number | "">("");
-  const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
   const [donorName, setDonorName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,28 +32,14 @@ function DonationForm() {
   useEffect(() => {
     if (initialAmount) {
       const parsed = parseFloat(initialAmount);
-      if (!isNaN(parsed)) {
+      if (!isNaN(parsed) && PRESET_AMOUNTS.includes(parsed)) {
         setAmount(parsed);
-        if (!PRESET_AMOUNTS.includes(parsed)) {
-          setCustomAmount(parsed.toString());
-        }
       }
     }
   }, [initialAmount]);
 
   const handlePresetClick = (value: number) => {
     setAmount(value);
-    setCustomAmount("");
-  };
-
-  const handleCustomAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setCustomAmount(value);
-    if (value && !isNaN(parseFloat(value))) {
-      setAmount(parseFloat(value));
-    } else {
-      setAmount("");
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,7 +133,7 @@ function DonationForm() {
               Faire un don
             </CardTitle>
             <CardDescription>
-              Choisissez un montant ou saisissez une somme libre.
+              Choisissez un montant pour soutenir le BDE.
             </CardDescription>
           </CardHeader>
 
@@ -157,16 +142,14 @@ function DonationForm() {
               {/* Preset Amounts */}
               <div className="space-y-3">
                 <Label>Montant du don</Label>
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {PRESET_AMOUNTS.map((val) => (
                     <Button
                       key={val}
                       type="button"
-                      variant={
-                        amount === val && !customAmount ? "default" : "outline"
-                      }
+                      variant={amount === val ? "default" : "outline"}
                       className={`h-12 text-lg font-medium transition-all ${
-                        amount === val && !customAmount
+                        amount === val
                           ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
                           : "hover:border-primary/50 hover:text-primary"
                       }`}
@@ -175,22 +158,6 @@ function DonationForm() {
                       {val}€
                     </Button>
                   ))}
-                  <div className="relative col-span-2 md:col-span-1">
-                    <Input
-                      type="number"
-                      placeholder="Autre"
-                      value={customAmount}
-                      onChange={handleCustomAmountChange}
-                      className={`h-12 text-center text-lg transition-all ${
-                        customAmount
-                          ? "border-primary ring-2 ring-primary/20"
-                          : ""
-                      }`}
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
-                      €
-                    </span>
-                  </div>
                 </div>
               </div>
 
