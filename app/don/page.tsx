@@ -18,13 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-const PRESET_AMOUNTS = [5, 10, 15, 20, 50, 80, 100, 150];
+const PRESET_AMOUNTS = [5, 10, 15, 20, 50, 80, 100];
 
 function DonationForm() {
   const searchParams = useSearchParams();
   const initialAmount = searchParams.get("amount");
 
   const [amount, setAmount] = useState<number | "">("");
+  const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
   const [donorName, setDonorName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,14 +33,28 @@ function DonationForm() {
   useEffect(() => {
     if (initialAmount) {
       const parsed = parseFloat(initialAmount);
-      if (!isNaN(parsed) && PRESET_AMOUNTS.includes(parsed)) {
+      if (!isNaN(parsed)) {
         setAmount(parsed);
+        if (!PRESET_AMOUNTS.includes(parsed)) {
+          setCustomAmount(parsed.toString());
+        }
       }
     }
   }, [initialAmount]);
 
   const handlePresetClick = (value: number) => {
     setAmount(value);
+    setCustomAmount("");
+  };
+
+  const handleCustomAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCustomAmount(value);
+    if (value && !isNaN(parseFloat(value))) {
+      setAmount(parseFloat(value));
+    } else {
+      setAmount("");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -113,45 +128,46 @@ function DonationForm() {
           </Button>
         </div>
 
-        <div className="text-center mb-6 space-y-2">
-          <div className="inline-flex items-center justify-center p-2 rounded-full bg-primary/10 mb-2 animate-pulse">
-            <Heart className="w-6 h-6 text-primary fill-primary" />
+        <div className="text-center mb-10 space-y-4">
+          <div className="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 mb-4 animate-pulse">
+            <Heart className="w-8 h-8 text-primary fill-primary" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
-            Soutenir le BDE
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
+            Soutenir le BDE FEN'SUP
           </h1>
-          <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-            Votre soutien nous aide à améliorer la vie étudiante. Merci ! ❤️
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Votre soutien nous aide à organiser des événements inoubliables et à
+            améliorer la vie étudiante. Merci pour votre générosité ! ❤️
           </p>
         </div>
 
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl max-w-2xl mx-auto">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Sparkles className="w-4 h-4 text-yellow-500" />
+        <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-yellow-500" />
               Faire un don
             </CardTitle>
             <CardDescription>
-              Choisissez un montant pour soutenir le BDE.
+              Choisissez un montant ou saisissez une somme libre.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="pt-2">
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Preset Amounts */}
-              <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                  Montant
-                </Label>
-                <div className="grid grid-cols-4 gap-2">
+              <div className="space-y-3">
+                <Label>Montant du don</Label>
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                   {PRESET_AMOUNTS.map((val) => (
                     <Button
                       key={val}
                       type="button"
-                      variant={amount === val ? "default" : "outline"}
-                      className={`h-9 text-sm font-medium transition-all ${
-                        amount === val
-                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105"
+                      variant={
+                        amount === val && !customAmount ? "default" : "outline"
+                      }
+                      className={`h-12 text-lg font-medium transition-all ${
+                        amount === val && !customAmount
+                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
                           : "hover:border-primary/50 hover:text-primary"
                       }`}
                       onClick={() => handlePresetClick(val)}
@@ -159,67 +175,75 @@ function DonationForm() {
                       {val}€
                     </Button>
                   ))}
+                  <div className="relative col-span-2 md:col-span-1">
+                    <Input
+                      type="number"
+                      placeholder="Autre"
+                      value={customAmount}
+                      onChange={handleCustomAmountChange}
+                      className={`h-12 text-center text-lg transition-all ${
+                        customAmount
+                          ? "border-primary ring-2 ring-primary/20"
+                          : ""
+                      }`}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+                      €
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Donor Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="donorName"
-                    className="text-xs uppercase tracking-wider text-muted-foreground"
-                  >
-                    Nom (Optionnel)
-                  </Label>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="donorName">Votre nom (optionnel)</Label>
                   <Input
                     id="donorName"
-                    placeholder="Anonyme"
+                    placeholder="Anonyme ou votre nom"
                     value={donorName}
                     onChange={(e) => setDonorName(e.target.value)}
-                    className="bg-background/50 h-9"
+                    className="bg-background/50"
                   />
                 </div>
 
-                <div className="space-y-1.5 md:col-span-2">
-                  <Label
-                    htmlFor="message"
-                    className="text-xs uppercase tracking-wider text-muted-foreground"
-                  >
-                    Message (Optionnel)
+                <div className="space-y-2">
+                  <Label htmlFor="message">
+                    Un petit message ? (optionnel)
                   </Label>
                   <Textarea
                     id="message"
-                    placeholder="Un petit mot ?"
+                    placeholder="Force à vous pour l'orga ! 💪"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="bg-background/50 min-h-[60px] h-16 resize-none"
+                    className="bg-background/50 min-h-[100px]"
                   />
                 </div>
               </div>
 
               <Button
                 type="submit"
-                size="default"
-                className="w-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all"
+                size="lg"
+                className="w-full text-lg font-bold shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all"
                 disabled={!amount || loading}
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Redirection...
                   </>
                 ) : (
                   <>
                     Faire un don de {amount ? amount : "..."}€
-                    <Heart className="ml-2 h-4 w-4 fill-current" />
+                    <Heart className="ml-2 h-5 w-5 fill-current" />
                   </>
                 )}
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="justify-center border-t border-border/50 pt-4 pb-4">
-            <p className="text-[10px] text-muted-foreground text-center">
-              Paiement sécurisé via Revolut.me.
+          <CardFooter className="justify-center border-t border-border/50 pt-6">
+            <p className="text-xs text-muted-foreground text-center">
+              Paiement sécurisé via Revolut.me. Aucun frais caché.
             </p>
           </CardFooter>
         </Card>
