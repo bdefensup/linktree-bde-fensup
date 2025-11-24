@@ -1,6 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
 
 export default function Home() {
   const links = [
@@ -8,93 +14,166 @@ export default function Home() {
       name: "Instagram",
       url: "https://BDE-FENSUP.short.gy/Instagram",
       icon: "📸",
+      description: "Suivez notre actualité en direct",
     },
-    { name: "TikTok", url: "https://BDE-FENSUP.short.gy/TikTok", icon: "🎵" },
+    {
+      name: "TikTok",
+      url: "https://BDE-FENSUP.short.gy/TikTok",
+      icon: "🎵",
+      description: "Découvrez nos vidéos exclusives",
+    },
     {
       name: "Billetterie",
-      url: "#",
+      url: "/billetterie",
       icon: "🎟️",
-      comingSoon: true,
+      description: "Réservez vos places pour nos événements",
+      highlight: true,
     },
     {
       name: "Discord",
       url: "#",
       icon: "💬",
+      description: "Rejoignez la communauté",
       comingSoon: true,
     },
     {
       name: "Site Web",
       url: "https://BDE-FENSUP.short.gy/SiteWeb",
       icon: "🌐",
+      description: "Toutes les infos sur le BDE",
       comingSoon: true,
     },
   ];
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground flex flex-col items-center relative overflow-hidden">
-      {/* Background Gradient Blob */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] pointer-events-none " />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px] pointer-events-none " />
+    <div className="min-h-screen w-full bg-background text-foreground flex flex-col items-center relative overflow-hidden transition-colors duration-300">
+      {/* Background Effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none animate-pulse" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none animate-pulse delay-1000" />
 
-      <main className="flex-1 flex flex-col items-center w-full max-w-md px-6 py-12 z-10 ">
+      {/* Top Bar */}
+      <div className="absolute top-4 right-4 z-50">
+        <ModeToggle />
+      </div>
+
+      <main className="flex-1 flex flex-col items-center w-full max-w-lg px-6 py-16 z-10">
         {/* Logo Section */}
-        <div className="relative mb-7 group mt-4">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-full blur opacity-25 "></div>
-          <div className="relative bg-transparent p-2 m-4">
+        <div className="relative mb-8 group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+          <div className="relative bg-card/50 backdrop-blur-xl p-4 rounded-full border border-border/50 shadow-xl">
             <Image
               src="/logo.png"
               alt="Logo BDE FEN'SUP"
-              width={200}
-              height={200}
-              className="object-contain drop-shadow-xl "
+              width={120}
+              height={120}
+              className="object-contain drop-shadow-md"
+              priority
             />
           </div>
         </div>
 
         {/* Header Text */}
-        <div className="text-center mb-10 space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+        <div className="text-center mb-12 space-y-3">
+          <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary pb-2">
             FEN'SUP
           </h1>
-          <p className="text-lg text-muted-foreground font-medium">
+          <p className="text-xl text-muted-foreground font-medium">
             Bureau des Étudiants
           </p>
           <div className="pt-2">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20 animate-pulse">
-              🚧 Site en construction
-            </span>
+            <Badge
+              variant="outline"
+              className="bg-primary/5 text-primary border-primary/20 px-4 py-1 text-sm font-medium rounded-full"
+            >
+              🎓 Année 2025-2026
+            </Badge>
           </div>
         </div>
 
         {/* Links Section */}
         <div className="w-full space-y-4">
           {links.map((link) => (
-            <a
+            <Link
               key={link.name}
               href={link.url}
-              className={`group relative flex items-center justify-center w-full p-4 bg-card text-foreground border border-border/50 rounded-xl shadow-sm transition-all duration-300 overflow-hidden ${
-                link.comingSoon
-                  ? "opacity-60 cursor-not-allowed"
-                  : "hover:bg-secondary hover:text-white hover:scale-[1.02] hover:shadow-md"
-              }`}
               onClick={(e) => link.comingSoon && e.preventDefault()}
+              className={`block group ${
+                link.comingSoon ? "cursor-not-allowed opacity-70" : ""
+              }`}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-              <span className="absolute left-6 text-2xl">{link.icon}</span>
-              <span className="font-semibold text-lg">{link.name}</span>
-              {link.comingSoon && (
-                <span className="absolute right-4 text-xs px-2 py-1 rounded-full bg-accent/20 text-accent border border-accent/30">
-                  Bientôt
-                </span>
-              )}
-            </a>
+              <Card
+                className={`relative overflow-hidden border-border/50 transition-all duration-300 ${
+                  link.comingSoon
+                    ? "bg-muted/50"
+                    : "hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 bg-card/80 backdrop-blur-sm"
+                } ${
+                  link.highlight
+                    ? "border-primary/50 shadow-md shadow-primary/10"
+                    : ""
+                }`}
+              >
+                {/* Hover Gradient Effect */}
+                {!link.comingSoon && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                )}
+
+                <CardContent className="flex items-center p-4">
+                  <div
+                    className={`flex items-center justify-center w-12 h-12 rounded-xl text-2xl mr-4 transition-colors ${
+                      link.highlight
+                        ? "bg-primary/10 text-primary"
+                        : "bg-secondary/5 text-secondary group-hover:bg-primary/10 group-hover:text-primary"
+                    }`}
+                  >
+                    {link.icon}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-lg truncate group-hover:text-primary transition-colors">
+                        {link.name}
+                      </h3>
+                      {link.comingSoon && (
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] h-5 px-1.5"
+                        >
+                          Bientôt
+                        </Badge>
+                      )}
+                      {link.highlight && (
+                        <Badge className="bg-primary text-primary-foreground text-[10px] h-5 px-1.5 animate-pulse">
+                          Nouveau
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {link.description}
+                    </p>
+                  </div>
+
+                  {!link.comingSoon && (
+                    <ExternalLink className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary transition-colors ml-2" />
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-6 text-center text-sm text-muted-foreground z-10">
-        <p>© {new Date().getFullYear()} BDE FEN'SUP. Tous droits réservés.</p>
+      <footer className="w-full py-8 text-center text-sm text-muted-foreground z-10 border-t border-border/20 bg-background/50 backdrop-blur-sm mt-auto">
+        <p className="mb-2">© {new Date().getFullYear()} BDE FEN'SUP</p>
+        <div className="flex justify-center gap-4 text-xs opacity-60">
+          <Link href="#" className="hover:text-primary transition-colors">
+            Mentions légales
+          </Link>
+          <span>•</span>
+          <Link href="#" className="hover:text-primary transition-colors">
+            Contact
+          </Link>
+        </div>
       </footer>
     </div>
   );
