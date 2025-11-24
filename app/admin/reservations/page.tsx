@@ -1,31 +1,43 @@
-"use client";
+import { prisma } from "@/lib/prisma";
+import { DataTable } from "./data-table";
+import { columns } from "./columns";
 
-import { signOut } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+export const dynamic = "force-dynamic"; // Ensure fresh data on every request
 
-export default function AdminReservationsPage() {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/admin/login");
+async function getBookings() {
+  const bookings = await prisma.booking.findMany({
+    include: {
+      event: {
+        select: {
+          title: true,
+          date: true,
         },
       },
-    });
-  };
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  // Serialize dates to strings to avoid "Date object cannot be passed to Client Component" error
+  return bookings.map((booking) => ({
+    ...booking,
+    createdAt: booking.createdAt.toISOString(),
+    updatedAt: booking.updatedAt.toISOString(),
+    event: {
+      ...booking.event,
+      date: booking.event.date.toISOString(),
+    },
+  }));
+}
+
+export default async function AdminReservationsPage() {
+  const bookings = await getBookings();
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Réservations</h1>
-        <Button onClick={handleLogout} variant="outline">
-          Déconnexion
-        </Button>
-      </div>
-      <p>Bienvenue sur le backoffice administrateur.</p>
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold mb-8">Gestion des Réservations</h1>
+      <DataTable columns={columns} data={bookings} />
     </div>
   );
 }
