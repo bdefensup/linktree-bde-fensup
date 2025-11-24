@@ -77,14 +77,25 @@ export function AdminSidebar() {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src="/logo.png" alt="BDE FEN'SUP" />
-                    <AvatarFallback className="rounded-lg">BDE</AvatarFallback>
+                    <AvatarImage
+                      src={session?.user?.image || ""}
+                      alt={session?.user?.name || "Admin"}
+                    />
+                    <AvatarFallback className="rounded-lg">AD</AvatarFallback>
                   </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {session?.user?.name || "Admin"}
+                    </span>
+                    <span className="truncate text-xs">
+                      {session?.user?.email || "admin@bdefensup.fr"}
+                    </span>
+                  </div>
                   <ChevronDown className="ml-auto size-4" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-64 rounded-lg"
                 align="start"
                 side="bottom"
                 sideOffset={4}
