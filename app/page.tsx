@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ExternalLink, Heart, HandHeart, Sparkles } from "lucide-react";
+import { ExternalLink, Heart, Sparkles } from "lucide-react";
+import { LuHandHelping } from "react-icons/lu";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -112,7 +113,7 @@ export default function Home() {
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 animate-bounce duration-[1500ms]">
                   <Heart className="w-8 h-8 text-red-500 fill-red-500 drop-shadow-lg" />
                 </div>
-                <HandHeart className="w-16 h-16 text-amber-500 stroke-[1.5]" />
+                <LuHandHelping className="w-16 h-16 text-amber-500" />
               </div>
 
               <div className="space-y-1">
