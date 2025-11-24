@@ -165,16 +165,23 @@ export default function EventDetailPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-12 relative z-10">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          asChild
-          className="mb-8 hover:bg-muted/50 -ml-4"
-        >
-          <Link href="/billetterie" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Retour aux événements
-          </Link>
-        </Button>
+        <div className="mb-8">
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="rounded-full bg-background/50 backdrop-blur-md border-border/50 hover:bg-background/80 hover:border-primary/50 transition-all duration-300 group"
+          >
+            <Link href="/billetterie" className="gap-2 pl-2 pr-4">
+              <div className="bg-primary/10 p-1 rounded-full group-hover:bg-primary/20 transition-colors">
+                <ArrowLeft className="h-3 w-3 text-primary" />
+              </div>
+              <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                Retour aux événements
+              </span>
+            </Link>
+          </Button>
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
