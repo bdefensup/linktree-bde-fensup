@@ -58,15 +58,15 @@ export default function Home() {
 
       <main className="flex-1 flex flex-col items-center w-full max-w-lg px-6 py-16 z-10">
         {/* Logo Section */}
-        <div className="relative mb-8">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur opacity-30"></div>
-          <div className="relative bg-card/50 backdrop-blur-xl p-4 rounded-full border border-border/50 shadow-xl">
+        <div className="relative mb-9">
+          <div className="absolute -inset-3 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur opacity-30"></div>
+          <div className="relative bg-card/50 backdrop-blur-xl p-8 rounded-full border border-border/50 shadow-xl">
             <Image
               src="/logo.png"
               alt="Logo BDE FEN'SUP"
-              width={120}
-              height={120}
-              className="object-contain drop-shadow-md"
+              width={200}
+              height={200}
+              className="object-contain drop-shadow-md translate-y-2"
               priority
             />
           </div>
