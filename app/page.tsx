@@ -172,7 +172,7 @@ export default function Home() {
                       rel="noopener noreferrer"
                       className="text-center flex flex-col items-center"
                     >
-                      <div className="relative w-8 h-8 mb-1">
+                      <div className="relative w-12 h-8 mb-1">
                         <Image
                           src="/Logo_Action_contre_la_faim.svg.png"
                           alt="Action contre la Faim"
@@ -197,7 +197,7 @@ export default function Home() {
                       rel="noopener noreferrer"
                       className="text-center flex flex-col items-center"
                     >
-                      <div className="relative w-8 h-8 mb-1">
+                      <div className="relative w-12 h-8 mb-1">
                         <Image
                           src="/png-clipart-international-committee-of-the-red-cross-international-red-cross-and-red-crescent-movement-american-red-cross-organization-indian-red-cross-society-cruz-roja-text-trademark.png"
                           alt="Croix-Rouge"
@@ -222,7 +222,7 @@ export default function Home() {
                       rel="noopener noreferrer"
                       className="text-center flex flex-col items-center"
                     >
-                      <div className="relative w-8 h-8 mb-1">
+                      <div className="relative w-12 h-8 mb-1">
                         <Image
                           src="/hu1963h69c-human-appeal-logo-human-appeal-logo-jli.webp"
                           alt="Human Appeal"
