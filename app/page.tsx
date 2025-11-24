@@ -149,6 +149,73 @@ export default function Home() {
                   <Link href="/don">Dons</Link>
                 </Button>
               </div>
+
+              <div className="w-full pt-2">
+                <div className="relative flex items-center py-2">
+                  <div className="flex-grow border-t border-border/40"></div>
+                  <span className="flex-shrink-0 mx-2 text-[10px] text-muted-foreground uppercase tracking-wider">
+                    Ou soutenez une asso
+                  </span>
+                  <div className="flex-grow border-t border-border/40"></div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 mt-1">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto py-2 flex flex-col gap-1 hover:bg-accent/50"
+                  >
+                    <a
+                      href="https://donner.actioncontrelafaim.org/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-center"
+                    >
+                      <span className="text-lg">🥣</span>
+                      <span className="text-[9px] leading-tight text-muted-foreground">
+                        Action contre la Faim
+                      </span>
+                    </a>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto py-2 flex flex-col gap-1 hover:bg-accent/50"
+                  >
+                    <a
+                      href="https://donner.croix-rouge.fr/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-center"
+                    >
+                      <span className="text-lg">⛑️</span>
+                      <span className="text-[9px] leading-tight text-muted-foreground">
+                        Croix-Rouge
+                      </span>
+                    </a>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto py-2 flex flex-col gap-1 hover:bg-accent/50"
+                  >
+                    <a
+                      href="https://humanappeal.fr/faire-un-don"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-center"
+                    >
+                      <span className="text-lg">🌍</span>
+                      <span className="text-[9px] leading-tight text-muted-foreground">
+                        Human Appeal
+                      </span>
+                    </a>
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
