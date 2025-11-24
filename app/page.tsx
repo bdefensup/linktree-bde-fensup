@@ -172,7 +172,7 @@ export default function Home() {
                       rel="noopener noreferrer"
                       className="text-center flex flex-col items-center"
                     >
-                      <div className="relative w-12 h-8 mb-1">
+                      <div className="relative w-12 h-16 mb-1">
                         <Image
                           src="/Logo_Action_contre_la_faim.svg.png"
                           alt="Action contre la Faim"
@@ -199,7 +199,7 @@ export default function Home() {
                     >
                       <div className="relative w-24 h-16 mb-1">
                         <Image
-                          src="/croix rouge francaise unite locale de suresnes-ee9b063c1a1a4c38b4828f3aa26440e6.png"
+                          src="/croix rouge francaise unite locale de suresnes-ee9b063c1a1a4c38b4828f3aa26440e6.png.png"
                           alt="Croix-Rouge"
                           fill
                           className="object-contain"
@@ -222,7 +222,7 @@ export default function Home() {
                       rel="noopener noreferrer"
                       className="text-center flex flex-col items-center"
                     >
-                      <div className="relative w-12 h-8 mb-1">
+                      <div className="relative w-12 h-16 mb-1">
                         <Image
                           src="/hu1963h69c-human-appeal-logo-human-appeal-logo-jli-removebg-preview.png"
                           alt="Human Appeal"
