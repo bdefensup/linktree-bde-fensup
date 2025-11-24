@@ -10,8 +10,9 @@ const prisma = new PrismaClient({ adapter });
 
 export async function GET(
   request: Request,
-  { params }: { params: { eventId: string } }
+  props: { params: Promise<{ eventId: string }> }
 ) {
+  const params = await props.params;
   try {
     const event = await prisma.event.findUnique({
       where: {
@@ -40,7 +41,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching event:", error);
     return NextResponse.json(
-      { error: "Failed to fetch event" },
+      { error: "Failed to fetch event", details: String(error) },
       { status: 500 }
     );
   }
