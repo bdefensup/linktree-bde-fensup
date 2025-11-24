@@ -55,16 +55,23 @@ export default function BilletteriePage() {
       <div className="max-w-7xl mx-auto px-4 py-16 relative z-10">
         {/* Header */}
         <div className="text-center mb-16 space-y-4 relative">
-          <div className="flex justify-start md:absolute md:left-0 md:top-0 mb-4 md:mb-0">
+          <div className="flex justify-start md:absolute md:left-0 md:top-0 mb-6 md:mb-0 z-20">
             <Button
-              variant="ghost"
+              variant="outline"
+              size="sm"
               asChild
-              className="hover:bg-muted/50 -ml-4 md:ml-0"
+              className="rounded-full bg-background/50 backdrop-blur-md border-border/50 hover:bg-background/80 hover:border-primary/50 transition-all duration-300 group"
             >
-              <Link href="/" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="hidden md:inline">Retour à l'accueil</span>
-                <span className="md:hidden">Retour</span>
+              <Link href="/" className="gap-2 pl-2 pr-4">
+                <div className="bg-primary/10 p-1 rounded-full group-hover:bg-primary/20 transition-colors">
+                  <ArrowLeft className="h-3 w-3 text-primary" />
+                </div>
+                <span className="hidden md:inline text-muted-foreground group-hover:text-foreground transition-colors">
+                  Retour à l'accueil
+                </span>
+                <span className="md:hidden text-muted-foreground group-hover:text-foreground transition-colors">
+                  Retour
+                </span>
               </Link>
             </Button>
           </div>
