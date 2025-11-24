@@ -4,6 +4,15 @@ import type { NextRequest } from "next/server";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Protect /admin routes
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    const sessionCookie = request.cookies.get("better-auth.session_token");
+
+    if (!sessionCookie) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+  }
+
   // Liste des chemins autorisés
   const allowedPaths = [
     "/",
