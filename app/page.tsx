@@ -58,8 +58,8 @@ export default function Home() {
 
       <main className="flex-1 flex flex-col items-center w-full max-w-lg px-6 py-16 z-10">
         {/* Logo Section */}
-        <div className="relative mb-8 group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+        <div className="relative mb-8">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur opacity-30"></div>
           <div className="relative bg-card/50 backdrop-blur-xl p-4 rounded-full border border-border/50 shadow-xl">
             <Image
               src="/logo.png"
