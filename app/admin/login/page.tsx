@@ -83,7 +83,11 @@ export default function AdminLoginPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form
+            onSubmit={handleLogin}
+            className="space-y-4"
+            suppressHydrationWarning
+          >
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -94,6 +98,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="bg-background/50"
+                suppressHydrationWarning
               />
             </div>
             <div className="space-y-2">
@@ -105,6 +110,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="bg-background/50"
+                suppressHydrationWarning
               />
             </div>
             <Button
