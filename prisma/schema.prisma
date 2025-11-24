@@ -82,6 +82,11 @@ model Event {
   date        DateTime
   location    String
   price       Float
+  memberPrice Float?
+  
+  externalPaymentLink       String?
+  externalMemberPaymentLink String?
+
   maxSeats    Int
   image       String?
   createdAt   DateTime  @default(now())
@@ -100,6 +105,7 @@ model Booking {
   lastName  String
   email     String
   phone     String
+  isMember  Boolean       @default(false)
   
   status    BookingStatus @default(PENDING)
   

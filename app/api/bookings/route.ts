@@ -11,7 +11,7 @@ const prisma = new PrismaClient({ adapter });
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { eventId, firstName, lastName, email, phone } = body;
+    const { eventId, firstName, lastName, email, phone, isMember } = body;
 
     // Validate input
     if (!eventId || !firstName || !lastName || !email || !phone) {
@@ -59,14 +59,25 @@ export async function POST(request: Request) {
         lastName,
         email,
         phone,
+        isMember: isMember || false,
         status: "PENDING",
       },
     });
 
-    // Generate Revolut link
-    // Format: https://revolut.me/username/amount
-    const revolutUsername = process.env.REVOLUT_USERNAME || "bdefensup";
-    const revolutLink = `https://revolut.me/${revolutUsername}/${event.price}?note=BOOKING-${booking.id}`;
+    // Determine payment link
+    let revolutLink = "";
+
+    if (isMember && event.externalMemberPaymentLink) {
+      revolutLink = event.externalMemberPaymentLink;
+    } else if (!isMember && event.externalPaymentLink) {
+      revolutLink = event.externalPaymentLink;
+    } else {
+      // Fallback to generated link
+      const price =
+        isMember && event.memberPrice ? event.memberPrice : event.price;
+      const revolutUsername = process.env.REVOLUT_USERNAME || "bdefensup";
+      revolutLink = `https://revolut.me/${revolutUsername}/${price}?note=BOOKING-${booking.id}`;
+    }
 
     // Update booking with Revolut link
     await prisma.booking.update({

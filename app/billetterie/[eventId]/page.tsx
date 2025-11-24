@@ -12,6 +12,7 @@ interface Event {
   date: string;
   location: string;
   price: number;
+  memberPrice?: number;
   maxSeats: number;
   image: string | null;
   _count?: {
@@ -30,6 +31,7 @@ export default function EventDetailPage() {
     lastName: "",
     email: "",
     phone: "",
+    isMember: false,
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -104,6 +106,8 @@ export default function EventDetailPage() {
 
   const availableSeats = event.maxSeats - (event._count?.bookings || 0);
   const isSoldOut = availableSeats <= 0;
+  const currentPrice =
+    formData.isMember && event.memberPrice ? event.memberPrice : event.price;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -172,9 +176,16 @@ export default function EventDetailPage() {
                   <span className="text-2xl">💰</span>
                   <div>
                     <p className="text-sm text-muted-foreground">Prix</p>
-                    <p className="text-3xl font-bold text-primary">
-                      {event.price}€
-                    </p>
+                    <div className="flex flex-col">
+                      <span className="text-3xl font-bold text-primary">
+                        {event.price}€
+                      </span>
+                      {event.memberPrice && (
+                        <span className="text-sm text-accent font-medium">
+                          {event.memberPrice}€ pour les membres
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -288,15 +299,34 @@ export default function EventDetailPage() {
                 />
               </div>
 
+              {event.memberPrice && (
+                <div className="flex items-center gap-3 p-3 bg-secondary/10 rounded-lg border border-secondary/20">
+                  <input
+                    type="checkbox"
+                    id="isMember"
+                    checked={formData.isMember}
+                    onChange={(e) =>
+                      setFormData({ ...formData, isMember: e.target.checked })
+                    }
+                    className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label
+                    htmlFor="isMember"
+                    className="text-sm font-medium cursor-pointer"
+                  >
+                    Je suis membre cotisant FEN'SUP ({event.memberPrice}€ au
+                    lieu de {event.price}€)
+                  </label>
+                </div>
+              )}
+
               <div className="pt-4">
                 <button
                   type="submit"
                   disabled={submitting}
                   className="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {submitting
-                    ? "Redirection..."
-                    : `Réserver et payer ${event.price}€`}
+                  {submitting ? "Redirection..." : `Payer ${currentPrice}€`}
                 </button>
               </div>
             </form>
