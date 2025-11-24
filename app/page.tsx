@@ -25,6 +25,13 @@ export default function Home() {
 
   const links = [
     {
+      name: "Billetterie",
+      url: "/billetterie",
+      icon: "🎟️",
+      description: "Réservez vos places pour nos événements",
+      highlight: true,
+    },
+    {
       name: "Instagram",
       url: "https://BDE-FENSUP.short.gy/Instagram",
       icon: "📸",
@@ -36,13 +43,7 @@ export default function Home() {
       icon: "🎵",
       description: "Découvrez nos vidéos exclusives",
     },
-    {
-      name: "Billetterie",
-      url: "/billetterie",
-      icon: "🎟️",
-      description: "Réservez vos places pour nos événements",
-      highlight: true,
-    },
+
     {
       name: "Discord",
       url: "#",
