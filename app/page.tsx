@@ -99,73 +99,108 @@ export default function Home() {
 
         {/* Links Section */}
         <div className="w-full space-y-4">
-          {links.map((link) => (
-            <Link
-              key={link.name}
-              href={link.url}
-              onClick={(e) => link.comingSoon && e.preventDefault()}
-              className={`block group ${
-                link.comingSoon ? "cursor-not-allowed opacity-70" : ""
-              }`}
-            >
-              <Card
-                className={`relative overflow-hidden border-border/50 transition-all duration-300 ${
-                  link.comingSoon
-                    ? "bg-muted/50"
-                    : "hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 bg-card/80 backdrop-blur-sm"
-                } ${
-                  link.highlight
-                    ? "border-primary/50 shadow-md shadow-primary/10"
-                    : ""
+          {links.map((link) => {
+            const isDonation = link.url === "/don";
+            return (
+              <Link
+                key={link.name}
+                href={link.url}
+                onClick={(e) => link.comingSoon && e.preventDefault()}
+                className={`block group ${
+                  link.comingSoon ? "cursor-not-allowed opacity-70" : ""
                 }`}
               >
-                {/* Hover Gradient Effect */}
-                {!link.comingSoon && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                )}
-
-                <CardContent className="flex items-center p-4">
-                  <div
-                    className={`flex items-center justify-center w-12 h-12 rounded-xl text-2xl mr-4 transition-colors ${
-                      link.highlight
-                        ? "bg-primary/10 text-primary"
-                        : "bg-secondary/5 text-secondary group-hover:bg-primary/10 group-hover:text-primary"
-                    }`}
-                  >
-                    {link.icon}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-lg truncate group-hover:text-primary transition-colors">
-                        {link.name}
-                      </h3>
-                      {link.comingSoon && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] h-5 px-1.5"
-                        >
-                          Bientôt
-                        </Badge>
-                      )}
-                      {link.highlight && (
-                        <Badge className="bg-primary text-primary-foreground text-[10px] h-5 px-1.5 animate-pulse">
-                          Nouveau
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {link.description}
-                    </p>
-                  </div>
-
+                <Card
+                  className={`relative overflow-hidden border transition-all duration-300 ${
+                    link.comingSoon
+                      ? "bg-muted/50 border-border/50"
+                      : "hover:shadow-lg hover:-translate-y-1 backdrop-blur-sm"
+                  } ${
+                    isDonation
+                      ? "bg-gradient-to-br from-amber-500/5 via-background/50 to-orange-500/5 border-amber-500/30 hover:border-amber-500/60 hover:shadow-amber-500/10"
+                      : "bg-card/80 border-border/50 hover:border-primary/50 hover:shadow-primary/5"
+                  } ${
+                    link.highlight && !isDonation
+                      ? "border-primary/50 shadow-md shadow-primary/10"
+                      : ""
+                  }`}
+                >
+                  {/* Hover Gradient Effect */}
                   {!link.comingSoon && (
-                    <ExternalLink className="w-5 h-5 text-muted-foreground/50 group-hover:text-primary transition-colors ml-2" />
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-r translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ${
+                        isDonation
+                          ? "from-amber-500/0 via-amber-500/10 to-amber-500/0"
+                          : "from-primary/0 via-primary/5 to-primary/0"
+                      }`}
+                    />
                   )}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+
+                  <CardContent className="flex items-center p-4">
+                    <div
+                      className={`flex items-center justify-center w-12 h-12 rounded-xl text-2xl mr-4 transition-colors ${
+                        isDonation
+                          ? "bg-amber-500/10 text-amber-500 group-hover:bg-amber-500/20 group-hover:scale-110 transition-transform duration-300"
+                          : link.highlight
+                            ? "bg-primary/10 text-primary"
+                            : "bg-secondary/5 text-secondary group-hover:bg-primary/10 group-hover:text-primary"
+                      }`}
+                    >
+                      {link.icon}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3
+                          className={`font-bold text-lg truncate transition-colors ${
+                            isDonation
+                              ? "text-foreground group-hover:text-amber-500"
+                              : "group-hover:text-primary"
+                          }`}
+                        >
+                          {link.name}
+                        </h3>
+                        {link.comingSoon && (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] h-5 px-1.5"
+                          >
+                            Bientôt
+                          </Badge>
+                        )}
+                        {link.highlight && !isDonation && (
+                          <Badge className="bg-primary text-primary-foreground text-[10px] h-5 px-1.5 animate-pulse">
+                            Nouveau
+                          </Badge>
+                        )}
+                        {isDonation && (
+                          <Badge
+                            variant="outline"
+                            className="border-amber-500/50 text-amber-500 text-[10px] h-5 px-1.5 bg-amber-500/5"
+                          >
+                            Soutien ❤️
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {link.description}
+                      </p>
+                    </div>
+
+                    {!link.comingSoon && (
+                      <ExternalLink
+                        className={`w-5 h-5 transition-colors ml-2 ${
+                          isDonation
+                            ? "text-amber-500/50 group-hover:text-amber-500"
+                            : "text-muted-foreground/50 group-hover:text-primary"
+                        }`}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       </main>
 
