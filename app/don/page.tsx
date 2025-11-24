@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Heart, Loader2, Sparkles } from "lucide-react";
@@ -19,12 +20,27 @@ import { Textarea } from "@/components/ui/textarea";
 
 const PRESET_AMOUNTS = [5, 10, 15, 20, 50, 80, 100];
 
-export default function DonationPage() {
+function DonationForm() {
+  const searchParams = useSearchParams();
+  const initialAmount = searchParams.get("amount");
+
   const [amount, setAmount] = useState<number | "">("");
   const [customAmount, setCustomAmount] = useState<string>("");
   const [message, setMessage] = useState("");
   const [donorName, setDonorName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialAmount) {
+      const parsed = parseFloat(initialAmount);
+      if (!isNaN(parsed)) {
+        setAmount(parsed);
+        if (!PRESET_AMOUNTS.includes(parsed)) {
+          setCustomAmount(parsed.toString());
+        }
+      }
+    }
+  }, [initialAmount]);
 
   const handlePresetClick = (value: number) => {
     setAmount(value);
@@ -233,5 +249,13 @@ export default function DonationPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function DonationPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <DonationForm />
+    </Suspense>
   );
 }
