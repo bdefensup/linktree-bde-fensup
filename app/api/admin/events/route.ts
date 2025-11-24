@@ -12,11 +12,18 @@ export async function POST(request: Request) {
       price,
       memberPrice,
       image,
+      externalPrice,
       capacity,
     } = body;
 
     // Basic validation
-    if (!title || !date || !location || !price || !capacity) {
+    if (
+      !title ||
+      !date ||
+      !location ||
+      price === undefined ||
+      capacity === undefined
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -31,6 +38,7 @@ export async function POST(request: Request) {
         location,
         price: parseFloat(price),
         memberPrice: memberPrice ? parseFloat(memberPrice) : null,
+        externalPrice: externalPrice ? parseFloat(externalPrice) : null,
         image,
         maxSeats: parseInt(capacity),
       },

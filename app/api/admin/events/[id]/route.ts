@@ -16,6 +16,7 @@ export async function PUT(
       price,
       memberPrice,
       image,
+      externalPrice,
       capacity,
     } = body;
 
@@ -26,10 +27,12 @@ export async function PUT(
         description,
         date: new Date(date),
         location,
-        price: parseFloat(price),
-        memberPrice: memberPrice ? parseFloat(memberPrice) : null,
+        price: price !== undefined ? parseFloat(price) : undefined,
+        memberPrice: memberPrice !== undefined ? parseFloat(memberPrice) : null,
+        externalPrice:
+          externalPrice !== undefined ? parseFloat(externalPrice) : null,
         image,
-        maxSeats: parseInt(capacity),
+        maxSeats: capacity !== undefined ? parseInt(capacity) : undefined,
       },
     });
 

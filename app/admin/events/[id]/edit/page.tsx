@@ -23,6 +23,7 @@ export default async function EditEventPage(props: {
           ...event,
           date: event.date,
           memberPrice: event.memberPrice || undefined,
+          externalPrice: event.externalPrice || undefined,
           image: event.image || undefined,
           capacity: event.maxSeats,
           time: format(event.date, "HH:mm"),

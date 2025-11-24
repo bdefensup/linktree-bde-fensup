@@ -83,6 +83,7 @@ model Event {
   location    String
   price       Float
   memberPrice Float?
+  externalPrice Float?
   
   externalPaymentLink       String?
   externalMemberPaymentLink String?

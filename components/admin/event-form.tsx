@@ -52,6 +52,10 @@ const formSchema = z.object({
     .url("L'URL de l'image est invalide")
     .optional()
     .or(z.literal("")),
+  externalPrice: z.coerce
+    .number()
+    .min(0, "Le prix extérieur ne peut pas être négatif")
+    .optional(),
 });
 
 type EventFormValues = z.infer<typeof formSchema>;
@@ -70,6 +74,7 @@ export function EventForm({ initialData }: EventFormProps) {
         date: new Date(initialData.date),
         time: format(new Date(initialData.date), "HH:mm"),
         memberPrice: initialData.memberPrice || undefined,
+        externalPrice: initialData.externalPrice || undefined,
         image: initialData.image || "",
       }
     : {
@@ -82,6 +87,7 @@ export function EventForm({ initialData }: EventFormProps) {
         memberPrice: 0,
         capacity: 100,
         image: "",
+        externalPrice: 0,
       };
 
   const form = useForm<EventFormValues>({
@@ -115,13 +121,20 @@ export function EventForm({ initialData }: EventFormProps) {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error("Une erreur est survenue");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Une erreur est survenue");
+      }
 
       toast.success(initialData ? "Événement modifié !" : "Événement créé !");
       router.push("/admin/events");
       router.refresh();
     } catch (error) {
-      toast.error("Erreur lors de l'enregistrement");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'enregistrement"
+      );
       console.error(error);
     } finally {
       setLoading(false);
@@ -259,7 +272,7 @@ export function EventForm({ initialData }: EventFormProps) {
             name="memberPrice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prix Adhérent (€) (Optionnel)</FormLabel>
+                <FormLabel>Prix Adhérent (€)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -280,6 +293,27 @@ export function EventForm({ initialData }: EventFormProps) {
                 <FormLabel>Capacité</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} value={field.value ?? ""} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <FormField
+            control={form.control}
+            name="externalPrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prix Extérieur (€) (Optionnel)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    value={field.value ?? ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
