@@ -7,6 +7,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import imageCompression from "browser-image-compression";
 
 interface ImageUploadProps {
   value?: string;
@@ -31,13 +32,22 @@ export function ImageUpload({
 
         if (!file) return;
 
+        // Compress image
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+
+        const compressedFile = await imageCompression(file, options);
+
         const fileExt = file.name.split(".").pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from("events")
-          .upload(filePath, file);
+          .upload(filePath, compressedFile);
 
         if (uploadError) {
           throw uploadError;
