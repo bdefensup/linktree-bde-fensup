@@ -47,6 +47,24 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check for existing booking
+    const existingBooking = await prisma.booking.findFirst({
+      where: {
+        eventId,
+        email,
+        status: {
+          in: ["PENDING", "CONFIRMED"],
+        },
+      },
+    });
+
+    if (existingBooking) {
+      return NextResponse.json(
+        { error: "Vous êtes déjà inscrit à cet événement avec cet email." },
+        { status: 409 }
+      );
+    }
+
     // Create booking
     const booking = await prisma.booking.create({
       data: {

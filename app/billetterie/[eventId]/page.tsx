@@ -202,15 +202,15 @@ export default function EventDetailPage() {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
 
-              <div className="absolute bottom-0 left-0 p-8 w-full">
-                <Badge className="mb-4 bg-primary/90 hover:bg-primary text-primary-foreground border-none">
+              <div className="absolute bottom-0 left-0 p-4 w-full">
+                <Badge className="mb-1.5 bg-primary/90 hover:bg-primary text-primary-foreground border-none text-[10px] px-2 py-0.5 h-auto">
                   {new Date(event.date).getFullYear()}
                 </Badge>
-                <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-2 drop-shadow-sm">
+                <h1 className="text-lg md:text-xl font-extrabold text-foreground mb-1 drop-shadow-sm leading-tight">
                   {event.title}
                 </h1>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="h-5 w-5 text-primary" />
+                <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                  <MapPin className="h-3.5 w-3.5 text-primary" />
                   <span className="font-medium">{event.location}</span>
                 </div>
               </div>

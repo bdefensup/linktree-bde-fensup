@@ -138,119 +138,132 @@ export default function BilletteriePage() {
               const isSoldOut = availableSeats <= 0;
 
               return (
-                <Link
+                <div
                   key={event.id}
-                  href={`/billetterie/${event.id}`}
-                  className="group block h-full"
+                  className={`group block h-full ${isSoldOut ? "pointer-events-none opacity-75 grayscale" : ""}`}
                 >
-                  <Card className="h-full flex flex-col overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300">
-                    {/* Image Container */}
-                    <div className="relative h-56 w-full overflow-hidden">
-                      {event.image ? (
-                        <Image
-                          src={event.image}
-                          alt={event.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
-                          <Ticket className="w-16 h-16 text-primary/20" />
-                        </div>
-                      )}
-
-                      {/* Status Badges */}
-                      <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
-                        {isSoldOut ? (
-                          <Badge
-                            variant="destructive"
-                            className="font-semibold shadow-lg"
-                          >
-                            Complet
-                          </Badge>
+                  <Link
+                    href={isSoldOut ? "#" : `/billetterie/${event.id}`}
+                    className={isSoldOut ? "cursor-not-allowed" : ""}
+                    aria-disabled={isSoldOut}
+                  >
+                    <Card
+                      className={`h-full flex flex-col overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 ${
+                        !isSoldOut
+                          ? "hover:bg-card hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
+                          : ""
+                      }`}
+                    >
+                      {/* Image Container */}
+                      <div className="relative h-56 w-full overflow-hidden">
+                        {event.image ? (
+                          <Image
+                            src={event.image}
+                            alt={event.title}
+                            fill
+                            className={`object-cover transition-transform duration-500 ${!isSoldOut ? "group-hover:scale-105" : ""}`}
+                          />
                         ) : (
-                          <Badge
-                            variant="secondary"
-                            className="bg-background/80 backdrop-blur-md text-foreground font-medium shadow-sm"
-                          >
-                            {availableSeats} places restantes
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start gap-4">
-                        <h3 className="text-2xl font-bold leading-tight group-hover:text-primary transition-colors">
-                          {event.title}
-                        </h3>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="flex-grow space-y-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="w-4 h-4 text-primary" />
-                        <span className="font-medium">
-                          {new Date(event.date).toLocaleDateString("fr-FR", {
-                            weekday: "long",
-                            day: "numeric",
-                            month: "long",
-                          })}
-                        </span>
-                        <span className="text-border">•</span>
-                        <span className="font-medium">
-                          {new Date(event.date).toLocaleTimeString("fr-FR", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="w-4 h-4 text-secondary" />
-                        <span>{event.location}</span>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                        {event.description}
-                      </p>
-                    </CardContent>
-
-                    <CardFooter className="pt-2 pb-6 px-6 border-t border-border/50 mt-auto">
-                      <div className="w-full flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                            À partir de
-                          </span>
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-primary">
-                              {event.memberPrice || event.price}€
-                            </span>
-                            {event.memberPrice && (
-                              <span className="text-sm text-muted-foreground line-through decoration-destructive/50">
-                                {event.price}€
-                              </span>
-                            )}
+                          <div className="h-full w-full bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
+                            <Ticket className="w-16 h-16 text-primary/20" />
                           </div>
+                        )}
+
+                        {/* Status Badges */}
+                        <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+                          {isSoldOut ? (
+                            <Badge
+                              variant="destructive"
+                              className="font-semibold shadow-lg"
+                            >
+                              Complet
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                              className="bg-background/80 backdrop-blur-md text-foreground font-medium shadow-sm"
+                            >
+                              {availableSeats} places restantes
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start gap-4">
+                          <h3
+                            className={`text-2xl font-bold leading-tight transition-colors ${!isSoldOut ? "group-hover:text-primary" : ""}`}
+                          >
+                            {event.title}
+                          </h3>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent className="flex-grow space-y-4">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="w-4 h-4 text-primary" />
+                          <span className="font-medium">
+                            {new Date(event.date).toLocaleDateString("fr-FR", {
+                              weekday: "long",
+                              day: "numeric",
+                              month: "long",
+                            })}
+                          </span>
+                          <span className="text-border">•</span>
+                          <span className="font-medium">
+                            {new Date(event.date).toLocaleTimeString("fr-FR", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
                         </div>
 
-                        <Button
-                          variant={isSoldOut ? "secondary" : "default"}
-                          disabled={isSoldOut}
-                          className={`rounded-full px-6 transition-all ${
-                            !isSoldOut &&
-                            "group-hover:bg-primary group-hover:text-primary-foreground shadow-lg shadow-primary/20"
-                          }`}
-                        >
-                          {isSoldOut ? "Complet" : "Réserver"}
-                          {!isSoldOut && (
-                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                          )}
-                        </Button>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                </Link>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <MapPin className="w-4 h-4 text-secondary" />
+                          <span>{event.location}</span>
+                        </div>
+
+                        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                          {event.description}
+                        </p>
+                      </CardContent>
+
+                      <CardFooter className="pt-2 pb-6 px-6 border-t border-border/50 mt-auto">
+                        <div className="w-full flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
+                              À partir de
+                            </span>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-2xl font-bold text-primary">
+                                {event.memberPrice || event.price}€
+                              </span>
+                              {event.memberPrice && (
+                                <span className="text-sm text-muted-foreground line-through decoration-destructive/50">
+                                  {event.price}€
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <Button
+                            variant={isSoldOut ? "secondary" : "default"}
+                            disabled={isSoldOut}
+                            className={`rounded-full px-6 transition-all ${
+                              !isSoldOut &&
+                              "group-hover:bg-primary group-hover:text-primary-foreground shadow-lg shadow-primary/20"
+                            }`}
+                          >
+                            {isSoldOut ? "Complet" : "Réserver"}
+                            {!isSoldOut && (
+                              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                            )}
+                          </Button>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  </Link>
+                </div>
               );
             })}
           </div>

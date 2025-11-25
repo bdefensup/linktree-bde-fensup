@@ -10,6 +10,7 @@ import { CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   Form,
   FormControl,
@@ -324,12 +325,16 @@ export function EventForm({ initialData }: EventFormProps) {
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL de l'image (Optionnel)</FormLabel>
+              <FormLabel>Image de l'événement</FormLabel>
               <FormControl>
-                <Input placeholder="https://..." {...field} />
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={loading}
+                />
               </FormControl>
               <FormDescription>
-                Lien vers l'affiche de l'événement.
+                Glissez une image ou cliquez pour télécharger (Max 5MB).
               </FormDescription>
               <FormMessage />
             </FormItem>
