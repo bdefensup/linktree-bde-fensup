@@ -17,7 +17,11 @@ export default async function EditEventPage(props: {
 
   return (
     <div className="container mx-auto py-10 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-8">Modifier l'événement</h1>
+      <h1 className="text-3xl font-bold mb-2">Modifier l'événement</h1>
+      <p className="text-muted-foreground mb-8">
+        Modification de :{" "}
+        <span className="font-medium text-foreground">{event.title}</span>
+      </p>
       <EventForm
         initialData={{
           ...event,

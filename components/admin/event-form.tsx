@@ -34,9 +34,7 @@ const formSchema = z.object({
   description: z
     .string()
     .min(10, "La description doit contenir au moins 10 caractères"),
-  date: z.date({
-    required_error: "Une date est requise",
-  }),
+  date: z.date(),
   time: z
     .string()
     .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Format invalide (HH:MM)"),
@@ -338,10 +336,19 @@ export function EventForm({ initialData }: EventFormProps) {
           )}
         />
 
-        <Button type="submit" disabled={loading}>
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {initialData ? "Modifier l'événement" : "Créer l'événement"}
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push("/admin/events")}
+          >
+            Annuler
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {initialData ? "Modifier l'événement" : "Créer l'événement"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

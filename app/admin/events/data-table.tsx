@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+
+import { DateRange } from "react-day-picker";
 import {
   ColumnDef,
   flexRender,
@@ -25,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -58,15 +61,24 @@ export function DataTable<TData, TValue>({
   return (
     <div suppressHydrationWarning>
       <div className="flex items-center justify-between py-4">
-        <Input
-          placeholder="Filtrer par titre..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-          suppressHydrationWarning
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Filtrer par titre..."
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("title")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+            suppressHydrationWarning
+          />
+          <DatePickerWithRange
+            date={
+              (table.getColumn("date")?.getFilterValue() as DateRange) ??
+              undefined
+            }
+            setDate={(date) => table.getColumn("date")?.setFilterValue(date)}
+          />
+        </div>
         <Button asChild>
           <Link href="/admin/events/create">
             <Plus className="mr-2 h-4 w-4" />

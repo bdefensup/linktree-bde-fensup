@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { signIn } from "@/lib/auth-client";
+import { signUp } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,24 +15,37 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 
-export default function AdminLoginPage() {
+export default function AdminSignupPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    const allowedEmail = "bdefensup@gmail.com";
+    const allowedDomain = "@edufenelon.org";
+
+    if (email !== allowedEmail && !email.endsWith(allowedDomain)) {
+      toast.error(
+        "Seules les adresses @edufenelon.org ou bdefensup@gmail.com sont autorisées."
+      );
+      setLoading(false);
+      return;
+    }
+
     try {
-      await signIn.email({
+      await signUp.email({
         email,
         password,
+        name,
         callbackURL: "/admin/reservations",
         fetchOptions: {
           onResponse: () => {
@@ -46,14 +59,15 @@ export default function AdminLoginPage() {
             setLoading(false);
           },
           onSuccess: () => {
+            toast.success("Compte créé avec succès !");
             router.push("/admin/reservations");
           },
         },
       });
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Signup error:", error);
       setLoading(false);
-      toast.error("Une erreur est survenue lors de la connexion.");
+      toast.error("Une erreur est survenue lors de l'inscription.");
     }
   };
 
@@ -76,25 +90,38 @@ export default function AdminLoginPage() {
           </div>
           <div className="space-y-2">
             <CardTitle className="text-2xl font-bold tracking-tight">
-              Administration
+              Inscription Admin
             </CardTitle>
             <CardDescription>
-              Connectez-vous pour accéder au backoffice.
+              Créez un compte pour accéder au backoffice.
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <form
-            onSubmit={handleLogin}
+            onSubmit={handleSignup}
             className="space-y-4"
             suppressHydrationWarning
           >
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="name">Nom complet</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Jean Dupont"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="bg-background/50"
+                suppressHydrationWarning
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email (@edufenelon.org)</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@bdefensup.fr"
+                placeholder="prenom.nom@edufenelon.org"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -110,6 +137,7 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={8}
                 className="bg-background/50"
                 suppressHydrationWarning
               />
@@ -122,12 +150,12 @@ export default function AdminLoginPage() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Connexion...
+                  Inscription...
                 </>
               ) : (
                 <>
-                  <Lock className="mr-2 h-4 w-4" />
-                  Se connecter
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  S'inscrire
                 </>
               )}
             </Button>
@@ -135,12 +163,12 @@ export default function AdminLoginPage() {
         </CardContent>
         <CardFooter className="justify-center border-t border-border/50 pt-4 flex-col gap-2">
           <p className="text-sm text-muted-foreground text-center">
-            Pas encore de compte ?{" "}
+            Déjà un compte ?{" "}
             <Link
-              href="/admin/signup"
+              href="/admin/login"
               className="text-primary hover:underline font-medium"
             >
-              S'inscrire
+              Se connecter
             </Link>
           </p>
           <p className="text-xs text-muted-foreground text-center">

@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { AdminBreadcrumbs } from "@/components/admin/admin-breadcrumbs";
 
 export default function AdminLayout({
   children,
@@ -12,7 +13,7 @@ export default function AdminLayout({
       <main className="w-full">
         <div className="p-4 flex items-center gap-4 border-b">
           <SidebarTrigger />
-          <h1 className="font-semibold text-lg">Backoffice</h1>
+          <AdminBreadcrumbs />
         </div>
         <div className="p-4">{children}</div>
       </main>

@@ -4,13 +4,36 @@ import type { NextRequest } from "next/server";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Protect /admin routes
-  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const sessionCookie = request.cookies.get("better-auth.session_token");
+  // --- Admin Redirection Logic ---
+  const isAdminRoot = pathname === "/admin";
+  const isAdminLogin = pathname === "/admin/login";
+  const isAdminRoute = pathname.startsWith("/admin");
 
-    if (!sessionCookie) {
+  const sessionCookie =
+    request.cookies.get("better-auth.session_token") ||
+    request.cookies.get("__Secure-better-auth.session_token");
+  const isAuthenticated = !!sessionCookie;
+
+  // 1. Redirect /admin to /admin/events if authenticated, or /admin/login if not
+  if (isAdminRoot) {
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL("/admin/events", request.url));
+    } else {
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
+  }
+
+  // 2. Protect /admin/* routes (excluding login and signup)
+  const isAdminSignup = pathname === "/admin/signup";
+  if (isAdminRoute && !isAdminLogin && !isAdminSignup) {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+  }
+
+  // 3. Redirect /admin/login to /admin/events if already authenticated
+  if (isAdminLogin && isAuthenticated) {
+    return NextResponse.redirect(new URL("/admin/events", request.url));
   }
 
   // Liste des chemins autorisés
@@ -21,6 +44,8 @@ export function proxy(request: NextRequest) {
     "/logo.png",
     "/api",
     "/billetterie",
+    "/admin", // Allow admin routes (auth is handled above)
+    "/don", // Allow donation page
   ];
 
   // Vérifier si le chemin commence par un des chemins autorisés

@@ -95,6 +95,15 @@ export const columns: ColumnDef<Event>[] = [
         locale: fr,
       });
     },
+    filterFn: (row, id, value) => {
+      const rowDate = new Date(row.getValue(id));
+      const { from, to } = value as { from?: Date; to?: Date };
+
+      if (!from) return true;
+      if (!to) return rowDate >= from;
+
+      return rowDate >= from && rowDate <= to;
+    },
   },
   {
     accessorKey: "location",
