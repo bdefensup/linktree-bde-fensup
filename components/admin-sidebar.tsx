@@ -8,8 +8,10 @@ import {
   Ticket,
   User,
   Users,
+  KeyRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signOut, useSession } from "@/lib/auth-client";
 import {
   Sidebar,
@@ -29,6 +31,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -121,6 +124,13 @@ export function AdminSidebar() {
                 side="bottom"
                 sideOffset={4}
               >
+                <DropdownMenuItem asChild>
+                  <Link href="/forgot-password">
+                    <KeyRound className="mr-2 h-4 w-4" />
+                    Mot de passe oublié
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
                   className="text-red-500 focus:text-red-500"

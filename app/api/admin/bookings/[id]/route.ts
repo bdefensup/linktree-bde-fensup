@@ -35,7 +35,7 @@ export async function PATCH(
     if (process.env.RESEND_API_KEY) {
       if (status === "CONFIRMED") {
         await resend.emails.send({
-          from: "BDE FEN'SUP <no-reply@bdefensup.fr>",
+          from: "onboarding@resend.dev",
           to: booking.email,
           subject: `Paiement validé - ${booking.event.title}`,
           react: PaymentReceivedEmail({
@@ -46,7 +46,7 @@ export async function PATCH(
         });
       } else if (status === "CANCELLED") {
         await resend.emails.send({
-          from: "BDE FEN'SUP <no-reply@bdefensup.fr>",
+          from: "onboarding@resend.dev",
           to: booking.email,
           subject: `Mise à jour réservation - ${booking.event.title}`,
           react: BookingCancelledEmail({

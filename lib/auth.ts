@@ -5,6 +5,9 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 // If your Prisma file is located elsewhere, you can change the path
 import { PrismaClient } from "@/lib/generated/prisma/client";
+import { Resend } from "resend";
+import ResetPasswordEmail from "@/components/emails/reset-password";
+import VerifyEmail from "@/components/emails/verify-email";
 
 const connectionString = process.env.DIRECT_URL;
 const pool = new Pool({ connectionString });
@@ -16,6 +19,53 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    async sendResetPassword(data, request) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      if (!process.env.RESEND_API_KEY) {
+        console.error("RESEND_API_KEY is missing!");
+        return;
+      }
+      try {
+        const result = await resend.emails.send({
+          from: "onboarding@resend.dev",
+          to: data.user.email,
+          subject: "Réinitialisation de votre mot de passe",
+          react: ResetPasswordEmail({
+            url: data.url,
+            firstName: data.user.name.split(" ")[0],
+          }),
+        });
+      } catch (error) {
+        console.error("Error sending reset email:", error);
+      }
+    },
+    requireEmailVerification: true,
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url, token }, request) => {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      if (!process.env.RESEND_API_KEY) {
+        console.error("RESEND_API_KEY is missing!");
+        return;
+      }
+      try {
+        const result = await resend.emails.send({
+          from: "onboarding@resend.dev", // Using test email until domain is verified
+          to: user.email,
+          subject: "Vérifiez votre adresse email",
+          react: VerifyEmail({
+            url,
+            firstName: user.name.split(" ")[0],
+          }),
+        });
+      } catch (error) {
+        console.error("Error sending verification email:", error);
+      }
+    },
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // Update session every day
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
