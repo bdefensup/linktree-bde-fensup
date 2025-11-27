@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown, Check, X, Clock } from "lucide-react";
+import { MoreHorizontal, Check, X, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export type Booking = {
   id: string;
@@ -47,7 +46,7 @@ const updateStatus = async (id: string, status: string) => {
     // We need to refresh the data. Since this is a client component,
     // we might need a way to trigger a refresh in the parent or use router.refresh()
     window.location.reload(); // Simple reload for now, or use router.refresh() if in a server component context
-  } catch (error) {
+  } catch {
     toast.error("Impossible de mettre à jour le statut de la réservation.");
   }
 };
@@ -58,21 +57,30 @@ export const columns: ColumnDef<Booking>[] = [
     header: "Statut",
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
+      let badgeClass = "";
+      let label = "";
+
+      switch (status) {
+        case "CONFIRMED":
+          badgeClass =
+            "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-200 hover:border-green-300 dark:hover:bg-green-900/50 transition-colors duration-200";
+          label = "Validé";
+          break;
+        case "CANCELLED":
+          badgeClass =
+            "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200 dark:border-red-800 hover:bg-red-200 hover:border-red-300 dark:hover:bg-red-900/50 transition-colors duration-200";
+          label = "Refusé";
+          break;
+        default:
+          badgeClass =
+            "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200 border-orange-200 dark:border-orange-800 hover:bg-orange-200 hover:border-orange-300 dark:hover:bg-orange-900/50 transition-colors duration-200";
+          label = "En attente";
+          break;
+      }
+
       return (
-        <Badge
-          variant={
-            status === "CONFIRMED"
-              ? "default"
-              : status === "CANCELLED"
-                ? "destructive"
-                : "secondary"
-          }
-        >
-          {status === "CONFIRMED"
-            ? "Validé"
-            : status === "CANCELLED"
-              ? "Annulé"
-              : "En attente"}
+        <Badge variant="outline" className={badgeClass}>
+          {label}
         </Badge>
       );
     },
@@ -87,21 +95,47 @@ export const columns: ColumnDef<Booking>[] = [
   },
   {
     accessorKey: "email",
-    header: ({ column }) => {
+    cell: ({ row }) => {
+      const email = row.getValue("email") as string;
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        <a
+          href={`mailto:${email}`}
+          className="hover:underline hover:text-primary transition-colors"
         >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+          {email}
+        </a>
+      );
+    },
+  },
+  {
+    accessorKey: "phone",
+    header: "Téléphone",
+    cell: ({ row }) => {
+      const phone = row.getValue("phone") as string;
+      if (!phone) return <span className="text-muted-foreground">-</span>;
+
+      return (
+        <a
+          href={`tel:${phone}`}
+          className="hover:underline hover:text-primary transition-colors"
+        >
+          {phone}
+        </a>
       );
     },
   },
   {
     accessorKey: "event.title",
+    id: "event_title",
     header: "Événement",
+    cell: ({ row }) => {
+      const title = row.original.event.title;
+      return (
+        <div className="max-w-[200px] truncate font-medium" title={title}>
+          {title}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "createdAt",
@@ -130,7 +164,7 @@ export const columns: ColumnDef<Booking>[] = [
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(booking.email)}
             >
-              Copier l'email
+              Copier l&apos;email
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

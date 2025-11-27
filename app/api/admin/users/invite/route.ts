@@ -65,39 +65,43 @@ export async function POST(req: Request) {
     });
 
     // 3. Trigger password reset email (acts as invitation)
-    // We call the auth endpoint directly since auth.api.forgetPassword is not available server-side
-    const origin = new URL(req.url).origin;
-    const resetResponse = await fetch(`${origin}/api/auth/forget-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    // We use auth.api.requestPasswordReset directly to avoid network issues
+    const resetResponse = await auth.api.requestPasswordReset({
+      body: {
         email,
         redirectTo: "/reset-password",
-      }),
+      },
+      headers: await headers(),
     });
 
-    if (!resetResponse.ok) {
+    if (!resetResponse?.status) {
       console.error(
         "Failed to trigger password reset:",
-        await resetResponse.text()
+        resetResponse?.message || "Unknown error"
       );
       // We don't fail the whole request since the user is created
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Invite user error:", error);
 
     // Handle specific better-auth errors if possible
-    if (error.body?.message) {
-      return NextResponse.json({ error: error.body.message }, { status: 400 });
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "body" in error &&
+      (error as { body?: { message?: string } }).body?.message
+    ) {
+      return NextResponse.json(
+        { error: (error as { body: { message: string } }).body.message },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json(
-      { error: error.message || "Failed to invite user" },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to invite user";
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

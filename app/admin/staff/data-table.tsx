@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -27,16 +26,24 @@ import { InviteUserModal } from "@/components/admin/invite-user-modal";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { isSameDay, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { DateRange } from "react-day-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Shield, ShieldAlert, User as UserIcon, Check, X } from "lucide-react";
+import { getColumns, User } from "./columns";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps {
+  data: User[];
+  userRole: string;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+export function DataTable({ data, userRole }: DataTableProps) {
+  const columns = React.useMemo(() => getColumns(userRole), [userRole]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -48,7 +55,7 @@ export function DataTable<TData, TValue>({
 
   // Filter data based on date AND global text search
   const filteredData = React.useMemo(() => {
-    return data.filter((item: any) => {
+    return data.filter((item) => {
       // 1. Date Filtering
       let matchesDate = true;
       if (item.createdAt && dateRange?.from) {
@@ -101,13 +108,119 @@ export function DataTable<TData, TValue>({
         </div>
 
         {/* Search and Invite */}
-        <div className="flex items-center justify-between w-full">
-          <Input
-            placeholder="Rechercher par nom ou email..."
-            value={globalFilter ?? ""}
-            onChange={(event) => setGlobalFilter(event.target.value)}
-            className="max-w-sm bg-background/50"
-          />
+        <div className="flex items-center justify-between w-full gap-2">
+          <div className="flex items-center gap-2 flex-1">
+            <Input
+              placeholder="Rechercher par nom ou email..."
+              value={globalFilter ?? ""}
+              onChange={(event) => setGlobalFilter(event.target.value)}
+              className="max-w-sm bg-background/50"
+            />
+            <Select
+              value={
+                (table.getColumn("role")?.getFilterValue() as string) ?? "ALL"
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn("role")
+                  ?.setFilterValue(value === "ALL" ? "" : value)
+              }
+            >
+              <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background/50">
+                <SelectValue placeholder="Rôle" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL" className="cursor-pointer">
+                  Rôle
+                </SelectItem>
+                <SelectItem
+                  value="admin"
+                  className="cursor-pointer focus:bg-black/10 dark:focus:bg-white/10"
+                >
+                  <Badge
+                    variant="outline"
+                    className="bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800 gap-1 hover:bg-orange-100 dark:hover:bg-orange-900/60"
+                  >
+                    <ShieldAlert className="w-3 h-3 text-orange-700 dark:text-orange-300" />
+                    Admin
+                  </Badge>
+                </SelectItem>
+                <SelectItem
+                  value="staff"
+                  className="cursor-pointer focus:bg-black/10 dark:focus:bg-white/10"
+                >
+                  <Badge
+                    variant="outline"
+                    className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800 gap-1 hover:bg-blue-100 dark:hover:bg-blue-900/60"
+                  >
+                    <Shield className="w-3 h-3" />
+                    Staff
+                  </Badge>
+                </SelectItem>
+                <SelectItem
+                  value="adherent"
+                  className="cursor-pointer focus:bg-black/10 dark:focus:bg-white/10"
+                >
+                  <Badge
+                    variant="outline"
+                    className="bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800 gap-1 hover:bg-violet-100 dark:hover:bg-violet-900/60"
+                  >
+                    <UserIcon className="w-3 h-3" />
+                    Adhérent
+                  </Badge>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={
+                (table
+                  .getColumn("emailVerified")
+                  ?.getFilterValue() as string) === undefined
+                  ? "ALL"
+                  : String(table.getColumn("emailVerified")?.getFilterValue())
+              }
+              onValueChange={(value) =>
+                table
+                  .getColumn("emailVerified")
+                  ?.setFilterValue(
+                    value === "ALL" ? undefined : value === "true"
+                  )
+              }
+            >
+              <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background/50">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL" className="cursor-pointer">
+                  Statut
+                </SelectItem>
+                <SelectItem
+                  value="true"
+                  className="cursor-pointer focus:bg-black/10 dark:focus:bg-white/10"
+                >
+                  <Badge
+                    variant="outline"
+                    className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800 gap-1 hover:bg-green-100 dark:hover:bg-green-900/60"
+                  >
+                    <Check className="w-3 h-3" />
+                    Vérifié
+                  </Badge>
+                </SelectItem>
+                <SelectItem
+                  value="false"
+                  className="cursor-pointer focus:bg-black/10 dark:focus:bg-white/10"
+                >
+                  <Badge
+                    variant="outline"
+                    className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 gap-1 hover:bg-red-100 dark:hover:bg-red-900/60"
+                  >
+                    <X className="w-3 h-3" />
+                    Non vérifié
+                  </Badge>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <InviteUserModal />
         </div>
       </div>

@@ -1,29 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LandingLogo } from "@/components/landing-logo";
-import { Input } from "@/components/ui/input";
-import { ExternalLink, Heart, Sparkles } from "lucide-react";
+
+import { ExternalLink, Heart } from "lucide-react";
 import { LuHandHelping } from "react-icons/lu";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter();
-  const [donationAmount, setDonationAmount] = useState("");
-
-  const handleQuickDonate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (donationAmount) {
-      router.push(`/don?amount=${donationAmount}`);
-    }
-  };
-
   const links = [
     {
       name: "Billetterie",
@@ -76,7 +63,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 w-full">
           {/* Hero Section (Logo + Text) - Spans 2 cols on mobile and desktop */}
           <div className="col-span-1 md:col-span-2 md:row-span-2 md:bg-card/40 md:backdrop-blur-md md:border md:border-white/10 md:rounded-3xl md:p-8 flex flex-col items-center justify-center text-center md:shadow-xl relative overflow-visible md:overflow-hidden group">
-            <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="hidden md:block absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <LandingLogo className="mb-6 md:mb-6" />
             <div className="space-y-3 z-10">
               <p className="text-xl md:text-2xl text-muted-foreground font-medium">
@@ -96,11 +83,11 @@ export default function Home() {
           {/* Quick Donate Section - Spans 1 col */}
           <div className="col-span-1 md:col-span-1">
             <div className="w-full h-full relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-3xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+              <div className="absolute -inset-1 bg-linear-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-3xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
               <Card className="relative h-full border-amber-500/30 bg-card/80 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
                 <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
                   <div className="relative mt-1 mb-1">
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 animate-bounce duration-[1500ms]">
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 animate-bounce duration-1500">
                       <Heart className="w-6 h-6 text-red-500 fill-red-500 drop-shadow-md" />
                     </div>
                     <LuHandHelping className="w-12 h-12 text-amber-500" />
@@ -119,7 +106,7 @@ export default function Home() {
                     <Button
                       asChild
                       size="sm"
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md shadow-amber-500/20"
+                      className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md shadow-amber-500/20"
                     >
                       <a
                         href="https://BDE-FENSUP.short.gy/Dons"
@@ -145,7 +132,7 @@ export default function Home() {
           </div>
 
           {/* Links Section - Grid Items */}
-          {links.map((link, index) => {
+          {links.map((link) => {
             // Custom spanning for specific links to make the grid interesting
             const isWide = link.name === "Billetterie";
             // Billetterie spans 2 cols on desktop
@@ -176,7 +163,7 @@ export default function Home() {
                   {/* Hover Gradient Effect */}
                   {!link.comingSoon && (
                     <div
-                      className={`absolute inset-0 bg-gradient-to-r translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ${"from-primary/0 via-primary/5 to-primary/0"}`}
+                      className={`absolute inset-0 bg-linear-to-r -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ${"from-primary/0 via-primary/5 to-primary/0"}`}
                     />
                   )}
 

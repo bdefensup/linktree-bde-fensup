@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { betterAuth } from "better-auth";
-import { createAuthMiddleware, APIError } from "better-auth/api";
+
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";
 import { Resend } from "resend";
@@ -14,15 +14,15 @@ export const auth = betterAuth({
   plugins: [admin()],
   emailAndPassword: {
     enabled: true,
-    async sendResetPassword(data, request) {
+    async sendResetPassword(data) {
       const resend = new Resend(process.env.RESEND_API_KEY);
       if (!process.env.RESEND_API_KEY) {
         console.error("RESEND_API_KEY is missing!");
         return;
       }
       try {
-        const result = await resend.emails.send({
-          from: "onboarding@resend.dev",
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || "onboarding@resend.dev",
           to: data.user.email,
           subject: "Réinitialisation de votre mot de passe",
           react: ResetPasswordEmail({
@@ -37,15 +37,15 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, url }) => {
       const resend = new Resend(process.env.RESEND_API_KEY);
       if (!process.env.RESEND_API_KEY) {
         console.error("RESEND_API_KEY is missing!");
         return;
       }
       try {
-        const result = await resend.emails.send({
-          from: "onboarding@resend.dev", // Using test email until domain is verified
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || "onboarding@resend.dev",
           to: user.email,
           subject: "Vérifiez votre adresse email",
           react: VerifyEmail({
@@ -61,26 +61,5 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // Update session every day
-  },
-  hooks: {
-    before: createAuthMiddleware(async (ctx) => {
-      if (ctx.path === "/sign-up/email") {
-        // Allow admin invites to bypass domain restriction
-        if (ctx.headers?.get("x-admin-invite") === "true") {
-          return;
-        }
-
-        const email = ctx.body?.email;
-        const allowedEmail = "bdefensup@gmail.com";
-        const allowedDomain = "@edufenelon.org";
-
-        if (email !== allowedEmail && !email?.endsWith(allowedDomain)) {
-          throw new APIError("BAD_REQUEST", {
-            message:
-              "Seules les adresses @edufenelon.org ou bdefensup@gmail.com sont autorisées.",
-          });
-        }
-      }
-    }),
   },
 });

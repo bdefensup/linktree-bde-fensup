@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { DataTable } from "./data-table";
-import { columns } from "./columns";
+import { StaffTableWrapper } from "./staff-table-wrapper";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +18,16 @@ async function getUsers() {
   }));
 }
 
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
 export default async function AdminStaffPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   const users = await getUsers();
+  const userRole = session?.user?.role || "adherent";
 
   return (
     <div className="container mx-auto py-10 space-y-8">
@@ -35,7 +42,7 @@ export default async function AdminStaffPage() {
         </div>
       </div>
 
-      <DataTable columns={columns} data={users} />
+      <StaffTableWrapper data={users} userRole={userRole} />
     </div>
   );
 }

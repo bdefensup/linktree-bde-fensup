@@ -150,7 +150,7 @@ export default function BilletteriePage() {
               </Link>
             </Button>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-primary via-accent to-secondary">
             Billetterie Officielle
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
@@ -304,7 +304,7 @@ export default function BilletteriePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredEvents.map((event, index) => {
+            {filteredEvents.map((event) => {
               const availableSeats =
                 event.maxSeats - (event._count?.bookings || 0);
               const isSoldOut = availableSeats <= 0;
@@ -343,7 +343,7 @@ export default function BilletteriePage() {
                             className={`object-cover transition-transform duration-500 ${!isSoldOut ? "group-hover:scale-105" : ""}`}
                           />
                         ) : (
-                          <div className="h-full w-full bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
+                          <div className="h-full w-full bg-linear-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
                             <Ticket className="w-16 h-16 text-primary/20" />
                           </div>
                         )}
@@ -378,7 +378,7 @@ export default function BilletteriePage() {
                         </div>
                       </CardHeader>
 
-                      <CardContent className="flex-grow space-y-4">
+                      <CardContent className="grow space-y-4">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <CalendarIcon className="w-4 h-4 text-primary" />
                           <span className="font-medium">

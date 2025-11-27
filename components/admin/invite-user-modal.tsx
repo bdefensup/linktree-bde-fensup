@@ -102,7 +102,7 @@ export function InviteUserModal() {
               <Input
                 id="email"
                 type="email"
-                placeholder="jean.dupont@edufenelon.org"
+                placeholder="votre.email@exemple.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-9 bg-background/50"

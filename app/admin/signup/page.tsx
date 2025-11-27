@@ -30,17 +30,6 @@ export default function AdminSignupPage() {
     e.preventDefault();
     setLoading(true);
 
-    const allowedEmail = "bdefensup@gmail.com";
-    const allowedDomain = "@edufenelon.org";
-
-    if (email !== allowedEmail && !email.endsWith(allowedDomain)) {
-      toast.error(
-        "Seules les adresses @edufenelon.org ou bdefensup@gmail.com sont autorisées."
-      );
-      setLoading(false);
-      return;
-    }
-
     try {
       await signUp.email({
         email,
@@ -119,11 +108,11 @@ export default function AdminSignupPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email (@edufenelon.org)</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="prenom.nom@edufenelon.org"
+                placeholder="votre.email@exemple.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

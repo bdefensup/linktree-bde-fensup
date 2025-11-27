@@ -106,6 +106,14 @@ export const columns: ColumnDef<Event>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const title = row.getValue("title") as string;
+      return (
+        <div className="max-w-[200px] truncate font-medium" title={title}>
+          {title}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "isFeatured",
@@ -149,6 +157,14 @@ export const columns: ColumnDef<Event>[] = [
   {
     accessorKey: "location",
     header: "Lieu",
+    cell: ({ row }) => {
+      const location = row.getValue("location") as string;
+      return (
+        <div className="max-w-[150px] truncate" title={location}>
+          {location}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "price",

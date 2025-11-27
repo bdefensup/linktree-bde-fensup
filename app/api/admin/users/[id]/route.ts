@@ -37,3 +37,76 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const currentUserRole = session.user.role;
+
+    // Adherent cannot delete anyone
+    if (currentUserRole === "adherent") {
+      return NextResponse.json(
+        {
+          error: "Vous n'avez pas la permission de supprimer des utilisateurs.",
+        },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+
+    // Prevent deleting self
+    if (session.user.id === id) {
+      return NextResponse.json(
+        { error: "Vous ne pouvez pas supprimer votre propre compte." },
+        { status: 400 }
+      );
+    }
+
+    // Fetch target user to check their role
+    const targetUser = await prisma.user.findUnique({
+      where: { id },
+      select: { role: true },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json(
+        { error: "Utilisateur introuvable." },
+        { status: 404 }
+      );
+    }
+
+    // Staff cannot delete Admin
+    if (currentUserRole === "staff" && targetUser.role === "admin") {
+      return NextResponse.json(
+        {
+          error:
+            "Les membres du staff ne peuvent pas supprimer un administrateur.",
+        },
+        { status: 403 }
+      );
+    }
+
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Delete user error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to delete user" },
+      { status: 500 }
+    );
+  }
+}
