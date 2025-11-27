@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { betterAuth } from "better-auth";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { admin } from "better-auth/plugins";
 import { Resend } from "resend";
 import ResetPasswordEmail from "@/components/emails/reset-password";
 import VerifyEmail from "@/components/emails/verify-email";
@@ -10,6 +11,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  plugins: [admin()],
   emailAndPassword: {
     enabled: true,
     async sendResetPassword(data, request) {

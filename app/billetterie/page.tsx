@@ -3,7 +3,15 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, MapPin, Ticket, ArrowRight, ArrowLeft } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  MapPin,
+  Ticket,
+  ArrowRight,
+  ArrowLeft,
+  Filter,
+  X,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -13,7 +21,25 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LandingLogo } from "@/components/landing-logo";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  format,
+  isSameDay,
+  isSameWeek,
+  isSameMonth,
+  isSameYear,
+  isWithinInterval,
+  startOfDay,
+  endOfDay,
+} from "date-fns";
+import { fr } from "date-fns/locale";
+import { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 
 interface Event {
   id: string;
@@ -31,9 +57,14 @@ interface Event {
   };
 }
 
+type FilterType = "all" | "day" | "week" | "month" | "year" | "custom";
+
 export default function BilletteriePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterType, setFilterType] = useState<FilterType>("all");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/events")
@@ -48,6 +79,48 @@ export default function BilletteriePage() {
       });
   }, []);
 
+  const filteredEvents = events.filter((event) => {
+    const eventDate = new Date(event.date);
+    const now = new Date();
+
+    switch (filterType) {
+      case "day":
+        return isSameDay(eventDate, now);
+      case "week":
+        return isSameWeek(eventDate, now, { locale: fr });
+      case "month":
+        return isSameMonth(eventDate, now);
+      case "year":
+        return isSameYear(eventDate, now);
+      case "custom":
+        if (dateRange?.from && dateRange?.to) {
+          return isWithinInterval(eventDate, {
+            start: startOfDay(dateRange.from),
+            end: endOfDay(dateRange.to),
+          });
+        } else if (dateRange?.from) {
+          return isSameDay(eventDate, dateRange.from);
+        }
+        return true;
+      default:
+        return true;
+    }
+  });
+
+  const handleFilterChange = (type: FilterType) => {
+    if (type === "custom") {
+      setIsCalendarOpen(true);
+    } else {
+      setFilterType(type);
+      setDateRange(undefined);
+    }
+  };
+
+  const clearFilters = () => {
+    setFilterType("all");
+    setDateRange(undefined);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
       {/* Background Ambience */}
@@ -56,7 +129,7 @@ export default function BilletteriePage() {
 
       <div className="max-w-7xl mx-auto px-4 py-16 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16 space-y-4 relative">
+        <div className="text-center mb-12 space-y-4 relative">
           <div className="flex justify-start md:absolute md:left-0 md:top-0 mb-6 md:mb-0 z-20">
             <Button
               variant="outline"
@@ -86,6 +159,108 @@ export default function BilletteriePage() {
           </p>
         </div>
 
+        {/* Filter Bar */}
+        <div className="mb-10 flex flex-col items-center gap-4">
+          <div className="w-full max-w-4xl overflow-x-auto pb-4 md:pb-0 scrollbar-hide">
+            <div className="flex items-center gap-2 px-2 md:justify-center min-w-max">
+              <Button
+                variant={filterType === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleFilterChange("all")}
+                className="rounded-full"
+              >
+                Tout
+              </Button>
+              <Button
+                variant={filterType === "day" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleFilterChange("day")}
+                className="rounded-full"
+              >
+                Aujourd'hui
+              </Button>
+              <Button
+                variant={filterType === "week" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleFilterChange("week")}
+                className="rounded-full"
+              >
+                Cette semaine
+              </Button>
+              <Button
+                variant={filterType === "month" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleFilterChange("month")}
+                className="rounded-full"
+              >
+                Ce mois
+              </Button>
+              <Button
+                variant={filterType === "year" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleFilterChange("year")}
+                className="rounded-full"
+              >
+                Cette année
+              </Button>
+
+              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={filterType === "custom" ? "default" : "outline"}
+                    size="sm"
+                    className={cn(
+                      "rounded-full gap-2",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "dd/MM", { locale: fr })} -{" "}
+                          {format(dateRange.to, "dd/MM", { locale: fr })}
+                        </>
+                      ) : (
+                        format(dateRange.from, "dd/MM", { locale: fr })
+                      )
+                    ) : (
+                      "Période..."
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={(range) => {
+                      setDateRange(range);
+                      if (range?.from) {
+                        setFilterType("custom");
+                      }
+                    }}
+                    numberOfMonths={2}
+                    locale={fr}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              {filterType !== "all" && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={clearFilters}
+                  className="rounded-full h-8 w-8 ml-2 hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Events Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -108,25 +283,33 @@ export default function BilletteriePage() {
               </Card>
             ))}
           </div>
-        ) : events.length === 0 ? (
+        ) : filteredEvents.length === 0 ? (
           <div className="text-center py-20 bg-card/50 backdrop-blur-sm rounded-3xl border border-border/50 shadow-sm">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-              <Ticket className="w-8 h-8 text-muted-foreground" />
+              <Filter className="w-8 h-8 text-muted-foreground" />
             </div>
             <h3 className="text-xl font-semibold mb-2">
-              Aucun événement prévu
+              Aucun événement trouvé
             </h3>
-            <p className="text-muted-foreground">
-              Revenez plus tard pour découvrir nos prochaines soirées !
+            <p className="text-muted-foreground mb-6">
+              Aucun événement ne correspond à vos filtres.
             </p>
+            <Button
+              onClick={clearFilters}
+              variant="outline"
+              className="rounded-full"
+            >
+              Effacer les filtres
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {events.map((event) => {
+            {filteredEvents.map((event, index) => {
               const availableSeats =
                 event.maxSeats - (event._count?.bookings || 0);
               const isSoldOut = availableSeats <= 0;
-              const isFeatured = event.isFeatured;
+              // Only feature the first event if we are viewing ALL events, otherwise standard grid
+              const isFeatured = filterType === "all" && event.isFeatured;
               const colSpan = isFeatured
                 ? "col-span-1 md:col-span-2 md:row-span-2"
                 : "col-span-1";
@@ -197,7 +380,7 @@ export default function BilletteriePage() {
 
                       <CardContent className="flex-grow space-y-4">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4 text-primary" />
+                          <CalendarIcon className="w-4 h-4 text-primary" />
                           <span className="font-medium">
                             {new Date(event.date).toLocaleDateString("fr-FR", {
                               weekday: "long",
