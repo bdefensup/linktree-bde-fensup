@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown, Pencil, Trash } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,9 +27,29 @@ export type Event = {
   externalPrice?: number | null;
   maxSeats: number;
   image: string | null;
+  isFeatured: boolean;
   _count?: {
     bookings: number;
   };
+};
+
+const toggleFeatured = async (id: string, currentStatus: boolean) => {
+  try {
+    const response = await fetch(`/api/admin/events/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isFeatured: !currentStatus }),
+    });
+
+    if (!response.ok) throw new Error("Failed to update event");
+
+    toast.success(
+      !currentStatus ? "Événement mis en avant" : "Événement retiré de la une"
+    );
+    window.location.reload();
+  } catch (error) {
+    toast.error("Erreur lors de la mise à jour");
+  }
 };
 
 const deleteEvent = async (id: string) => {
@@ -83,6 +103,27 @@ export const columns: ColumnDef<Event>[] = [
         >
           Titre
           <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "isFeatured",
+    header: "À la une",
+    cell: ({ row }) => {
+      const isFeatured = row.getValue("isFeatured") as boolean;
+      return (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => toggleFeatured(row.original.id, isFeatured)}
+          className={
+            isFeatured
+              ? "text-yellow-500 hover:text-yellow-600"
+              : "text-muted-foreground hover:text-yellow-500"
+          }
+        >
+          <Star className={`h-5 w-5 ${isFeatured ? "fill-current" : ""}`} />
         </Button>
       );
     },

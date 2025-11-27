@@ -25,6 +25,7 @@ interface Event {
   memberPrice?: number;
   maxSeats: number;
   image: string | null;
+  isFeatured: boolean;
   _count?: {
     bookings: number;
   };
@@ -120,16 +121,20 @@ export default function BilletteriePage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {events.map((event) => {
               const availableSeats =
                 event.maxSeats - (event._count?.bookings || 0);
               const isSoldOut = availableSeats <= 0;
+              const isFeatured = event.isFeatured;
+              const colSpan = isFeatured
+                ? "col-span-1 md:col-span-2 md:row-span-2"
+                : "col-span-1";
 
               return (
                 <div
                   key={event.id}
-                  className={`group block h-full ${isSoldOut ? "pointer-events-none opacity-75 grayscale" : ""}`}
+                  className={`group block h-full ${colSpan} ${isSoldOut ? "pointer-events-none opacity-75 grayscale" : ""}`}
                 >
                   <Link
                     href={isSoldOut ? "#" : `/billetterie/${event.id}`}
@@ -137,14 +142,16 @@ export default function BilletteriePage() {
                     aria-disabled={isSoldOut}
                   >
                     <Card
-                      className={`h-full flex flex-col overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 ${
+                      className={`h-full flex flex-col overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 rounded-3xl ${
                         !isSoldOut
                           ? "hover:bg-card hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
                           : ""
                       }`}
                     >
                       {/* Image Container */}
-                      <div className="relative h-56 w-full overflow-hidden">
+                      <div
+                        className={`relative w-full overflow-hidden ${isFeatured ? "h-64 md:h-80" : "h-56"}`}
+                      >
                         {event.image ? (
                           <Image
                             src={event.image}
@@ -181,7 +188,7 @@ export default function BilletteriePage() {
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start gap-4">
                           <h3
-                            className={`text-2xl font-bold leading-tight transition-colors ${!isSoldOut ? "group-hover:text-primary" : ""}`}
+                            className={`font-bold leading-tight transition-colors ${isFeatured ? "text-3xl" : "text-xl"} ${!isSoldOut ? "group-hover:text-primary" : ""}`}
                           >
                             {event.title}
                           </h3>
@@ -212,7 +219,9 @@ export default function BilletteriePage() {
                           <span>{event.location}</span>
                         </div>
 
-                        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                        <p
+                          className={`text-muted-foreground leading-relaxed ${isFeatured ? "text-base line-clamp-3" : "text-sm line-clamp-2"}`}
+                        >
                           {event.description}
                         </p>
                       </CardContent>
@@ -224,7 +233,9 @@ export default function BilletteriePage() {
                               À partir de
                             </span>
                             <div className="flex items-baseline gap-2">
-                              <span className="text-2xl font-bold text-primary">
+                              <span
+                                className={`font-bold text-primary ${isFeatured ? "text-3xl" : "text-2xl"}`}
+                              >
                                 {event.memberPrice || event.price}€
                               </span>
                               {event.memberPrice && (

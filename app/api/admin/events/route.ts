@@ -14,6 +14,7 @@ export async function POST(request: Request) {
       image,
       externalPrice,
       capacity,
+      isFeatured,
     } = body;
 
     // Basic validation
@@ -30,6 +31,13 @@ export async function POST(request: Request) {
       );
     }
 
+    // If this event is featured, unfeature all others
+    if (isFeatured) {
+      await prisma.event.updateMany({
+        data: { isFeatured: false },
+      });
+    }
+
     const event = await prisma.event.create({
       data: {
         title,
@@ -41,6 +49,7 @@ export async function POST(request: Request) {
         externalPrice: externalPrice ? parseFloat(externalPrice) : null,
         image,
         maxSeats: parseInt(capacity),
+        isFeatured: isFeatured || false,
       },
     });
 

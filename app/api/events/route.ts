@@ -22,9 +22,7 @@ export async function GET() {
           },
         },
       },
-      orderBy: {
-        date: "asc",
-      },
+      orderBy: [{ isFeatured: "desc" }, { date: "asc" }],
     });
 
     return NextResponse.json(events);

@@ -81,6 +81,7 @@ model Event {
   price       Float
   memberPrice Float?
   externalPrice Float?
+  isFeatured  Boolean   @default(false)
   
   externalPaymentLink       String?
   externalMemberPaymentLink String?

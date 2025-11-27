@@ -18,22 +18,35 @@ export async function PUT(
       image,
       externalPrice,
       capacity,
+      isFeatured,
     } = body;
+
+    // If this event is featured, unfeature all others
+    if (isFeatured) {
+      await prisma.event.updateMany({
+        where: { id: { not: id } },
+        data: { isFeatured: false },
+      });
+    }
+
+    // Construct update data dynamically to support partial updates
+    const updateData: any = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (date !== undefined) updateData.date = new Date(date);
+    if (location !== undefined) updateData.location = location;
+    if (price !== undefined) updateData.price = parseFloat(price);
+    if (memberPrice !== undefined)
+      updateData.memberPrice = parseFloat(memberPrice);
+    if (externalPrice !== undefined)
+      updateData.externalPrice = parseFloat(externalPrice);
+    if (image !== undefined) updateData.image = image;
+    if (capacity !== undefined) updateData.maxSeats = parseInt(capacity);
+    if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
 
     const event = await prisma.event.update({
       where: { id },
-      data: {
-        title,
-        description,
-        date: new Date(date),
-        location,
-        price: price !== undefined ? parseFloat(price) : undefined,
-        memberPrice: memberPrice !== undefined ? parseFloat(memberPrice) : null,
-        externalPrice:
-          externalPrice !== undefined ? parseFloat(externalPrice) : null,
-        image,
-        maxSeats: capacity !== undefined ? parseInt(capacity) : undefined,
-      },
+      data: updateData,
     });
 
     return NextResponse.json(event);

@@ -181,14 +181,14 @@ export default function Home() {
                   )}
 
                   <CardContent
-                    className={`flex items-center p-3 md:p-6 h-full ${
+                    className={`flex items-center p-2 md:p-6 h-full ${
                       isWide
                         ? "justify-between"
                         : "flex-row justify-between text-left gap-2 md:flex-col md:justify-center md:text-center md:gap-4"
                     }`}
                   >
                     <div
-                      className={`flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl text-xl md:text-3xl transition-colors ${
+                      className={`flex items-center justify-center w-8 h-8 md:w-14 md:h-14 rounded-lg md:rounded-2xl text-lg md:text-3xl transition-colors ${
                         link.highlight
                           ? "bg-primary/10 text-primary"
                           : "bg-secondary/5 text-secondary group-hover:bg-primary/10 group-hover:text-primary"
@@ -198,38 +198,38 @@ export default function Home() {
                     </div>
 
                     <div
-                      className={`flex-1 min-w-0 ${isWide ? "text-left ml-3 md:ml-4" : "text-left md:text-center"}`}
+                      className={`flex-1 min-w-0 ${isWide ? "text-left ml-2 md:ml-4" : "text-left md:text-center"}`}
                     >
                       <div
-                        className={`flex items-center gap-2 ${isWide ? "" : "justify-start md:justify-center"}`}
+                        className={`flex items-center gap-1.5 md:gap-2 ${isWide ? "" : "justify-start md:justify-center"}`}
                       >
                         <h3
-                          className={`font-bold text-base md:text-xl truncate transition-colors ${"group-hover:text-primary"}`}
+                          className={`font-bold text-sm md:text-xl truncate transition-colors ${"group-hover:text-primary"}`}
                         >
                           {link.name}
                         </h3>
                         {link.comingSoon && (
                           <Badge
                             variant="secondary"
-                            className="text-[9px] md:text-[10px] h-4 md:h-5 px-1 md:px-1.5"
+                            className="text-[9px] md:text-[10px] h-3.5 md:h-5 px-1 md:px-1.5"
                           >
                             Bientôt
                           </Badge>
                         )}
                         {link.highlight && (
-                          <Badge className="bg-primary text-primary-foreground text-[9px] md:text-[10px] h-4 md:h-5 px-1 md:px-1.5 animate-pulse">
+                          <Badge className="bg-primary text-primary-foreground text-[9px] md:text-[10px] h-3.5 md:h-5 px-1 md:px-1.5 animate-pulse">
                             Nouveau
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1">
+                      <p className="text-[10px] md:text-sm text-muted-foreground mt-0 md:mt-1">
                         {link.description}
                       </p>
                     </div>
 
                     {!link.comingSoon && (
                       <ExternalLink
-                        className={`w-4 h-4 md:w-6 md:h-6 transition-colors ${isWide ? "ml-3 md:ml-4" : "ml-0 md:mt-2"} ${"text-muted-foreground/50 group-hover:text-primary"}`}
+                        className={`w-3.5 h-3.5 md:w-6 md:h-6 transition-colors ${isWide ? "ml-2 md:ml-4" : "ml-0 md:mt-2"} ${"text-muted-foreground/50 group-hover:text-primary"}`}
                       />
                     )}
                   </CardContent>
