@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   flexRender,
   getCoreRowModel,
@@ -34,7 +36,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldAlert, User as UserIcon, Check, X } from "lucide-react";
+import {
+  Shield,
+  ShieldAlert,
+  User as UserIcon,
+  Check,
+  X,
+  Trash2,
+  Users,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getColumns, User } from "./columns";
 
 interface DataTableProps {
@@ -43,12 +59,14 @@ interface DataTableProps {
 }
 
 export function DataTable({ data, userRole }: DataTableProps) {
+  const router = useRouter();
   const columns = React.useMemo(() => getColumns(userRole), [userRole]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const [rowSelection, setRowSelection] = React.useState({});
 
   // Date filtering state
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>();
@@ -96,12 +114,118 @@ export function DataTable({ data, userRole }: DataTableProps) {
     state: {
       sorting,
       columnFilters,
+      rowSelection,
     },
+    onRowSelectionChange: setRowSelection,
   });
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const isBulkActionsVisible = selectedRows.length > 0;
+
+  const handleBulkDelete = async () => {
+    if (
+      !confirm(
+        `Êtes-vous sûr de vouloir supprimer ${selectedRows.length} utilisateurs ?`
+      )
+    ) {
+      return;
+    }
+
+    const userIds = selectedRows.map((row) => row.original.id);
+
+    try {
+      const response = await fetch("/api/admin/users/bulk", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userIds }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete users");
+      }
+
+      toast.success(`${selectedRows.length} utilisateurs supprimés.`);
+      setRowSelection({});
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la suppression.");
+    }
+  };
+
+  const handleBulkRoleChange = async (newRole: string) => {
+    const userIds = selectedRows.map((row) => row.original.id);
+
+    try {
+      const response = await fetch("/api/admin/users/bulk", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userIds, role: newRole }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update roles");
+      }
+
+      toast.success(
+        `Rôle mis à jour pour ${selectedRows.length} utilisateurs.`
+      );
+      setRowSelection({});
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la mise à jour.");
+    }
+  };
 
   return (
     <div>
       <div className="flex flex-col gap-4 py-4 w-full">
+        {/* Bulk Actions Toolbar */}
+        {isBulkActionsVisible && (
+          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md border border-border/50 animate-in fade-in slide-in-from-top-2">
+            <span className="text-sm font-medium px-2">
+              {selectedRows.length} sélectionné(s)
+            </span>
+            <div className="h-4 w-px bg-border/50 mx-2" />
+
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDelete}
+              className="gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Supprimer
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Users className="w-4 h-4" />
+                  Changer Rôle
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem
+                  onClick={() => handleBulkRoleChange("adherent")}
+                >
+                  <UserIcon className="w-4 h-4 mr-2 text-violet-600" />
+                  Adhérent
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkRoleChange("staff")}>
+                  <Shield className="w-4 h-4 mr-2 text-blue-600" />
+                  Staff
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkRoleChange("admin")}>
+                  <ShieldAlert className="w-4 h-4 mr-2 text-orange-600" />
+                  Admin
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
         {/* Date Filters */}
         <div className="flex items-center gap-2">
           <DateRangePicker date={dateRange} setDate={setDateRange} />

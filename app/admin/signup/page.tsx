@@ -35,7 +35,7 @@ export default function AdminSignupPage() {
         email,
         password,
         name,
-        callbackURL: "/admin/reservations",
+        callbackURL: "/admin",
         fetchOptions: {
           onResponse: () => {
             setLoading(false);
@@ -49,7 +49,7 @@ export default function AdminSignupPage() {
           },
           onSuccess: () => {
             toast.success("Compte créé avec succès !");
-            router.push("/admin/reservations");
+            router.push("/admin");
           },
         },
       });

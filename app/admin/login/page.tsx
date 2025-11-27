@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
       await signIn.email({
         email,
         password,
-        callbackURL: "/admin/reservations",
+        callbackURL: "/admin",
         fetchOptions: {
           onResponse: () => {
             setLoading(false);
@@ -46,7 +46,7 @@ export default function AdminLoginPage() {
             setLoading(false);
           },
           onSuccess: () => {
-            router.push("/admin/reservations");
+            router.push("/admin");
           },
         },
       });

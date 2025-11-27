@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   ColumnDef,
   flexRender,
@@ -23,7 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Clock, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -56,10 +58,12 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -73,11 +77,83 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       columnFilters,
+      rowSelection,
     },
+    onRowSelectionChange: setRowSelection,
   });
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const isBulkActionsVisible = selectedRows.length > 0;
+
+  const handleBulkStatusChange = async (
+    status: "CONFIRMED" | "PENDING" | "CANCELLED"
+  ) => {
+    const bookingIds = selectedRows.map((row) => (row.original as any).id);
+
+    try {
+      const response = await fetch("/api/admin/bookings/bulk", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingIds, status }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update bookings");
+      }
+
+      toast.success(`${selectedRows.length} réservations mises à jour.`);
+      setRowSelection({});
+      router.refresh();
+      // Force reload to ensure data is fresh if router.refresh is not enough for client components
+      setTimeout(() => window.location.reload(), 500);
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la mise à jour.");
+    }
+  };
 
   return (
     <div>
+      {/* Bulk Actions Toolbar */}
+      {isBulkActionsVisible && (
+        <div className="flex items-center gap-2 p-2 mb-4 bg-muted/50 rounded-md border border-border/50 animate-in fade-in slide-in-from-top-2">
+          <span className="text-sm font-medium px-2">
+            {selectedRows.length} sélectionné(s)
+          </span>
+          <div className="h-4 w-px bg-border/50 mx-2" />
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleBulkStatusChange("CONFIRMED")}
+            className="gap-2 text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
+          >
+            <Check className="w-4 h-4" />
+            Valider
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleBulkStatusChange("PENDING")}
+            className="gap-2 text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+          >
+            <Clock className="w-4 h-4" />
+            En attente
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleBulkStatusChange("CANCELLED")}
+            className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+          >
+            <X className="w-4 h-4" />
+            Refuser
+          </Button>
+        </div>
+      )}
+
       <div className="flex items-center py-4 gap-2" suppressHydrationWarning>
         <Input
           placeholder="Filtrer par email..."

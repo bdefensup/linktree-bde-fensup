@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- Admin Redirection Logic ---
-  const isAdminRoot = pathname === "/admin";
   const isAdminLogin = pathname === "/admin/login";
   const isAdminRoute = pathname.startsWith("/admin");
 
@@ -14,14 +13,7 @@ export function proxy(request: NextRequest) {
     request.cookies.get("__Secure-better-auth.session_token");
   const isAuthenticated = !!sessionCookie;
 
-  // 1. Redirect /admin to /admin/events if authenticated, or /admin/login if not
-  if (isAdminRoot) {
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/admin/events", request.url));
-    } else {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
-    }
-  }
+  // 1. Removed redirect for /admin to allow dashboard access
 
   // 2. Protect /admin/* routes (excluding login and signup)
   const isAdminSignup = pathname === "/admin/signup";
@@ -31,9 +23,9 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 3. Redirect /admin/login to /admin/events if already authenticated
+  // 3. Redirect /admin/login to /admin (Dashboard) if already authenticated
   if (isAdminLogin && isAuthenticated) {
-    return NextResponse.redirect(new URL("/admin/events", request.url));
+    return NextResponse.redirect(new URL("/admin", request.url));
   }
 
   // Liste des chemins autorisés
