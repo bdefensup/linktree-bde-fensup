@@ -6,6 +6,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LandingLogo } from "@/components/landing-logo";
 import { Input } from "@/components/ui/input";
 import { ExternalLink, Heart, Sparkles } from "lucide-react";
 import { LuHandHelping } from "react-icons/lu";
@@ -72,26 +73,10 @@ export default function Home() {
       </div>
 
       <main className="flex-1 flex flex-col items-center w-full max-w-lg px-6 py-16 z-10">
-        {/* Logo Section */}
-        <div className="relative mb-6">
-          <div className="absolute -inset-3 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur opacity-30"></div>
-          <div className="relative bg-card/50 backdrop-blur-xl p-8 rounded-full border border-border/50 shadow-xl ">
-            <Image
-              src="/logo-full.png"
-              alt="Logo BDE FEN'SUP"
-              width={1920}
-              height={1080}
-              className="object-contain drop-shadow-xl"
-              priority
-            />
-          </div>
-        </div>
+        <LandingLogo />
 
         {/* Header Text */}
         <div className="text-center mb-8 space-y-3">
-          <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary pb-2">
-            FEN'SUP
-          </h1>
           <p className="text-xl text-muted-foreground font-medium">
             Bureau des Étudiants
           </p>

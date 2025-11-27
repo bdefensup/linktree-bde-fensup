@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LandingLogo } from "@/components/landing-logo";
 
 interface Event {
   id: string;
@@ -75,24 +76,12 @@ export default function BilletteriePage() {
               </Link>
             </Button>
           </div>
-          <Link
-            href="/"
-            className="inline-block mb-4 hover:opacity-80 transition-opacity"
-          >
-            <Image
-              src="/logo-full.png"
-              alt="BDE FEN'SUP"
-              width={80}
-              height={80}
-              className="mx-auto drop-shadow-lg"
-            />
-          </Link>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
             Billetterie Officielle
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
             Découvrez et réservez vos places pour les événements exclusifs du
-            BDE FEN'SUP.
+            BDE FENELON.
           </p>
         </div>
 
