@@ -72,178 +72,101 @@ export default function Home() {
         <ModeToggle />
       </div>
 
-      <main className="flex-1 flex flex-col items-center w-full max-w-lg px-6 py-16 z-10">
-        <LandingLogo />
-
-        {/* Header Text */}
-        <div className="text-center mb-8 space-y-3">
-          <p className="text-xl text-muted-foreground font-medium">
-            Bureau des Étudiants
-          </p>
-          <div className="pt-2">
-            <Badge
-              variant="outline"
-              className="bg-primary/5 text-primary border-primary/20 px-4 py-1 text-sm font-medium rounded-full"
-            >
-              🎓 Année 2025-2026
-            </Badge>
-          </div>
-        </div>
-
-        {/* Quick Donate Section */}
-        <div className="w-full mb-6 relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
-          <Card className="relative border-amber-500/30 bg-card/80 backdrop-blur-sm overflow-hidden">
-            <CardContent className="p-4 flex flex-col items-center text-center space-y-3">
-              <div className="relative mt-1 mb-1">
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 animate-bounce duration-[1500ms]">
-                  <Heart className="w-5 h-5 text-red-500 fill-red-500 drop-shadow-md" />
-                </div>
-                <LuHandHelping className="w-10 h-10 text-amber-500" />
-              </div>
-
-              <div className="space-y-0.5">
-                <h3 className="font-bold text-base text-foreground">
-                  Soutenir le BDE
-                </h3>
-                <p className="text-[10px] text-muted-foreground">
-                  Votre aide est précieuse
-                </p>
-              </div>
-
-              <div className="flex w-full max-w-sm items-center justify-center gap-2">
-                <Button
-                  asChild
-                  size="sm"
-                  className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md shadow-amber-500/20 text-xs h-8"
-                >
-                  <a
-                    href="https://BDE-FENSUP.short.gy/Dons"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Faire un don personnalisé
-                  </a>
-                </Button>
-
-                <Button
-                  asChild
+      <main className="flex-1 w-full max-w-lg md:max-w-7xl px-6 py-16 z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 w-full">
+          {/* Hero Section (Logo + Text) - Spans 2 cols on mobile and desktop */}
+          <div className="col-span-1 md:col-span-2 md:row-span-2 md:bg-card/40 md:backdrop-blur-md md:border md:border-white/10 md:rounded-3xl md:p-8 flex flex-col items-center justify-center text-center md:shadow-xl relative overflow-visible md:overflow-hidden group">
+            <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <LandingLogo className="mb-6 md:mb-6" />
+            <div className="space-y-3 z-10">
+              <p className="text-xl md:text-2xl text-muted-foreground font-medium">
+                Bureau des Étudiants
+              </p>
+              <div className="pt-2">
+                <Badge
                   variant="outline"
-                  size="sm"
-                  className="flex-1 border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-600 text-foreground text-xs h-8"
+                  className="bg-primary/5 text-primary border-primary/20 px-4 py-1 text-sm font-medium rounded-full"
                 >
-                  <Link href="/don">Dons</Link>
-                </Button>
+                  🎓 Année 2025-2026
+                </Badge>
               </div>
+            </div>
+          </div>
 
-              <div className="w-full pt-2">
-                <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-border/40"></div>
-                  <span className="flex-shrink-0 mx-2 text-[10px] text-muted-foreground uppercase tracking-wider">
-                    Ou soutenez une asso
-                  </span>
-                  <div className="flex-grow border-t border-border/40"></div>
-                </div>
+          {/* Quick Donate Section - Spans 1 col */}
+          <div className="col-span-1 md:col-span-1">
+            <div className="w-full h-full relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-3xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+              <Card className="relative h-full border-amber-500/30 bg-card/80 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
+                <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
+                  <div className="relative mt-1 mb-1">
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 animate-bounce duration-[1500ms]">
+                      <Heart className="w-6 h-6 text-red-500 fill-red-500 drop-shadow-md" />
+                    </div>
+                    <LuHandHelping className="w-12 h-12 text-amber-500" />
+                  </div>
 
-                <div className="grid grid-cols-3 gap-2 mt-1">
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto py-2 flex flex-col gap-1 hover:bg-accent/50"
-                  >
-                    <a
-                      href="https://donner.actioncontrelafaim.org/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-center flex flex-col items-center"
-                    >
-                      <div className="relative w-12 h-8 mb-1">
-                        <Image
-                          src="/Logo_Action_contre_la_faim.svg.png"
-                          alt="Action contre la Faim"
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                      <span className="text-[9px] leading-tight text-muted-foreground">
-                        Action contre la Faim
-                      </span>
-                    </a>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto py-2 flex flex-col gap-1 hover:bg-accent/50"
-                  >
-                    <a
-                      href="https://donner.croix-rouge.fr/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-center flex flex-col items-center"
-                    >
-                      <div className="relative w-24 h-8 mb-1">
-                        <Image
-                          src="/croix rouge francaise unite locale de suresnes-ee9b063c1a1a4c38b4828f3aa26440e6.png.png"
-                          alt="Croix-Rouge"
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                      <span className="text-[9px] leading-tight text-muted-foreground">
-                        Croix-Rouge
-                      </span>
-                    </a>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto py-2 flex flex-col gap-1 hover:bg-accent/50"
-                  >
-                    <a
-                      href="https://humanappeal.fr/faire-un-don"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-center flex flex-col items-center"
-                    >
-                      <div className="relative w-12 h-8 mb-1">
-                        <Image
-                          src="/hu1963h69c-human-appeal-logo-human-appeal-logo-jli-removebg-preview.png"
-                          alt="Human Appeal"
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                      <span className="text-[9px] leading-tight text-muted-foreground">
-                        Human Appeal
-                      </span>
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-lg text-foreground">
+                      Soutenir le BDE
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Votre aide est précieuse
+                    </p>
+                  </div>
 
-        {/* Links Section */}
-        <div className="w-full space-y-4">
-          {links.map((link) => {
+                  <div className="flex flex-col w-full gap-2">
+                    <Button
+                      asChild
+                      size="sm"
+                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md shadow-amber-500/20"
+                    >
+                      <a
+                        href="https://BDE-FENSUP.short.gy/Dons"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Faire un don personnalisé
+                      </a>
+                    </Button>
+
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-600 text-foreground"
+                    >
+                      <Link href="/don">Dons</Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Links Section - Grid Items */}
+          {links.map((link, index) => {
+            // Custom spanning for specific links to make the grid interesting
+            const isWide = link.name === "Billetterie";
+            // Billetterie spans 2 cols on desktop
+            // Others span 1 col on desktop
+            // All span 1 col on mobile (vertical stack)
+            const colSpan = isWide ? "col-span-1 md:col-span-2" : "col-span-1";
+
             return (
               <Link
                 key={link.name}
                 href={link.url}
                 onClick={(e) => link.comingSoon && e.preventDefault()}
-                className={`block group ${
+                className={`block group ${colSpan} ${
                   link.comingSoon ? "cursor-not-allowed opacity-70" : ""
                 }`}
               >
                 <Card
-                  className={`relative overflow-hidden border transition-all duration-300 ${
+                  className={`relative h-full overflow-hidden border transition-all duration-300 rounded-3xl ${
                     link.comingSoon
                       ? "bg-muted/50 border-border/50"
-                      : "hover:shadow-lg hover:-translate-y-1 backdrop-blur-sm"
+                      : "hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm"
                   } ${"bg-card/80 border-border/50 hover:border-primary/50 hover:shadow-primary/5"} ${
                     link.highlight
                       ? "border-primary/50 shadow-md shadow-primary/10"
@@ -257,9 +180,15 @@ export default function Home() {
                     />
                   )}
 
-                  <CardContent className="flex items-center p-4">
+                  <CardContent
+                    className={`flex items-center p-3 md:p-6 h-full ${
+                      isWide
+                        ? "justify-between"
+                        : "flex-row justify-between text-left gap-2 md:flex-col md:justify-center md:text-center md:gap-4"
+                    }`}
+                  >
                     <div
-                      className={`flex items-center justify-center w-12 h-12 rounded-xl text-2xl mr-4 transition-colors ${
+                      className={`flex items-center justify-center w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl text-xl md:text-3xl transition-colors ${
                         link.highlight
                           ? "bg-primary/10 text-primary"
                           : "bg-secondary/5 text-secondary group-hover:bg-primary/10 group-hover:text-primary"
@@ -268,35 +197,39 @@ export default function Home() {
                       {link.icon}
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                    <div
+                      className={`flex-1 min-w-0 ${isWide ? "text-left ml-3 md:ml-4" : "text-left md:text-center"}`}
+                    >
+                      <div
+                        className={`flex items-center gap-2 ${isWide ? "" : "justify-start md:justify-center"}`}
+                      >
                         <h3
-                          className={`font-bold text-lg truncate transition-colors ${"group-hover:text-primary"}`}
+                          className={`font-bold text-base md:text-xl truncate transition-colors ${"group-hover:text-primary"}`}
                         >
                           {link.name}
                         </h3>
                         {link.comingSoon && (
                           <Badge
                             variant="secondary"
-                            className="text-[10px] h-5 px-1.5"
+                            className="text-[9px] md:text-[10px] h-4 md:h-5 px-1 md:px-1.5"
                           >
                             Bientôt
                           </Badge>
                         )}
                         {link.highlight && (
-                          <Badge className="bg-primary text-primary-foreground text-[10px] h-5 px-1.5 animate-pulse">
+                          <Badge className="bg-primary text-primary-foreground text-[9px] md:text-[10px] h-4 md:h-5 px-1 md:px-1.5 animate-pulse">
                             Nouveau
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1">
                         {link.description}
                       </p>
                     </div>
 
                     {!link.comingSoon && (
                       <ExternalLink
-                        className={`w-5 h-5 transition-colors ml-2 ${"text-muted-foreground/50 group-hover:text-primary"}`}
+                        className={`w-4 h-4 md:w-6 md:h-6 transition-colors ${isWide ? "ml-3 md:ml-4" : "ml-0 md:mt-2"} ${"text-muted-foreground/50 group-hover:text-primary"}`}
                       />
                     )}
                   </CardContent>

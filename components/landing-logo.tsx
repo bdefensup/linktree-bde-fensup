@@ -2,9 +2,13 @@
 
 import Image from "next/image";
 
-export function LandingLogo() {
+interface LandingLogoProps {
+  className?: string;
+}
+
+export function LandingLogo({ className }: LandingLogoProps) {
   return (
-    <div className="relative mb-8 group">
+    <div className={`relative mb-8 group ${className}`}>
       {/* Animated Glow Effect */}
       <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur-2xl opacity-40 group-hover:opacity-70 transition-opacity duration-500 animate-pulse"></div>
 
