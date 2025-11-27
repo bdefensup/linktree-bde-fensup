@@ -65,6 +65,11 @@ export const auth = betterAuth({
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-up/email") {
+        // Allow admin invites to bypass domain restriction
+        if (ctx.headers?.get("x-admin-invite") === "true") {
+          return;
+        }
+
         const email = ctx.body?.email;
         const allowedEmail = "bdefensup@gmail.com";
         const allowedDomain = "@edufenelon.org";

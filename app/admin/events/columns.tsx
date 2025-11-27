@@ -48,7 +48,7 @@ const toggleFeatured = async (id: string, currentStatus: boolean) => {
     );
     window.location.reload();
   } catch (error) {
-    toast.error("Erreur lors de la mise à jour");
+    toast.error("Impossible de mettre à jour l'événement.");
   }
 };
 
@@ -62,10 +62,10 @@ const deleteEvent = async (id: string) => {
 
     if (!response.ok) throw new Error("Failed to delete event");
 
-    toast.success("Événement supprimé");
+    toast.success("L'événement a été supprimé avec succès.");
     window.location.reload();
   } catch (error) {
-    toast.error("Erreur lors de la suppression");
+    toast.error("Impossible de supprimer l'événement.");
   }
 };
 

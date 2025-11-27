@@ -43,12 +43,12 @@ const updateStatus = async (id: string, status: string) => {
 
     if (!response.ok) throw new Error("Failed to update status");
 
-    toast.success(`Statut mis à jour : ${status}`);
+    toast.success("Le statut de la réservation a été mis à jour avec succès.");
     // We need to refresh the data. Since this is a client component,
     // we might need a way to trigger a refresh in the parent or use router.refresh()
     window.location.reload(); // Simple reload for now, or use router.refresh() if in a server component context
   } catch (error) {
-    toast.error("Erreur lors de la mise à jour");
+    toast.error("Impossible de mettre à jour le statut de la réservation.");
   }
 };
 

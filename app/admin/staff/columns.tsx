@@ -1,5 +1,8 @@
 "use client";
 
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 import { ColumnDef } from "@tanstack/react-table";
 import {
   MoreHorizontal,
@@ -30,6 +33,7 @@ export type User = {
   phoneNumber: string | null;
   role: string;
   createdAt: string; // Serialized date
+  banned?: boolean;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -100,8 +104,8 @@ export const columns: ColumnDef<User>[] = [
         case "admin":
           return (
             <Badge
-              variant="default"
-              className="bg-red-500/15 text-red-500 hover:bg-red-500/25 border-red-500/20 gap-1"
+              variant="outline"
+              className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200 dark:border-red-800 gap-1 hover:bg-red-100/80"
             >
               <ShieldAlert className="w-3 h-3" />
               Admin
@@ -110,8 +114,8 @@ export const columns: ColumnDef<User>[] = [
         case "staff":
           return (
             <Badge
-              variant="default"
-              className="bg-blue-500/15 text-blue-500 hover:bg-blue-500/25 border-blue-500/20 gap-1"
+              variant="outline"
+              className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border-blue-200 dark:border-blue-800 gap-1 hover:bg-blue-100/80"
             >
               <Shield className="w-3 h-3" />
               Staff
@@ -119,7 +123,10 @@ export const columns: ColumnDef<User>[] = [
           );
         default:
           return (
-            <Badge variant="secondary" className="gap-1">
+            <Badge
+              variant="outline"
+              className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800 gap-1 hover:bg-emerald-100/80"
+            >
               <User className="w-3 h-3" />
               Adhérent
             </Badge>
@@ -140,6 +147,52 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
+      const router = useRouter();
+
+      const handleCopyEmail = () => {
+        navigator.clipboard.writeText(user.email);
+        toast.success("Email copié dans le presse-papier.");
+      };
+
+      const handleRoleChange = async (newRole: string) => {
+        try {
+          const response = await fetch(`/api/admin/users/${user.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ role: newRole }),
+          });
+
+          if (!response.ok) throw new Error("Failed to update role");
+
+          toast.success(
+            "Le rôle de l'utilisateur a été mis à jour avec succès."
+          );
+          router.refresh();
+        } catch (error) {
+          toast.error("Impossible de modifier le rôle de l'utilisateur.");
+        }
+      };
+
+      const handleBanToggle = async () => {
+        try {
+          const response = await fetch(`/api/admin/users/${user.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ banned: !user.banned }),
+          });
+
+          if (!response.ok) throw new Error("Failed to ban");
+
+          toast.success(
+            user.banned
+              ? "L'utilisateur a été débanni avec succès."
+              : "L'utilisateur a été banni avec succès."
+          );
+          router.refresh();
+        } catch (error) {
+          toast.error("Impossible de modifier le statut de bannissement.");
+        }
+      };
 
       return (
         <DropdownMenu>
@@ -151,15 +204,26 @@ export const columns: ColumnDef<User>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.email)}
-            >
+            <DropdownMenuItem onClick={handleCopyEmail}>
               Copier l'email
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Modifier le rôle</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600 focus:text-red-600">
-              Bannir l'utilisateur
+            <DropdownMenuLabel>Changer le rôle</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => handleRoleChange("adherent")}>
+              Adhérent
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRoleChange("staff")}>
+              Staff
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRoleChange("admin")}>
+              Admin
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600"
+              onClick={handleBanToggle}
+            >
+              {user.banned ? "Débannir l'utilisateur" : "Bannir l'utilisateur"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

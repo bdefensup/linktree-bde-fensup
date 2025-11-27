@@ -62,7 +62,7 @@ export function InviteUserModal() {
       window.location.reload();
     } catch (error: any) {
       console.error("Invitation error:", error);
-      toast.error(error.message || "Erreur lors de l'invitation");
+      toast.error(error.message || "Impossible d'envoyer l'invitation.");
     } finally {
       setLoading(false);
     }

@@ -125,15 +125,15 @@ export function EventForm({ initialData }: EventFormProps) {
         throw new Error(errorData.error || "Une erreur est survenue");
       }
 
-      toast.success(initialData ? "Événement modifié !" : "Événement créé !");
+      toast.success(
+        initialData
+          ? "L'événement a été modifié avec succès."
+          : "L'événement a été créé avec succès."
+      );
       router.push("/admin/events");
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Erreur lors de l'enregistrement"
-      );
+      toast.error("Une erreur est survenue lors de l'enregistrement.");
       console.error(error);
     } finally {
       setLoading(false);

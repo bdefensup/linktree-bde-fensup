@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
             suppressHydrationWarning
           />
-          <DatePickerWithRange
+          <DateRangePicker
             date={
               (table.getColumn("date")?.getFilterValue() as DateRange) ??
               undefined
