@@ -80,7 +80,7 @@ export default function BilletteriePage() {
             className="inline-block mb-4 hover:opacity-80 transition-opacity"
           >
             <Image
-              src="/logo.png"
+              src="/logo-full.png"
               alt="BDE FEN'SUP"
               width={80}
               height={80}

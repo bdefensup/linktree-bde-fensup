@@ -75,13 +75,13 @@ export default function Home() {
         {/* Logo Section */}
         <div className="relative mb-6">
           <div className="absolute -inset-3 bg-gradient-to-r from-primary via-accent to-secondary rounded-full blur opacity-30"></div>
-          <div className="relative bg-card/50 backdrop-blur-xl p-8 rounded-full border border-border/50 shadow-xl">
+          <div className="relative bg-card/50 backdrop-blur-xl p-8 rounded-full border border-border/50 shadow-xl ">
             <Image
-              src="/logo.png"
+              src="/logo-full.png"
               alt="Logo BDE FEN'SUP"
-              width={200}
-              height={200}
-              className="object-contain drop-shadow-md translate-y-4"
+              width={1920}
+              height={1080}
+              className="object-contain drop-shadow-xl"
               priority
             />
           </div>

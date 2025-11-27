@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
         <CardHeader className="space-y-4 flex flex-col items-center text-center pb-2">
           <div className="relative w-32 h-32">
             <Image
-              src="/logo.png"
+              src="/logo-full.png"
               alt="Logo BDE FEN'SUP"
               fill
               className="object-contain drop-shadow-md"

@@ -14,6 +14,7 @@ interface ImageUploadProps {
   onChange: (url: string) => void;
   disabled?: boolean;
   className?: string;
+  variant?: "default" | "avatar";
 }
 
 export function ImageUpload({
@@ -21,9 +22,11 @@ export function ImageUpload({
   onChange,
   disabled,
   className,
+  variant = "default",
 }: ImageUploadProps) {
   const [loading, setLoading] = useState(false);
 
+  // ... (onDrop logic remains same) ...
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       try {
@@ -79,6 +82,39 @@ export function ImageUpload({
   const handleRemove = () => {
     onChange("");
   };
+
+  if (variant === "avatar") {
+    return (
+      <div className={cn("flex flex-col items-center gap-4", className)}>
+        <div
+          {...getRootProps()}
+          className={cn(
+            "relative flex h-32 w-32 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/25 bg-muted/50 transition-colors hover:bg-muted/80",
+            isDragActive && "border-primary bg-primary/5",
+            disabled && "cursor-not-allowed opacity-60",
+            value && "border-none"
+          )}
+        >
+          <input {...getInputProps()} />
+          {loading ? (
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          ) : value ? (
+            <div className="relative h-full w-full">
+              <Image src={value} alt="Avatar" fill className="object-cover" />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+                <UploadCloud className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          ) : (
+            <UploadCloud className="h-8 w-8 text-muted-foreground" />
+          )}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Cliquez pour modifier la photo
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("w-full", className)}>

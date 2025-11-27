@@ -1,21 +1,14 @@
+import { prisma } from "@/lib/prisma";
 import { betterAuth } from "better-auth";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
-// If your Prisma file is located elsewhere, you can change the path
-import { PrismaClient } from "@/lib/generated/prisma/client";
 import { Resend } from "resend";
 import ResetPasswordEmail from "@/components/emails/reset-password";
 import VerifyEmail from "@/components/emails/verify-email";
 
-const connectionString = process.env.DIRECT_URL;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
-    provider: "postgresql", // or "mysql", "postgresql", ...etc
+    provider: "postgresql",
   }),
   emailAndPassword: {
     enabled: true,

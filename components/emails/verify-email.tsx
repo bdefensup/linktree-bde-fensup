@@ -28,7 +28,7 @@ export const VerifyEmail = ({ url, firstName }: VerifyEmailProps) => (
         {/* Header with Logo */}
         <Section style={header}>
           <Img
-            src={`${baseUrl}/logo.png`}
+            src={`${baseUrl}/logo-full.png`}
             width="80"
             height="80"
             alt="BDE FEN'SUP"

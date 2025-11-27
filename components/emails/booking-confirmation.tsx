@@ -34,7 +34,7 @@ export const BookingConfirmationEmail = ({
         {/* Header with Logo Placeholder and Brand Name */}
         <Section style={header}>
           <Img
-            src={`${baseUrl}/logo.png`}
+            src={`${baseUrl}/logo-full.png`}
             width="80"
             height="80"
             alt="BDE FEN'SUP"

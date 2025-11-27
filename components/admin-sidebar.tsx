@@ -10,7 +10,7 @@ import {
   Users,
   KeyRound,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { signOut, useSession } from "@/lib/auth-client";
 import {
@@ -38,8 +38,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // Menu items.
 const items = [
   {
-    title: "Utilisateurs (Staff)",
-    url: "/admin/users",
+    title: "Staff",
+    url: "/admin/staff",
     icon: Users,
   },
   {
@@ -54,9 +54,16 @@ const items = [
   },
 ];
 
+import { ProfileModal } from "@/components/admin/profile-modal";
+import { useState } from "react";
+
+// ... (imports)
+
 export function AdminSidebar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session } = useSession();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut({
@@ -70,6 +77,7 @@ export function AdminSidebar() {
 
   return (
     <Sidebar>
+      <ProfileModal open={isProfileOpen} onOpenChange={setIsProfileOpen} />
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -124,6 +132,10 @@ export function AdminSidebar() {
                 side="bottom"
                 sideOffset={4}
               >
+                <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
+                  <User className="mr-2 h-4 w-4" />
+                  Mon Profil
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/forgot-password">
                     <KeyRound className="mr-2 h-4 w-4" />
@@ -150,11 +162,11 @@ export function AdminSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
+                    <Link href={item.url}>
+                      <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
