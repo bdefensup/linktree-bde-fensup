@@ -174,6 +174,13 @@ export const columns: ColumnDef<User>[] = [
       };
 
       const handleBanToggle = async () => {
+        if (user.role === "admin") {
+          toast.warning(
+            "Impossible de bannir un administrateur. Veuillez d'abord changer son rôle."
+          );
+          return;
+        }
+
         try {
           const response = await fetch(`/api/admin/users/${user.id}`, {
             method: "PATCH",

@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
-      toast.error("Une erreur est survenue lors de la connexion.");
+      toast.error("Échec de la connexion. Veuillez vérifier vos identifiants.");
     }
   };
 

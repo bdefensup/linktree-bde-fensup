@@ -67,7 +67,9 @@ export default function AdminSignupPage() {
     } catch (error) {
       console.error("Signup error:", error);
       setLoading(false);
-      toast.error("Une erreur est survenue lors de l'inscription.");
+      toast.error(
+        "Impossible de créer le compte. Veuillez réessayer plus tard."
+      );
     }
   };
 
