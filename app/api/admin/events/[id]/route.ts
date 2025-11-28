@@ -30,7 +30,7 @@ export async function PUT(
     }
 
     // Construct update data dynamically to support partial updates
-    const updateData: any = {};
+    const updateData: Record<string, any> = {};
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (date !== undefined) updateData.date = new Date(date);

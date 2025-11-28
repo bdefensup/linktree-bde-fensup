@@ -3,12 +3,12 @@
 import {
   Calendar,
   ChevronDown,
-  Inbox,
   LogOut,
   Ticket,
   User,
   Users,
   KeyRound,
+  Home,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -24,7 +24,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -156,6 +155,18 @@ export function AdminSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/">
+                  <Home className="h-4 w-4" />
+                  <span>Retour à l'accueil</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Gestion</SidebarGroupLabel>
           <SidebarGroupContent>

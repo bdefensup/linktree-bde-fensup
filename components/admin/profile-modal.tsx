@@ -26,7 +26,6 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { User } from "@/lib/generated/prisma/client";
 
 const formSchema = z.object({
   name: z.string().min(2, {

@@ -11,7 +11,6 @@ import {
   Hr,
   Img,
   Link,
-  Button,
 } from "@react-email/components";
 
 interface VerifyEmailProps {

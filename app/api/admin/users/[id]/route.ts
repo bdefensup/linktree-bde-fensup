@@ -29,10 +29,12 @@ export async function PATCH(
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error: any) {
+  } catch (error) {
     console.error("Update user error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to update user" },
+      {
+        error: error instanceof Error ? error.message : "Failed to update user",
+      },
       { status: 500 }
     );
   }
@@ -102,10 +104,12 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Delete user error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to delete user" },
+      {
+        error: error instanceof Error ? error.message : "Failed to delete user",
+      },
       { status: 500 }
     );
   }

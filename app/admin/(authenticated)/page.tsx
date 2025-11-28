@@ -1,7 +1,4 @@
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -21,6 +18,9 @@ import {
   MoreHorizontal,
   Activity,
   UserPlus,
+  Shield,
+  ShieldAlert,
+  User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -29,7 +29,7 @@ import { fr } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar } from "@/components/ui/calendar";
+
 import {
   Table,
   TableBody,
@@ -40,15 +40,6 @@ import {
 } from "@/components/ui/table";
 
 export default async function AdminDashboard() {
-  const headersList = await headers();
-  const session = await auth.api.getSession({
-    headers: headersList,
-  });
-
-  if (!session) {
-    redirect("/admin/login");
-  }
-
   // Fetch Data
   const [
     totalEvents,
@@ -121,7 +112,7 @@ export default async function AdminDashboard() {
                 asChild
                 title="Créer un événement"
               >
-                <Link href="/admin/events/new">
+                <Link href="/admin/events/create">
                   <Plus className="h-4 w-4" />
                 </Link>
               </Button>
@@ -193,20 +184,20 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* 5. Next Event (Left - Span 2 Cols, Span 2 Rows) */}
-        <Card className="col-span-1 md:col-span-1 row-span-2 relative overflow-hidden group border-border/50 shadow-md h-[350px]">
+        {/* 5. Next Event (Left - Span 2 Cols, Row 2) */}
+        <Card className="col-span-1 md:col-span-2 relative overflow-hidden group border-border/50 shadow-md h-full min-h-[300px]">
           {nextEvent?.image ? (
             <Image
               src={nextEvent.image}
               alt={nextEvent.title}
               fill
-              className="object-contain object-top z-10 transition-transform duration-500 group-hover:scale-105"
+              className="object-cover object-top z-10"
             />
           ) : (
-            <div className="absolute inset-0 z-0 bg-linear-to-br from-primary/20 via-card to-card" />
+            <div className="absolute inset-0 z-0 bg-linear-to-br from-primary/20 via-card to-card min-h-[300px]" />
           )}
 
-          <CardHeader className="relative z-30 pb-2 flex flex-row items-start justify-between">
+          <CardHeader className="absolute top-0 left-0 right-0 z-30 p-4 flex flex-row items-start justify-between">
             <div className="inline-flex">
               <CardTitle className="flex items-center gap-2 text-white bg-black/60 backdrop-blur-md rounded-md px-3 py-1.5 text-sm">
                 <CalendarIcon className="w-4 h-4 text-primary" />
@@ -220,10 +211,10 @@ export default async function AdminDashboard() {
                   size="icon"
                   className="h-8 w-8 bg-black/60 backdrop-blur-md text-white hover:bg-black/80 border-none"
                   asChild
-                  title="Gérer l'événement"
+                  title="Voir la page"
                 >
-                  <Link href={`/admin/events/${nextEvent.id}/edit`}>
-                    <ArrowRight className="h-4 w-4" />
+                  <Link href={`/billetterie/${nextEvent.id}`} target="_blank">
+                    <Ticket className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button
@@ -231,55 +222,61 @@ export default async function AdminDashboard() {
                   size="icon"
                   className="h-8 w-8 bg-black/60 backdrop-blur-md text-white hover:bg-black/80 border-none"
                   asChild
-                  title="Voir la page"
+                  title="Gérer l'événement"
                 >
-                  <Link href={`/billetterie/${nextEvent.id}`} target="_blank">
-                    <Ticket className="h-4 w-4" />
+                  <Link href={`/admin/events/${nextEvent.id}/edit`}>
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </div>
             )}
           </CardHeader>
 
-          <CardContent className="relative z-30 flex flex-col justify-end h-[calc(100%-60px)] pb-6">
-            {nextEvent ? (
-              <div className="space-y-3">
-                <h2 className="text-2xl font-bold tracking-tight line-clamp-2 text-white leading-tight drop-shadow-md">
-                  {nextEvent.title}
-                </h2>
-                <div className="flex flex-col gap-1.5 text-gray-100 text-sm font-medium drop-shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-primary shrink-0" />
-                    <span className="line-clamp-1">{nextEvent.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
-                    <span className="capitalize">
-                      {format(new Date(nextEvent.date), "EEE dd MMM • HH:mm", {
-                        locale: fr,
-                      })}
-                    </span>
+          <CardContent className="absolute inset-0 z-30 flex flex-col justify-end pb-4 pointer-events-none">
+            <div className="pointer-events-auto px-6">
+              {nextEvent ? (
+                <div className="space-y-3 bg-black/60 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                  <h2 className="text-xl font-bold tracking-tight line-clamp-2 text-white leading-tight drop-shadow-md">
+                    {nextEvent.title}
+                  </h2>
+                  <div className="flex flex-col gap-1.5 text-gray-100 text-sm font-medium drop-shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-primary shrink-0" />
+                      <span className="line-clamp-1">{nextEvent.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                      <span className="capitalize">
+                        {format(
+                          new Date(nextEvent.date),
+                          "EEE dd MMM • HH:mm",
+                          {
+                            locale: fr,
+                          }
+                        )}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-                <CalendarDays className="w-10 h-10 mb-2 opacity-50" />
-                <p className="text-sm">Aucun événement à venir.</p>
-                <Button
-                  variant="link"
-                  asChild
-                  className="mt-1 h-auto p-0 text-primary"
-                >
-                  <Link href="/admin/events/new">Créer un événement</Link>
-                </Button>
-              </div>
-            )}
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                  <CalendarDays className="w-10 h-10 mb-2 opacity-50" />
+                  <p className="text-sm">Aucun événement à venir.</p>
+                  <Button
+                    variant="link"
+                    asChild
+                    className="mt-1 h-auto p-0 text-primary"
+                  >
+                    <Link href="/admin/events/new">Créer un événement</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         {/* 6. Recent Activity (Right - Span 2 Cols, Row 2) */}
-        <Card className="col-span-1 md:col-span-2 lg:col-span-3 bg-card/50 backdrop-blur-xl border-border/50 shadow-sm">
+        <Card className="col-span-1 md:col-span-2 bg-card/50 backdrop-blur-xl border-border/50 shadow-sm h-auto">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-5 h-5 text-primary" />
@@ -290,7 +287,7 @@ export default async function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 h-[180px] divide-y md:divide-y-0 md:divide-x divide-border/50">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/50">
               {/* Column 1: Reservations */}
               <ScrollArea className="h-full">
                 <div className="p-4">
@@ -327,31 +324,33 @@ export default async function AdminDashboard() {
                                 locale: fr,
                               })}
                             </TableCell>
-                            <TableCell className="text-right">
-                              {booking.status === "CONFIRMED" && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px] bg-green-50 text-green-700 border-green-200 px-1 py-0 h-4"
-                                >
-                                  Validé
-                                </Badge>
-                              )}
-                              {booking.status === "PENDING" && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px] bg-orange-50 text-orange-700 border-orange-200 px-1 py-0 h-4"
-                                >
-                                  En attente
-                                </Badge>
-                              )}
-                              {booking.status === "CANCELLED" && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px] bg-red-50 text-red-700 border-red-200 px-1 py-0 h-4"
-                                >
-                                  Refusé
-                                </Badge>
-                              )}
+                            <TableCell className="text-right align-middle">
+                              <div className="flex justify-center items-center h-full">
+                                {booking.status === "CONFIRMED" && (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-200 hover:border-green-300 dark:hover:bg-green-900/50 transition-colors duration-200 px-2 py-0.5 h-5 flex items-center"
+                                  >
+                                    Validé
+                                  </Badge>
+                                )}
+                                {booking.status === "PENDING" && (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200 border-orange-200 dark:border-orange-800 hover:bg-orange-200 hover:border-orange-300 dark:hover:bg-orange-900/50 transition-colors duration-200 px-2 py-0.5 h-5 flex items-center"
+                                  >
+                                    En attente
+                                  </Badge>
+                                )}
+                                {booking.status === "CANCELLED" && (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200 dark:border-red-800 hover:bg-red-200 hover:border-red-300 dark:hover:bg-red-900/50 transition-colors duration-200 px-2 py-0.5 h-5 flex items-center"
+                                  >
+                                    Refusé
+                                  </Badge>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))
@@ -407,17 +406,37 @@ export default async function AdminDashboard() {
                                 </span>
                               </div>
                             </TableCell>
-                            <TableCell className="text-right">
-                              <Badge
-                                variant="secondary"
-                                className="text-[10px] px-1 py-0 h-4"
-                              >
-                                {user.role === "admin"
-                                  ? "Admin"
-                                  : user.role === "staff"
-                                    ? "Staff"
-                                    : "Adhérent"}
-                              </Badge>
+                            <TableCell className="text-right align-middle">
+                              <div className="flex justify-center items-center h-full">
+                                {user.role === "admin" && (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800 gap-1 hover:bg-orange-100 dark:hover:bg-orange-900/60 px-2 py-0.5 h-5 flex items-center"
+                                  >
+                                    <ShieldAlert className="w-3 h-3" />
+                                    Admin
+                                  </Badge>
+                                )}
+                                {user.role === "staff" && (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800 gap-1 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2 py-0.5 h-5 flex items-center"
+                                  >
+                                    <Shield className="w-3 h-3" />
+                                    Staff
+                                  </Badge>
+                                )}
+                                {(user.role === "adherent" ||
+                                  user.role === "user") && (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800 gap-1 hover:bg-violet-100 dark:hover:bg-violet-900/60 px-2 py-0.5 h-5 flex items-center"
+                                  >
+                                    <UserIcon className="w-3 h-3" />
+                                    Adhérent
+                                  </Badge>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))
@@ -436,21 +455,6 @@ export default async function AdminDashboard() {
                 </div>
               </ScrollArea>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* 7. Calendar (Right - Span 2 Cols, Row 3) */}
-        <Card className="col-span-1 md:col-span-2 lg:col-span-3 bg-card/50 backdrop-blur-xl border-border/50 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Calendrier</CardTitle>
-            <CardDescription>Aperçu du mois en cours</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center p-0">
-            <Calendar
-              mode="single"
-              selected={new Date()}
-              className="rounded-md border shadow-sm bg-background/50  w-full flex justify-center"
-            />
           </CardContent>
         </Card>
       </div>

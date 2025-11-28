@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Loader2, UserPlus, Mail } from "lucide-react";
 import { toast } from "sonner";
-import { authClient } from "@/lib/auth-client";
 
 export function InviteUserModal() {
   const [open, setOpen] = useState(false);
@@ -60,9 +59,13 @@ export function InviteUserModal() {
       setRole("adherent");
       // Refresh the page or list
       window.location.reload();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Invitation error:", error);
-      toast.error(error.message || "Impossible d'envoyer l'invitation.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Impossible d'envoyer l'invitation."
+      );
     } finally {
       setLoading(false);
     }

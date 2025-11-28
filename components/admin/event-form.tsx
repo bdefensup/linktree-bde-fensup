@@ -90,6 +90,7 @@ export function EventForm({ initialData }: EventFormProps) {
       };
 
   const form = useForm<EventFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(formSchema) as any,
     defaultValues,
   });
