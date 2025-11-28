@@ -48,20 +48,36 @@ interface StaffActionsCellProps {
   currentUserRole: string;
 }
 
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
   const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [roleToChange, setRoleToChange] = useState<string | null>(null);
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(user.email);
     toast.success("Email copié dans le presse-papier.");
   };
 
-  const handleRoleChange = async (newRole: string) => {
+  const confirmRoleChange = async () => {
+    if (!roleToChange) return;
+
     try {
       const response = await fetch(`/api/admin/users/${user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: newRole }),
+        body: JSON.stringify({ role: roleToChange }),
       });
 
       if (!response.ok) throw new Error("Failed to update role");
@@ -70,10 +86,36 @@ function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
       router.refresh();
     } catch {
       toast.error("Impossible de modifier le rôle de l'utilisateur.");
+    } finally {
+      setRoleToChange(null);
     }
   };
 
-  const handleDeleteUser = async () => {
+  const confirmDeleteUser = async () => {
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete");
+      }
+
+      toast.success("L'utilisateur a été supprimé avec succès.");
+      router.refresh();
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Impossible de supprimer l'utilisateur.";
+      toast.error(errorMessage);
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
+
+  const handleDeleteClick = () => {
     if (currentUserRole === "adherent") {
       toast.error(
         "Vous n'avez pas la permission de supprimer des utilisateurs."
@@ -93,33 +135,7 @@ function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
       return;
     }
 
-    if (
-      !confirm(
-        "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/admin/users/${user.id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to delete");
-      }
-
-      toast.success("L'utilisateur a été supprimé avec succès.");
-      router.refresh();
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Impossible de supprimer l'utilisateur.";
-      toast.error(errorMessage);
-    }
+    setShowDeleteDialog(true);
   };
 
   const canDelete =
@@ -127,65 +143,122 @@ function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
     (currentUserRole === "staff" && user.role !== "admin");
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Ouvrir menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-auto min-w-[140px]">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem onClick={handleCopyEmail}>
-          Copier l'email
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Changer le rôle</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-auto min-w-[120px]">
-            <DropdownMenuItem onClick={() => handleRoleChange("adherent")}>
-              <div className="flex items-center gap-2 w-full">
-                <UserIcon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-                <span>Adhérent</span>
-                {user.role === "adherent" && (
-                  <Check className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-                )}
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleRoleChange("staff")}>
-              <div className="flex items-center gap-2 w-full">
-                <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>Staff</span>
-                {user.role === "staff" && (
-                  <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                )}
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleRoleChange("admin")}>
-              <div className="flex items-center gap-2 w-full">
-                <ShieldAlert className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                <span>Admin</span>
-                {user.role === "admin" && (
-                  <Check className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                )}
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-
-        <DropdownMenuSeparator />
-        {canDelete && (
-          <DropdownMenuItem
-            className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10"
-            onClick={handleDeleteUser}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Supprimer
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Ouvrir menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-auto min-w-[140px]">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={handleCopyEmail}>
+            Copier l'email
           </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuSeparator />
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Changer le rôle</DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="w-auto min-w-[120px]">
+              <DropdownMenuItem onSelect={() => setRoleToChange("adherent")}>
+                <div className="flex items-center gap-2 w-full">
+                  <UserIcon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                  <span>Adhérent</span>
+                  {user.role === "adherent" && (
+                    <Check className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                  )}
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setRoleToChange("staff")}>
+                <div className="flex items-center gap-2 w-full">
+                  <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span>Staff</span>
+                  {user.role === "staff" && (
+                    <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  )}
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setRoleToChange("admin")}>
+                <div className="flex items-center gap-2 w-full">
+                  <ShieldAlert className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                  <span>Admin</span>
+                  {user.role === "admin" && (
+                    <Check className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                  )}
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+
+          <DropdownMenuSeparator />
+          {canDelete && (
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10"
+              onSelect={handleDeleteClick}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Supprimer
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Cela supprimera définitivement le
+              compte de
+              <span className="font-bold text-foreground">
+                {" "}
+                {user.name || user.email}{" "}
+              </span>
+              et toutes ses données associées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteUser}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!roleToChange}
+        onOpenChange={(open) => !open && setRoleToChange(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Changer le rôle</AlertDialogTitle>
+            <AlertDialogDescription>
+              Voulez-vous vraiment changer le rôle de
+              <span className="font-bold text-foreground">
+                {" "}
+                {user.name || user.email}{" "}
+              </span>
+              en{" "}
+              <span className="font-bold text-foreground capitalize">
+                {roleToChange}
+              </span>{" "}
+              ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRoleChange}>
+              Confirmer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

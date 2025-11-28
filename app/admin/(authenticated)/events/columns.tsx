@@ -52,22 +52,91 @@ const toggleFeatured = async (id: string, currentStatus: boolean) => {
   }
 };
 
-const deleteEvent = async (id: string) => {
-  if (!confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) return;
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-  try {
-    const response = await fetch(`/api/admin/events/${id}`, {
-      method: "DELETE",
-    });
+function EventActionsCell({ event }: { event: Event }) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    if (!response.ok) throw new Error("Failed to delete event");
+  const confirmDeleteEvent = async () => {
+    try {
+      const response = await fetch(`/api/admin/events/${event.id}`, {
+        method: "DELETE",
+      });
 
-    toast.success("L'événement a été supprimé avec succès.");
-    window.location.reload();
-  } catch (error) {
-    toast.error("Impossible de supprimer l'événement.");
-  }
-};
+      if (!response.ok) throw new Error("Failed to delete event");
+
+      toast.success("L'événement a été supprimé avec succès.");
+      window.location.reload();
+    } catch (error) {
+      toast.error("Impossible de supprimer l'événement.");
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Ouvrir menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem asChild>
+            <Link href={`/admin/events/${event.id}/edit`}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Modifier
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={() => setShowDeleteDialog(true)}
+            className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10"
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            Supprimer
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Cela supprimera définitivement
+              l'événement
+              <span className="font-bold text-foreground"> {event.title} </span>
+              et toutes les réservations associées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteEvent}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
 
 export const columns: ColumnDef<Event>[] = [
   {
@@ -214,36 +283,6 @@ export const columns: ColumnDef<Event>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const event = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Ouvrir menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-              <Link href={`/admin/events/${event.id}/edit`}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Modifier
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => deleteEvent(event.id)}
-              className="text-red-600 focus:text-red-600"
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Supprimer
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <EventActionsCell event={row.original} />,
   },
 ];
