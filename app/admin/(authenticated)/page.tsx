@@ -41,35 +41,58 @@ import {
 
 export default async function AdminDashboard() {
   // Fetch Data
-  const [
-    totalEvents,
-    upcomingEventsCount,
-    totalBookings,
-    pendingBookings,
-    totalUsers,
-    nextEvent,
-    recentBookings,
-    recentUsers,
-  ] = await Promise.all([
-    prisma.event.count(),
-    prisma.event.count({ where: { date: { gte: new Date() } } }),
-    prisma.booking.count(),
-    prisma.booking.count({ where: { status: "PENDING" } }),
-    prisma.user.count(),
-    prisma.event.findFirst({
+
+  let totalEvents = 0;
+  let upcomingEventsCount = 0;
+  let totalBookings = 0;
+  let pendingBookings = 0;
+  let totalUsers = 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let nextEvent: any = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let recentBookings: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let recentUsers: any[] = [];
+
+  try {
+    // Execute queries sequentially to avoid exhausting the connection pool
+    totalEvents = await prisma.event.count();
+    upcomingEventsCount = await prisma.event.count({
+      where: { date: { gte: new Date() } },
+    });
+    totalBookings = await prisma.booking.count();
+    pendingBookings = await prisma.booking.count({
+      where: { status: "PENDING" },
+    });
+    totalUsers = await prisma.user.count();
+
+    nextEvent = await prisma.event.findFirst({
       where: { date: { gte: new Date() } },
       orderBy: { date: "asc" },
-    }),
-    prisma.booking.findMany({
+    });
+
+    recentBookings = await prisma.booking.findMany({
       orderBy: { createdAt: "desc" },
       take: 10,
       include: { event: true },
-    }),
-    prisma.user.findMany({
+    });
+
+    recentUsers = await prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       take: 5,
-    }),
-  ]);
+    });
+  } catch (error) {
+    console.error("Admin Dashboard Data Fetch Error:", error);
+    // Return empty/safe data to prevent crash
+    totalEvents = 0;
+    upcomingEventsCount = 0;
+    totalBookings = 0;
+    pendingBookings = 0;
+    totalUsers = 0;
+    nextEvent = null;
+    recentBookings = [];
+    recentUsers = [];
+  }
 
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 p-4 md:p-8 pt-6">
