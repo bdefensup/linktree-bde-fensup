@@ -23,11 +23,6 @@ export default function proxy(request: NextRequest) {
     }
   }
 
-  // 3. Redirect /admin/login to /admin (Dashboard) if already authenticated
-  if (isAdminLogin && isAuthenticated) {
-    return NextResponse.redirect(new URL("/admin", request.url));
-  }
-
   // Liste des chemins autorisés
   const allowedPaths = [
     "/",
