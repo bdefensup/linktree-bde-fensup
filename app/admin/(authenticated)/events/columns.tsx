@@ -127,33 +127,20 @@ function EventActionsCell({ event }: { event: Event }) {
               <TriangleAlert className="h-5 w-5 text-destructive" />
               Suppression d'événement
             </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-4 mt-2">
-                <Alert className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 gap-1 hover:bg-red-100 dark:hover:bg-red-900/60">
-                  <TriangleAlert className="h-4 w-4 !text-red-700 dark:!text-red-300" />
-                  <AlertTitle className="font-bold">
-                    Attention : Irréversible
-                  </AlertTitle>
-                  <AlertDescription className="text-red-700/90 dark:text-red-300/90">
-                    Cette action ne peut pas être annulée.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="text-base text-foreground/80">
-                  Vous êtes sur le point de supprimer définitivement l'événement
-                  :
-                  <span className="font-bold text-foreground text-lg block mt-2 p-2 bg-muted rounded-md border border-border text-center bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 gap-1 hover:bg-red-100 dark:hover:bg-red-900/60">
-                    {event.title}
-                  </span>
-                  <p className="mt-2">
-                    Toutes les{" "}
-                    <span className="font-bold text-destructive">
-                      réservations associées
-                    </span>{" "}
-                    seront également supprimées.
-                  </p>
-                </div>
-              </div>
+            <AlertDialogDescription className="text-base text-red-700/90 dark:text-red-300/90 mt-2">
+              Attention, cette action est{" "}
+              <span className="font-black uppercase">irréversible</span>.
+              <br />
+              <br />
+              Vous êtes sur le point de supprimer définitivement l'événement :
+              <br />
+              <span className="font-bold text-lg block mt-1 p-2 bg-red-200/50 dark:bg-red-900/60 rounded-md border border-red-200 dark:border-red-800 text-center">
+                {event.title}
+              </span>
+              <br />
+              Toutes les{" "}
+              <span className="font-bold">réservations associées</span> seront
+              également supprimées.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
