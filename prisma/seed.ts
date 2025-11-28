@@ -71,10 +71,8 @@ async function main() {
     },
   });
 
-  let conversationId = existingConversation?.id;
-
   if (!existingConversation) {
-    const conversation = await prisma.conversation.create({
+    await prisma.conversation.create({
       data: {
         participants: {
           create: [{ userId: admin.id }, { userId: dummyUser.id }],
@@ -94,7 +92,6 @@ async function main() {
         lastMessageAt: new Date(),
       },
     });
-    conversationId = conversation.id;
     console.log("Created new conversation.");
   } else {
     console.log("Conversation already exists.");
