@@ -1,7 +1,14 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Star } from "lucide-react";
+import {
+  MoreHorizontal,
+  ArrowUpDown,
+  Pencil,
+  Trash,
+  Star,
+  TriangleAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -113,23 +120,38 @@ function EventActionsCell({ event }: { event: Event }) {
       </DropdownMenu>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800">
           <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. Cela supprimera définitivement
-              l'événement
-              <span className="font-bold text-foreground"> {event.title} </span>
-              et toutes les réservations associées.
+            <AlertDialogTitle className="flex items-center gap-2 text-red-700 dark:text-red-300 font-bold text-xl">
+              <TriangleAlert className="h-6 w-6" />
+              Suppression d'événement
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-red-700/90 dark:text-red-300/90 mt-2">
+              Attention, cette action est{" "}
+              <span className="font-black uppercase">irréversible</span>.
+              <br />
+              <br />
+              Vous êtes sur le point de supprimer définitivement l'événement :
+              <br />
+              <span className="font-bold text-lg block mt-1 p-2 bg-red-200/50 dark:bg-red-900/60 rounded-md border border-red-200 dark:border-red-800 text-center">
+                {event.title}
+              </span>
+              <br />
+              Toutes les{" "}
+              <span className="font-bold">réservations associées</span> seront
+              également supprimées.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel className="font-medium bg-transparent border-red-200 dark:border-red-800 hover:bg-red-200/50 dark:hover:bg-red-900/60 text-red-700 dark:text-red-300">
+              Annuler
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteEvent}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-600 text-white hover:bg-red-700 font-bold border-red-600"
             >
-              Supprimer
+              <Trash className="mr-2 h-4 w-4" />
+              Confirmer la suppression
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
