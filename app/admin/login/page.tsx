@@ -7,6 +7,7 @@ import { signIn, useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -81,10 +82,15 @@ export default function AdminLoginPage() {
           </div>
           <div className="space-y-2">
             <CardTitle className="text-2xl font-bold tracking-tight">
-              Administration
+              B D E
             </CardTitle>
             <CardDescription>
-              Connectez-vous pour accéder au backoffice.
+              <Badge
+                variant="outline"
+                className="bg-primary/5 text-primary border-primary/20 px-4 py-1 text-sm font-medium rounded-full"
+              >
+                🎓 Année 2025-2026
+              </Badge>
             </CardDescription>
           </div>
         </CardHeader>
