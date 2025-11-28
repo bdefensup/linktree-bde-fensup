@@ -49,6 +49,9 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
+  const [connectionStatus, setConnectionStatus] =
+    useState<string>("Connecting...");
+
   useEffect(() => {
     if (!chatIdParam) return;
     console.log("Setting up subscription for chat:", chatIdParam);
@@ -89,6 +92,7 @@ export default function MessagesPage() {
       )
       .subscribe((status) => {
         console.log("Realtime subscription status:", status);
+        setConnectionStatus(status);
       });
 
     return () => {
@@ -150,7 +154,21 @@ export default function MessagesPage() {
               </Avatar>
               <div>
                 <h2 className="font-semibold text-sm">Discussion</h2>
-                <p className="text-xs text-muted-foreground">En ligne</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">En ligne</p>
+                  <span
+                    className={cn(
+                      "text-[10px] px-1.5 py-0.5 rounded-full border",
+                      connectionStatus === "SUBSCRIBED"
+                        ? "bg-green-500/10 text-green-600 border-green-200"
+                        : connectionStatus === "CHANNEL_ERROR"
+                          ? "bg-red-500/10 text-red-600 border-red-200"
+                          : "bg-yellow-500/10 text-yellow-600 border-yellow-200"
+                    )}
+                  >
+                    {connectionStatus}
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-1">
