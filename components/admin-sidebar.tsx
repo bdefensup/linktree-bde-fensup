@@ -242,7 +242,7 @@ export function AdminSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Messagerie</SidebarGroupLabel>
           <SidebarGroupContent>
-            <ScrollArea className="h-[calc(100vh-20rem)]">
+            <ScrollArea className="max-h-[300px]">
               <SidebarMenu>
                 {[...mockConversations]
                   .sort((a, b) => b.time.localeCompare(a.time))
