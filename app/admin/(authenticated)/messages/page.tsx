@@ -123,6 +123,30 @@ const conversations = [
     unread: 1,
     messages: [],
   },
+  {
+    id: 6,
+    name: "TEAM COM",
+    status: "En ligne",
+    avatar: "",
+    initials: "TC",
+    color: "bg-yellow-500/20 text-yellow-500",
+    lastMessage: "Vous: Bientôt l...",
+    time: "19:07",
+    unread: 1,
+    messages: [],
+  },
+  {
+    id: 7,
+    name: "TEAM COM",
+    status: "En ligne",
+    avatar: "",
+    initials: "TC",
+    color: "bg-yellow-500/20 text-yellow-500",
+    lastMessage: "Vous: Bientôt l...",
+    time: "19:07",
+    unread: 1,
+    messages: [],
+  },
 ];
 
 export default function MessagesPage() {
@@ -203,7 +227,7 @@ export default function MessagesPage() {
                     <div
                       key={msg.id}
                       className={cn(
-                        "flex gap-2 max-w-[80%]",
+                        "flex gap-2 ",
                         msg.sender === "me" ? "ml-auto flex-row-reverse" : ""
                       )}
                     >
