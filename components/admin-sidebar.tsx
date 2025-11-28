@@ -140,7 +140,7 @@ export function AdminSidebar() {
                   ) : (
                     <>
                       <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src="/logo.png" alt="BDE FEN'SUP" />
+                        <AvatarImage src="/logo-full.png" alt="BDE FEN'SUP" />
                         <AvatarFallback className="rounded-lg">
                           BDE
                         </AvatarFallback>

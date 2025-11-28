@@ -83,9 +83,6 @@ export default function EventDetailPage() {
     e.preventDefault();
     setSubmitting(true);
 
-    // Open new tab immediately to avoid popup blockers
-    const paymentWindow = window.open("", "_blank");
-
     try {
       const response = await fetch("/api/bookings", {
         method: "POST",
@@ -101,23 +98,13 @@ export default function EventDetailPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Set URL of the already opened tab
-        if (paymentWindow) {
-          paymentWindow.location.href = data.revolutLink;
-        } else {
-          // Fallback if window failed to open
-          window.location.href = data.revolutLink;
-        }
-
-        // Redirect current tab to confirmation page
+        // Redirect to confirmation page
         router.push(`/billetterie/confirmation/${data.bookingId}`);
       } else {
-        if (paymentWindow) paymentWindow.close();
         alert(data.error || "Une erreur est survenue");
         setSubmitting(false);
       }
     } catch (error) {
-      if (paymentWindow) paymentWindow.close();
       console.error("Error creating booking:", error);
       alert("Une erreur est survenue");
       setSubmitting(false);
@@ -436,15 +423,12 @@ export default function EventDetailPage() {
                             {submitting ? (
                               <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Redirection...
+                                Réservation...
                               </>
                             ) : (
-                              `Payer ${currentPrice}€`
+                              `Réserver (${currentPrice}€)`
                             )}
                           </Button>
-                          <p className="text-xs text-center text-muted-foreground mt-3">
-                            Paiement sécurisé via Revolut.me
-                          </p>
                         </div>
                       </form>
                     </DialogContent>

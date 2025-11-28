@@ -49,9 +49,6 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
-  const [connectionStatus, setConnectionStatus] =
-    useState<string>("Connecting...");
-
   useEffect(() => {
     if (!chatIdParam) return;
     console.log("Setting up subscription for chat:", chatIdParam);
@@ -71,26 +68,6 @@ export default function MessagesPage() {
 
     fetchMessages();
 
-    // Check RLS / Access
-    const checkAccess = async () => {
-      const { data, error } = await supabase
-        .from("message")
-        .select("id")
-        .limit(1);
-      if (error) {
-        console.error(
-          "RLS CHECK FAILED: Cannot access 'message' table via Supabase client.",
-          error
-        );
-        alert(
-          "Attention : Supabase ne peut pas lire les messages. Le RLS est probablement activé !"
-        );
-      } else {
-        console.log("RLS CHECK PASSED: Can access 'message' table.", data);
-      }
-    };
-    checkAccess();
-
     // Realtime subscription
     const channel = supabase
       .channel(`conversation:${chatIdParam}`)
@@ -100,44 +77,23 @@ export default function MessagesPage() {
           event: "INSERT",
           schema: "public",
           table: "message",
-          // Removing filter temporarily to debug
-          // filter: `conversationId=eq.${chatIdParam}`,
+          filter: `conversationId=eq.${chatIdParam}`,
         },
         async (payload) => {
-          console.log("Realtime DB event received:", payload);
-          // Only refresh if it matches our chat (manual check since we removed filter)
+          // Only refresh if it matches our chat
           if ((payload.new as any).conversationId === chatIdParam) {
             const { getMessages } = await import("@/app/actions/messaging");
             const data = await getMessages(chatIdParam);
-            console.log("Fetched updated messages:", data.length);
             setMessages(data as unknown as Message[]);
           }
         }
       )
-      .on("broadcast", { event: "test" }, (payload) => {
-        console.log("Realtime BROADCAST received:", payload);
-        alert("Realtime fonctionne ! (Broadcast reçu)");
-      })
-      .subscribe((status) => {
-        console.log("Realtime subscription status:", status);
-        setConnectionStatus(status);
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
   }, [chatIdParam]);
-
-  const handleTestRealtime = async () => {
-    const channel = supabase.channel(`conversation:${chatIdParam}`);
-    await channel.subscribe();
-    await channel.send({
-      type: "broadcast",
-      event: "test",
-      payload: { message: "Hello from client!" },
-    });
-    console.log("Broadcast sent");
-  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,29 +149,7 @@ export default function MessagesPage() {
               </Avatar>
               <div>
                 <h2 className="font-semibold text-sm">Discussion</h2>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs text-muted-foreground">En ligne</p>
-                  <span
-                    className={cn(
-                      "text-[10px] px-1.5 py-0.5 rounded-full border",
-                      connectionStatus === "SUBSCRIBED"
-                        ? "bg-green-500/10 text-green-600 border-green-200"
-                        : connectionStatus === "CHANNEL_ERROR"
-                          ? "bg-red-500/10 text-red-600 border-red-200"
-                          : "bg-yellow-500/10 text-yellow-600 border-yellow-200"
-                    )}
-                  >
-                    {connectionStatus}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-5 text-[10px] px-2"
-                    onClick={handleTestRealtime}
-                  >
-                    Test Realtime
-                  </Button>
-                </div>
+                <p className="text-xs text-muted-foreground">En ligne</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -251,69 +185,71 @@ export default function MessagesPage() {
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4 bg-muted/5">
-            <div className="flex flex-col gap-4 max-w-3xl mx-auto">
-              {loading ? (
-                <div className="flex justify-center py-4">Chargement...</div>
-              ) : messages.length > 0 ? (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={cn(
-                      "flex gap-2 ",
-                      msg.senderId === session?.user?.id
-                        ? "ml-auto flex-row-reverse"
-                        : ""
-                    )}
-                  >
-                    <Avatar className="h-8 w-8 mt-1 border border-border/50">
-                      <AvatarImage src={msg.sender?.image || ""} />
-                      <AvatarFallback>
-                        {msg.sender?.name?.slice(0, 2).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
+          <div className="flex-1 min-h-0 overflow-hidden bg-muted/5">
+            <ScrollArea className="h-full p-4">
+              <div className="flex flex-col gap-4 max-w-3xl mx-auto">
+                {loading ? (
+                  <div className="flex justify-center py-4">Chargement...</div>
+                ) : messages.length > 0 ? (
+                  messages.map((msg) => (
                     <div
+                      key={msg.id}
                       className={cn(
-                        "rounded-2xl px-4 py-2 text-sm shadow-sm",
+                        "flex gap-2 ",
                         msg.senderId === session?.user?.id
-                          ? "bg-primary text-primary-foreground rounded-tr-none"
-                          : "bg-card border rounded-tl-none"
+                          ? "ml-auto flex-row-reverse"
+                          : ""
                       )}
                     >
-                      <p>{msg.content}</p>
+                      <Avatar className="h-8 w-8 mt-1 border border-border/50">
+                        <AvatarImage src={msg.sender?.image || ""} />
+                        <AvatarFallback>
+                          {msg.sender?.name?.slice(0, 2).toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
                       <div
                         className={cn(
-                          "flex items-center justify-end gap-1 mt-1 text-[10px]",
+                          "rounded-2xl px-4 py-2 text-sm shadow-sm",
                           msg.senderId === session?.user?.id
-                            ? "text-primary-foreground/70"
-                            : "text-muted-foreground"
+                            ? "bg-primary text-primary-foreground rounded-tr-none"
+                            : "bg-card border rounded-tl-none"
                         )}
                       >
-                        <span>
-                          {new Date(msg.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                        {msg.senderId === session?.user?.id && (
+                        <p>{msg.content}</p>
+                        <div
+                          className={cn(
+                            "flex items-center justify-end gap-1 mt-1 text-[10px]",
+                            msg.senderId === session?.user?.id
+                              ? "text-primary-foreground/70"
+                              : "text-muted-foreground"
+                          )}
+                        >
                           <span>
-                            <CheckCheck className="h-3 w-3" />
+                            {new Date(msg.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </span>
-                        )}
+                          {msg.senderId === session?.user?.id && (
+                            <span>
+                              <CheckCheck className="h-3 w-3" />
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                    <p>Aucun message pour le moment.</p>
+                    <p className="text-sm">
+                      Envoyez un message pour démarrer la discussion.
+                    </p>
                   </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                  <p>Aucun message pour le moment.</p>
-                  <p className="text-sm">
-                    Envoyez un message pour démarrer la discussion.
-                  </p>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
 
           {/* Input */}
           <div className="p-4 border-t bg-background">
