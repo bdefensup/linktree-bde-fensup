@@ -33,6 +33,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Menu items.
 const items = [
@@ -241,40 +242,44 @@ export function AdminSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Messagerie</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {mockConversations.map((chat) => (
-                <SidebarMenuItem key={chat.id}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === `/admin/messages`}
-                    className="h-14"
-                  >
-                    <Link
-                      href={`/admin/messages?chatId=${chat.id}`}
-                      className="flex items-center gap-3"
-                    >
-                      <Avatar className="h-8 w-8 border border-border/50">
-                        <AvatarImage src={chat.avatar} />
-                        <AvatarFallback className={chat.color}>
-                          {chat.initials}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col overflow-hidden">
-                        <span className="font-semibold text-sm truncate">
-                          {chat.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground truncate">
-                          {chat.lastMessage}
-                        </span>
-                      </div>
-                      {chat.unread && (
-                        <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
-                      )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <ScrollArea className="h-[calc(100vh-20rem)]">
+              <SidebarMenu>
+                {[...mockConversations]
+                  .sort((a, b) => b.time.localeCompare(a.time))
+                  .map((chat) => (
+                    <SidebarMenuItem key={chat.id}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === `/admin/messages`}
+                        className="h-14"
+                      >
+                        <Link
+                          href={`/admin/messages?chatId=${chat.id}`}
+                          className="flex items-center gap-3"
+                        >
+                          <Avatar className="h-8 w-8 border border-border/50">
+                            <AvatarImage src={chat.avatar} />
+                            <AvatarFallback className={chat.color}>
+                              {chat.initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="font-semibold text-sm truncate">
+                              {chat.name}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              {chat.lastMessage}
+                            </span>
+                          </div>
+                          {chat.unread && (
+                            <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </ScrollArea>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
