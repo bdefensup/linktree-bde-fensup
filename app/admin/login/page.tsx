@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "@/lib/auth-client";
@@ -27,9 +27,11 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
-  if (session) {
-    router.push("/admin");
-  }
+  useEffect(() => {
+    if (session) {
+      router.push("/admin");
+    }
+  }, [session, router]);
 
   // Calcul dynamique de l'année scolaire (Septembre à Août)
   const today = new Date();
