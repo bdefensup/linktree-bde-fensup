@@ -56,19 +56,37 @@ const items = [
   },
 ];
 
+interface Conversation {
+  id: string;
+  lastMessageAt: Date;
+  participants: {
+    userId: string;
+    user: {
+      id: string;
+      name: string | null;
+      image: string | null;
+      email: string;
+    };
+  }[];
+  messages: {
+    content: string;
+    createdAt: Date;
+  }[];
+}
+
 export function AdminSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [conversations, setConversations] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
 
   useEffect(() => {
     const fetchConversations = async () => {
       try {
         const { getConversations } = await import("@/app/actions/messaging");
         const data = await getConversations();
-        setConversations(data);
+        setConversations(data as unknown as Conversation[]);
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
       }
@@ -204,7 +222,7 @@ export function AdminSidebar() {
               <SidebarMenu>
                 {conversations.map((chat) => {
                   const otherParticipant = chat.participants.find(
-                    (p: any) => p.userId !== session?.user?.id
+                    (p) => p.userId !== session?.user?.id
                   )?.user;
                   const lastMessage = chat.messages[0];
 
