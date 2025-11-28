@@ -9,7 +9,10 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 const createPrismaClient = () => {
-  const pool = new Pool({ connectionString });
+  const pool = new Pool({
+    connectionString,
+    max: 1, // Limit to 1 connection per lambda to prevent exhausting Supabase pool
+  });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 };
