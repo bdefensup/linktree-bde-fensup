@@ -187,6 +187,14 @@ export default function MessagesPage() {
                   >
                     {connectionStatus}
                   </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-5 text-[10px] px-2"
+                    onClick={handleTestRealtime}
+                  >
+                    Test Realtime
+                  </Button>
                 </div>
               </div>
             </div>
