@@ -250,7 +250,7 @@ export function AdminSidebar() {
                     className="h-14"
                   >
                     <Link
-                      href="/admin/messages"
+                      href={`/admin/messages?chatId=${chat.id}`}
                       className="flex items-center gap-3"
                     >
                       <Avatar className="h-8 w-8 border border-border/50">
