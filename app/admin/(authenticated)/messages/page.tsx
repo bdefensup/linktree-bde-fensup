@@ -80,16 +80,24 @@ export default function MessagesPage() {
           event: "INSERT",
           schema: "public",
           table: "message",
-          filter: `conversationId=eq.${chatIdParam}`,
+          // Removing filter temporarily to debug
+          // filter: `conversationId=eq.${chatIdParam}`,
         },
         async (payload) => {
-          console.log("Realtime event received:", payload);
-          const { getMessages } = await import("@/app/actions/messaging");
-          const data = await getMessages(chatIdParam);
-          console.log("Fetched updated messages:", data.length);
-          setMessages(data as unknown as Message[]);
+          console.log("Realtime DB event received:", payload);
+          // Only refresh if it matches our chat (manual check since we removed filter)
+          if ((payload.new as any).conversationId === chatIdParam) {
+            const { getMessages } = await import("@/app/actions/messaging");
+            const data = await getMessages(chatIdParam);
+            console.log("Fetched updated messages:", data.length);
+            setMessages(data as unknown as Message[]);
+          }
         }
       )
+      .on("broadcast", { event: "test" }, (payload) => {
+        console.log("Realtime BROADCAST received:", payload);
+        alert("Realtime fonctionne ! (Broadcast reçu)");
+      })
       .subscribe((status) => {
         console.log("Realtime subscription status:", status);
         setConnectionStatus(status);
@@ -99,6 +107,17 @@ export default function MessagesPage() {
       supabase.removeChannel(channel);
     };
   }, [chatIdParam]);
+
+  const handleTestRealtime = async () => {
+    const channel = supabase.channel(`conversation:${chatIdParam}`);
+    await channel.subscribe();
+    await channel.send({
+      type: "broadcast",
+      event: "test",
+      payload: { message: "Hello from client!" },
+    });
+    console.log("Broadcast sent");
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
