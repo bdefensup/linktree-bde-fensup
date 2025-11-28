@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Connecté en tant que : {session.user.email} ({session.user.role})
+              Connecté en tant que: {session.user.email} ({session.user.role})
             </p>
           </CardContent>
           <CardFooter>
