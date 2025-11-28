@@ -70,7 +70,12 @@ export default function BilletteriePage() {
     fetch("/api/events")
       .then((res) => res.json())
       .then((data) => {
-        setEvents(data);
+        if (Array.isArray(data)) {
+          setEvents(data);
+        } else {
+          console.error("API returned non-array:", data);
+          setEvents([]);
+        }
         setLoading(false);
       })
       .catch((error) => {
