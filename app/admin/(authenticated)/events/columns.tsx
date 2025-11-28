@@ -54,7 +54,7 @@ const toggleFeatured = async (id: string, currentStatus: boolean) => {
       !currentStatus ? "Événement mis en avant" : "Événement retiré de la une"
     );
     window.location.reload();
-  } catch (error) {
+  } catch {
     toast.error("Impossible de mettre à jour l'événement.");
   }
 };
@@ -70,6 +70,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function EventActionsCell({ event }: { event: Event }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -120,40 +121,46 @@ function EventActionsCell({ event }: { event: Event }) {
       </DropdownMenu>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent className="border-red-200 dark:border-red-900/50">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-red-700 dark:text-red-400 font-bold text-xl">
-              <TriangleAlert className="h-6 w-6" />
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TriangleAlert className="h-5 w-5 text-destructive" />
               Suppression d'événement
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-base text-foreground/80 mt-2">
-              Attention, cette action est{" "}
-              <span className="font-black text-red-600 uppercase">
-                irréversible
-              </span>
-              .
-              <br />
-              <br />
-              Vous êtes sur le point de supprimer définitivement l'événement :
-              <br />
-              <span className="font-bold text-foreground text-lg block mt-1 p-2 bg-red-50 dark:bg-red-900/10 rounded-md border border-red-100 dark:border-red-900/20 text-center">
-                {event.title}
-              </span>
-              <br />
-              Toutes les{" "}
-              <span className="font-bold text-red-600">
-                réservations associées
-              </span>{" "}
-              seront également supprimées.
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 mt-2">
+                <Alert className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 gap-1 hover:bg-red-100 dark:hover:bg-red-900/60">
+                  <TriangleAlert className="h-4 w-4 !text-red-700 dark:!text-red-300" />
+                  <AlertTitle className="font-bold">
+                    Attention : Irréversible
+                  </AlertTitle>
+                  <AlertDescription className="text-red-700/90 dark:text-red-300/90">
+                    Cette action ne peut pas être annulée.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="text-base text-foreground/80">
+                  Vous êtes sur le point de supprimer définitivement l'événement
+                  :
+                  <span className="font-bold text-foreground text-lg block mt-2 p-2 bg-muted rounded-md border border-border text-center bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 gap-1 hover:bg-red-100 dark:hover:bg-red-900/60">
+                    {event.title}
+                  </span>
+                  <p className="mt-2">
+                    Toutes les{" "}
+                    <span className="font-bold text-destructive">
+                      réservations associées
+                    </span>{" "}
+                    seront également supprimées.
+                  </p>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-medium">
-              Annuler
-            </AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteEvent}
-              className="bg-red-600 text-white hover:bg-red-700 font-bold border-red-600"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold"
             >
               <Trash className="mr-2 h-4 w-4" />
               Confirmer la suppression

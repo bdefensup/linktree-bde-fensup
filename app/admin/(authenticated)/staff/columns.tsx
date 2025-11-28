@@ -61,6 +61,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
   const router = useRouter();
@@ -207,37 +208,44 @@ function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
       </DropdownMenu>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent className="border-red-200 dark:border-red-900/50">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-red-700 dark:text-red-400 font-bold text-xl">
-              <TriangleAlert className="h-6 w-6" />
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TriangleAlert className="h-5 w-5 text-destructive" />
               Suppression de compte
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-base text-foreground/80 mt-2">
-              Attention, cette action est{" "}
-              <span className="font-black text-red-600 uppercase">
-                irréversible
-              </span>
-              .
-              <br />
-              <br />
-              Vous êtes sur le point de supprimer définitivement le compte de :
-              <br />
-              <span className="font-bold text-foreground text-lg block mt-1 p-2 bg-red-50 dark:bg-red-900/10 rounded-md border border-red-100 dark:border-red-900/20 text-center">
-                {user.name || user.email}
-              </span>
-              <br />
-              Toutes les données associées seront{" "}
-              <span className="font-bold text-red-600">effacées</span>.
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 mt-2">
+                <Alert className="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 gap-1 hover:bg-red-100 dark:hover:bg-red-900/60">
+                  <TriangleAlert className="h-4 w-4 !text-red-700 dark:!text-red-300" />
+                  <AlertTitle className="font-bold">
+                    Attention : Irréversible
+                  </AlertTitle>
+                  <AlertDescription className="text-red-700/90 dark:text-red-300/90">
+                    Cette action ne peut pas être annulée.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="text-base text-foreground/80">
+                  Vous êtes sur le point de supprimer définitivement le compte
+                  de :
+                  <span className="font-bold text-foreground text-lg block mt-2 p-2 bg-muted rounded-md border border-border text-center">
+                    {user.name || user.email}
+                  </span>
+                  <p className="mt-2">
+                    Toutes les données associées seront{" "}
+                    <span className="font-bold text-destructive">effacées</span>
+                    .
+                  </p>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-medium">
-              Annuler
-            </AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteUser}
-              className="bg-red-600 text-white hover:bg-red-700 font-bold border-red-600"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold"
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Confirmer la suppression
@@ -250,66 +258,80 @@ function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
         open={!!roleToChange}
         onOpenChange={(open) => !open && setRoleToChange(null)}
       >
-        <AlertDialogContent
-          className={
-            roleToChange === "admin"
-              ? "border-orange-200 dark:border-orange-900/50"
-              : roleToChange === "staff"
-                ? "border-blue-200 dark:border-blue-900/50"
-                : "border-violet-200 dark:border-violet-900/50"
-          }
-        >
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle
-              className={`flex items-center gap-2 font-bold text-xl ${
-                roleToChange === "admin"
-                  ? "text-orange-700 dark:text-orange-400"
-                  : roleToChange === "staff"
-                    ? "text-blue-700 dark:text-blue-400"
-                    : "text-violet-700 dark:text-violet-400"
-              }`}
-            >
-              <UserCog className="h-6 w-6" />
+            <AlertDialogTitle className="flex items-center gap-2">
+              <UserCog className="h-5 w-5" />
               Changement de rôle
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-base text-foreground/80 mt-2">
-              Vous allez modifier les permissions de :
-              <span className="font-bold text-foreground block my-1">
-                {" "}
-                {user.name || user.email}{" "}
-              </span>
-              <br />
-              Le rôle passera de{" "}
-              <span className="font-bold line-through text-muted-foreground">
-                {user.role}
-              </span>{" "}
-              à :
-              <span
-                className={`font-black text-lg block mt-1 p-2 rounded-md border text-center capitalize ${
-                  roleToChange === "admin"
-                    ? "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800"
-                    : roleToChange === "staff"
-                      ? "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800"
-                      : "bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800"
-                }`}
-              >
-                {roleToChange}
-              </span>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 mt-2">
+                <Alert
+                  className={
+                    roleToChange === "admin"
+                      ? "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800"
+                      : roleToChange === "staff"
+                        ? "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800"
+                        : "bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800"
+                  }
+                >
+                  <UserCog
+                    className={`h-4 w-4 ${
+                      roleToChange === "admin"
+                        ? "!text-orange-700 dark:!text-orange-300"
+                        : roleToChange === "staff"
+                          ? "!text-blue-700 dark:!text-blue-300"
+                          : "!text-violet-700 dark:!text-violet-300"
+                    }`}
+                  />
+                  <AlertTitle className="font-bold">
+                    Modification des permissions
+                  </AlertTitle>
+                  <AlertDescription
+                    className={
+                      roleToChange === "admin"
+                        ? "text-orange-700/90 dark:text-orange-300/90"
+                        : roleToChange === "staff"
+                          ? "text-blue-700/90 dark:text-blue-300/90"
+                          : "text-violet-700/90 dark:text-violet-300/90"
+                    }
+                  >
+                    Le rôle de l'utilisateur va être modifié.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="text-base text-foreground/80">
+                  Le rôle de{" "}
+                  <span className="font-bold text-foreground">
+                    {user.name || user.email}
+                  </span>{" "}
+                  passera de :
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <span className="font-bold line-through text-muted-foreground">
+                      {user.role}
+                    </span>
+                    <ArrowUpDown className="h-4 w-4 rotate-90" />
+                    <span
+                      className={`font-black text-lg p-1 px-3 rounded-md border capitalize ${
+                        roleToChange === "admin"
+                          ? "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800"
+                          : roleToChange === "staff"
+                            ? "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800"
+                            : "bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800"
+                      }`}
+                    >
+                      {roleToChange}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="font-medium">
-              Annuler
-            </AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmRoleChange}
-              className={`font-bold ${
-                roleToChange === "admin"
-                  ? "bg-orange-600 hover:bg-orange-700 text-white"
-                  : roleToChange === "staff"
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-violet-600 hover:bg-violet-700 text-white"
-              }`}
+              className="font-bold"
             >
               Confirmer le changement
             </AlertDialogAction>
