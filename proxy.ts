@@ -28,7 +28,7 @@ export default function proxy(request: NextRequest) {
     "/",
     "/_next",
     "/favicon.ico",
-    "/logo.png",
+    "/logo-full.png",
     "/api",
     "/billetterie",
     "/admin", // Allow admin routes (auth is handled above)

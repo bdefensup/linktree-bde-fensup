@@ -35,66 +35,81 @@ async function main() {
 
   console.log(`Found admin user: ${admin.name} (${admin.email})`);
 
-  // 2. Create a dummy user to chat with
-  const dummyEmail = "membre.test@bdefenelon.org";
-  let dummyUser = await prisma.user.findUnique({
-    where: { email: dummyEmail },
-  });
-
-  if (!dummyUser) {
-    console.log("Creating dummy user...");
-    dummyUser = await prisma.user.create({
-      data: {
-        email: dummyEmail,
-        name: "Membre Test",
-        role: "adherent",
-        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-      },
-    });
-  }
-
-  console.log(
-    `Found/Created dummy user: ${dummyUser.name} (${dummyUser.email})`
-  );
-
-  // 3. Create a conversation between them
-  console.log("Creating conversation...");
-
-  // Check if conversation already exists
-  const existingConversation = await prisma.conversation.findFirst({
-    where: {
-      participants: {
-        every: {
-          userId: { in: [admin.id, dummyUser.id] },
-        },
-      },
+  // 2. Create 3 test users
+  const testUsers = [
+    {
+      email: "adherent.test@bdefenelon.org",
+      name: "Adhérent Test",
+      role: "adherent",
+      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Adherent",
+      message: "Bonjour, je suis un adhérent !",
     },
-  });
+    {
+      email: "staff.test@bdefenelon.org",
+      name: "Staff Test",
+      role: "staff",
+      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Staff",
+      message: "Salut, je fais partie du staff.",
+    },
+    {
+      email: "admin.test@bdefenelon.org",
+      name: "Admin Test",
+      role: "admin",
+      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
+      message: "Hello, je suis un autre admin.",
+    },
+  ];
 
-  if (!existingConversation) {
-    await prisma.conversation.create({
-      data: {
+  for (const u of testUsers) {
+    let user = await prisma.user.findUnique({
+      where: { email: u.email },
+    });
+
+    if (!user) {
+      console.log(`Creating user ${u.name}...`);
+      user = await prisma.user.create({
+        data: {
+          email: u.email,
+          name: u.name,
+          role: u.role,
+          image: u.image,
+        },
+      });
+    }
+    console.log(`Found/Created user: ${user.name} (${user.email})`);
+
+    // 3. Create conversation with admin
+    const existingConversation = await prisma.conversation.findFirst({
+      where: {
         participants: {
-          create: [{ userId: admin.id }, { userId: dummyUser.id }],
+          every: {
+            userId: { in: [admin.id, user.id] },
+          },
         },
-        messages: {
-          create: [
-            {
-              senderId: dummyUser.id,
-              content: "Bonjour ! J'ai une question sur le prochain événement.",
-            },
-            {
-              senderId: admin.id,
-              content: "Salut ! Je t'écoute, dis-moi tout.",
-            },
-          ],
-        },
-        lastMessageAt: new Date(),
       },
     });
-    console.log("Created new conversation.");
-  } else {
-    console.log("Conversation already exists.");
+
+    if (!existingConversation) {
+      console.log(`Creating conversation with ${user.name}...`);
+      await prisma.conversation.create({
+        data: {
+          participants: {
+            create: [{ userId: admin.id }, { userId: user.id }],
+          },
+          messages: {
+            create: [
+              {
+                senderId: user.id,
+                content: u.message,
+              },
+            ],
+          },
+          lastMessageAt: new Date(),
+        },
+      });
+    } else {
+      console.log(`Conversation with ${user.name} already exists.`);
+    }
   }
 
   console.log("Seeding complete! You can now test messaging.");
