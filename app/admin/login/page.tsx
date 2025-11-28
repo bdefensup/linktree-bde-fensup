@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { signIn, useSession } from "@/lib/auth-client";
+import { signIn, useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,10 +28,46 @@ export default function AdminLoginPage() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if (session) {
+    if (session?.user?.role === "admin" || session?.user?.role === "staff") {
       router.push("/admin");
     }
   }, [session, router]);
+
+  if (
+    session &&
+    session.user.role !== "admin" &&
+    session.user.role !== "staff"
+  ) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-destructive">Accès Refusé</CardTitle>
+            <CardDescription>
+              Votre compte n'a pas les droits d'administration.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Connecté en tant que : {session.user.email} ({session.user.role})
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={async () => {
+                await signOut();
+                window.location.reload();
+              }}
+            >
+              Se déconnecter
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   // Calcul dynamique de l'année scolaire (Septembre à Août)
   const today = new Date();
