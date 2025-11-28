@@ -1,7 +1,14 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Star } from "lucide-react";
+import {
+  MoreHorizontal,
+  ArrowUpDown,
+  Pencil,
+  Trash,
+  Star,
+  TriangleAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -77,7 +84,7 @@ function EventActionsCell({ event }: { event: Event }) {
 
       toast.success("L'événement a été supprimé avec succès.");
       window.location.reload();
-    } catch (error) {
+    } catch {
       toast.error("Impossible de supprimer l'événement.");
     } finally {
       setShowDeleteDialog(false);
@@ -113,23 +120,43 @@ function EventActionsCell({ event }: { event: Event }) {
       </DropdownMenu>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-red-200 dark:border-red-900/50">
           <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. Cela supprimera définitivement
-              l'événement
-              <span className="font-bold text-foreground"> {event.title} </span>
-              et toutes les réservations associées.
+            <AlertDialogTitle className="flex items-center gap-2 text-red-700 dark:text-red-400 font-bold text-xl">
+              <TriangleAlert className="h-6 w-6" />
+              Suppression d'événement
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-foreground/80 mt-2">
+              Attention, cette action est{" "}
+              <span className="font-black text-red-600 uppercase">
+                irréversible
+              </span>
+              .
+              <br />
+              <br />
+              Vous êtes sur le point de supprimer définitivement l'événement :
+              <br />
+              <span className="font-bold text-foreground text-lg block mt-1 p-2 bg-red-50 dark:bg-red-900/10 rounded-md border border-red-100 dark:border-red-900/20 text-center">
+                {event.title}
+              </span>
+              <br />
+              Toutes les{" "}
+              <span className="font-bold text-red-600">
+                réservations associées
+              </span>{" "}
+              seront également supprimées.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel className="font-medium">
+              Annuler
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteEvent}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-600 text-white hover:bg-red-700 font-bold border-red-600"
             >
-              Supprimer
+              <Trash className="mr-2 h-4 w-4" />
+              Confirmer la suppression
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -12,6 +12,8 @@ import {
   Trash2,
   Check,
   X,
+  TriangleAlert,
+  UserCog,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -205,26 +207,40 @@ function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
       </DropdownMenu>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-red-200 dark:border-red-900/50">
           <AlertDialogHeader>
-            <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est irréversible. Cela supprimera définitivement le
-              compte de
-              <span className="font-bold text-foreground">
-                {" "}
-                {user.name || user.email}{" "}
+            <AlertDialogTitle className="flex items-center gap-2 text-red-700 dark:text-red-400 font-bold text-xl">
+              <TriangleAlert className="h-6 w-6" />
+              Suppression de compte
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-foreground/80 mt-2">
+              Attention, cette action est{" "}
+              <span className="font-black text-red-600 uppercase">
+                irréversible
               </span>
-              et toutes ses données associées.
+              .
+              <br />
+              <br />
+              Vous êtes sur le point de supprimer définitivement le compte de :
+              <br />
+              <span className="font-bold text-foreground text-lg block mt-1 p-2 bg-red-50 dark:bg-red-900/10 rounded-md border border-red-100 dark:border-red-900/20 text-center">
+                {user.name || user.email}
+              </span>
+              <br />
+              Toutes les données associées seront{" "}
+              <span className="font-bold text-red-600">effacées</span>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel className="font-medium">
+              Annuler
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteUser}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-red-600 text-white hover:bg-red-700 font-bold border-red-600"
             >
-              Supprimer
+              <Trash2 className="mr-2 h-4 w-4" />
+              Confirmer la suppression
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -234,26 +250,68 @@ function StaffActionsCell({ user, currentUserRole }: StaffActionsCellProps) {
         open={!!roleToChange}
         onOpenChange={(open) => !open && setRoleToChange(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent
+          className={
+            roleToChange === "admin"
+              ? "border-orange-200 dark:border-orange-900/50"
+              : roleToChange === "staff"
+                ? "border-blue-200 dark:border-blue-900/50"
+                : "border-violet-200 dark:border-violet-900/50"
+          }
+        >
           <AlertDialogHeader>
-            <AlertDialogTitle>Changer le rôle</AlertDialogTitle>
-            <AlertDialogDescription>
-              Voulez-vous vraiment changer le rôle de
-              <span className="font-bold text-foreground">
+            <AlertDialogTitle
+              className={`flex items-center gap-2 font-bold text-xl ${
+                roleToChange === "admin"
+                  ? "text-orange-700 dark:text-orange-400"
+                  : roleToChange === "staff"
+                    ? "text-blue-700 dark:text-blue-400"
+                    : "text-violet-700 dark:text-violet-400"
+              }`}
+            >
+              <UserCog className="h-6 w-6" />
+              Changement de rôle
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-foreground/80 mt-2">
+              Vous allez modifier les permissions de :
+              <span className="font-bold text-foreground block my-1">
                 {" "}
                 {user.name || user.email}{" "}
               </span>
-              en{" "}
-              <span className="font-bold text-foreground capitalize">
-                {roleToChange}
+              <br />
+              Le rôle passera de{" "}
+              <span className="font-bold line-through text-muted-foreground">
+                {user.role}
               </span>{" "}
-              ?
+              à :
+              <span
+                className={`font-black text-lg block mt-1 p-2 rounded-md border text-center capitalize ${
+                  roleToChange === "admin"
+                    ? "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800"
+                    : roleToChange === "staff"
+                      ? "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800"
+                      : "bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800"
+                }`}
+              >
+                {roleToChange}
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRoleChange}>
-              Confirmer
+            <AlertDialogCancel className="font-medium">
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRoleChange}
+              className={`font-bold ${
+                roleToChange === "admin"
+                  ? "bg-orange-600 hover:bg-orange-700 text-white"
+                  : roleToChange === "staff"
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-violet-600 hover:bg-violet-700 text-white"
+              }`}
+            >
+              Confirmer le changement
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
