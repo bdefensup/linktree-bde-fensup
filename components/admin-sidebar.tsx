@@ -159,7 +159,7 @@ export function AdminSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link href="/">
+                <Link href="/admin">
                   <Home className="h-4 w-4" />
                   <span>Retour à l'accueil</span>
                 </Link>
