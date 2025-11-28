@@ -65,9 +65,15 @@ export async function getMessages(conversationId: string) {
     throw new Error("Unauthorized");
   }
 
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
   const messages = await prisma.message.findMany({
     where: {
       conversationId,
+      createdAt: {
+        gte: sevenDaysAgo,
+      },
     },
     include: {
       sender: true,
