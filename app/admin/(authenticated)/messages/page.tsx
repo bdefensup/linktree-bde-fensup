@@ -71,6 +71,26 @@ export default function MessagesPage() {
 
     fetchMessages();
 
+    // Check RLS / Access
+    const checkAccess = async () => {
+      const { data, error } = await supabase
+        .from("message")
+        .select("id")
+        .limit(1);
+      if (error) {
+        console.error(
+          "RLS CHECK FAILED: Cannot access 'message' table via Supabase client.",
+          error
+        );
+        alert(
+          "Attention : Supabase ne peut pas lire les messages. Le RLS est probablement activé !"
+        );
+      } else {
+        console.log("RLS CHECK PASSED: Can access 'message' table.", data);
+      }
+    };
+    checkAccess();
+
     // Realtime subscription
     const channel = supabase
       .channel(`conversation:${chatIdParam}`)
