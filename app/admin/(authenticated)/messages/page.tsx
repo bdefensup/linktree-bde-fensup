@@ -51,6 +51,7 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (!chatIdParam) return;
+    console.log("Setting up subscription for chat:", chatIdParam);
 
     const fetchMessages = async () => {
       setLoading(true);
