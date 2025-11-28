@@ -54,161 +54,8 @@ const items = [
   },
 ];
 
-const mockConversations = [
-  {
-    id: 1,
-    name: "Ambre FENELON",
-    lastMessage: "Un avec le...",
-    time: "21:43",
-    avatar: "",
-    initials: "AF",
-    color: "bg-blue-500/20 text-blue-500",
-    unread: true,
-  },
-  {
-    id: 2,
-    name: "BDE",
-    lastMessage: "Vous: Ta parler...",
-    time: "21:25",
-    avatar: "/logo.png",
-    initials: "BD",
-    color: "bg-orange-500/20 text-orange-500",
-    unread: false,
-  },
-  {
-    id: 3,
-    name: "Precieux",
-    lastMessage: "le tien tu l'as avec...",
-    time: "20:16",
-    avatar: "",
-    initials: "PR",
-    color: "bg-red-500/20 text-red-500",
-    unread: false,
-  },
-  {
-    id: 4,
-    name: "Général",
-    lastMessage: "Ines: J'trouve il e...",
-    time: "20:15",
-    avatar: "",
-    initials: "GN",
-    color: "bg-violet-500/20 text-violet-500",
-    unread: false,
-  },
-  {
-    id: 5,
-    name: "TEAM COM",
-    lastMessage: "Vous: Bientôt l...",
-    time: "19:07",
-    avatar: "",
-    initials: "TC",
-    color: "bg-yellow-500/20 text-yellow-500",
-    unread: true,
-  },
-  {
-    id: 6,
-    name: "Lucas DUPONT",
-    lastMessage: "C'est validé pour...",
-    time: "18:45",
-    avatar: "",
-    initials: "LD",
-    color: "bg-green-500/20 text-green-500",
-    unread: false,
-  },
-  {
-    id: 7,
-    name: "Sarah MARTIN",
-    lastMessage: "Je serai en reta...",
-    time: "18:30",
-    avatar: "",
-    initials: "SM",
-    color: "bg-pink-500/20 text-pink-500",
-    unread: false,
-  },
-  {
-    id: 8,
-    name: "Pole Event",
-    lastMessage: "Réunion à 19h ?",
-    time: "17:15",
-    avatar: "",
-    initials: "PE",
-    color: "bg-purple-500/20 text-purple-500",
-    unread: true,
-  },
-  {
-    id: 9,
-    name: "Thomas BERNARD",
-    lastMessage: "Ok ça marche",
-    time: "16:50",
-    avatar: "",
-    initials: "TB",
-    color: "bg-indigo-500/20 text-indigo-500",
-    unread: false,
-  },
-  {
-    id: 10,
-    name: "Emma PETIT",
-    lastMessage: "Merci beaucoup !",
-    time: "15:20",
-    avatar: "",
-    initials: "EP",
-    color: "bg-teal-500/20 text-teal-500",
-    unread: false,
-  },
-  {
-    id: 11,
-    name: "Partenariats",
-    lastMessage: "Nouveau contrat...",
-    time: "14:10",
-    avatar: "",
-    initials: "PA",
-    color: "bg-cyan-500/20 text-cyan-500",
-    unread: true,
-  },
-  {
-    id: 12,
-    name: "Hugo RICHARD",
-    lastMessage: "Je t'envoie le...",
-    time: "13:45",
-    avatar: "",
-    initials: "HR",
-    color: "bg-orange-500/20 text-orange-500",
-    unread: false,
-  },
-  {
-    id: 13,
-    name: "Julie MOREAU",
-    lastMessage: "C'est noté",
-    time: "12:30",
-    avatar: "",
-    initials: "JM",
-    color: "bg-rose-500/20 text-rose-500",
-    unread: false,
-  },
-  {
-    id: 14,
-    name: "Tresorerie",
-    lastMessage: "Virement effectué",
-    time: "11:15",
-    avatar: "",
-    initials: "TR",
-    color: "bg-emerald-500/20 text-emerald-500",
-    unread: false,
-  },
-  {
-    id: 15,
-    name: "Admin Sys",
-    lastMessage: "Maintenance prévue",
-    time: "10:00",
-    avatar: "",
-    initials: "AS",
-    color: "bg-slate-500/20 text-slate-500",
-    unread: true,
-  },
-];
-
 import { ProfileModal } from "@/components/admin/profile-modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ... (imports)
 
@@ -217,6 +64,20 @@ export function AdminSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [conversations, setConversations] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const { getConversations } = await import("@/app/actions/messaging");
+        const data = await getConversations();
+        setConversations(data);
+      } catch (error) {
+        console.error("Failed to fetch conversations:", error);
+      }
+    };
+    fetchConversations();
+  }, []);
 
   const handleLogout = async () => {
     await signOut({
@@ -344,9 +205,13 @@ export function AdminSidebar() {
           <SidebarGroupContent>
             <ScrollArea className="h-[280px]">
               <SidebarMenu>
-                {[...mockConversations]
-                  .sort((a, b) => b.time.localeCompare(a.time))
-                  .map((chat) => (
+                {conversations.map((chat) => {
+                  const otherParticipant = chat.participants.find(
+                    (p: any) => p.userId !== session?.user?.id
+                  )?.user;
+                  const lastMessage = chat.messages[0];
+
+                  return (
                     <SidebarMenuItem key={chat.id}>
                       <SidebarMenuButton
                         asChild
@@ -358,26 +223,26 @@ export function AdminSidebar() {
                           className="flex items-center gap-3"
                         >
                           <Avatar className="h-8 w-8 border border-border/50">
-                            <AvatarImage src={chat.avatar} />
-                            <AvatarFallback className={chat.color}>
-                              {chat.initials}
+                            <AvatarImage src={otherParticipant?.image || ""} />
+                            <AvatarFallback>
+                              {otherParticipant?.name
+                                ?.slice(0, 2)
+                                .toUpperCase() || "U"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col overflow-hidden">
                             <span className="font-semibold text-sm truncate">
-                              {chat.name}
+                              {otherParticipant?.name || "Utilisateur"}
                             </span>
                             <span className="text-xs text-muted-foreground truncate">
-                              {chat.lastMessage}
+                              {lastMessage?.content || "Nouvelle conversation"}
                             </span>
                           </div>
-                          {chat.unread && (
-                            <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
-                          )}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  ))}
+                  );
+                })}
               </SidebarMenu>
             </ScrollArea>
           </SidebarGroupContent>
