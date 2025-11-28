@@ -31,6 +31,13 @@ export default function AdminLoginPage() {
     router.push("/admin");
   }
 
+  // Calcul dynamique de l'année scolaire (Septembre à Août)
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0 = Janvier, 8 = Septembre
+  const startYear = currentMonth >= 8 ? currentYear : currentYear - 1;
+  const schoolYear = `${startYear}-${startYear + 1}`;
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -88,8 +95,9 @@ export default function AdminLoginPage() {
               <Badge
                 variant="outline"
                 className="bg-primary/5 text-primary border-primary/20 px-4 py-1 text-sm font-medium rounded-full"
+                suppressHydrationWarning
               >
-                🎓 Année 2025-2026
+                🎓 Année {schoolYear}
               </Badge>
             </CardDescription>
           </div>
