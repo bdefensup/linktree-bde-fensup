@@ -26,6 +26,7 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/lib/auth-client";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -42,6 +43,7 @@ interface ProfileModalProps {
 
 export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
   const router = useRouter();
+  const { refetch } = useSession();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
 
@@ -90,6 +92,10 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
       }
 
       toast.success("Profil mis à jour avec succès");
+
+      // Refresh session to update sidebar image immediately
+      await refetch();
+
       onOpenChange(false);
       router.refresh();
     } catch (error) {
