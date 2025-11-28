@@ -349,7 +349,11 @@ export function AdminSidebar() {
         </SidebarFooter>
       </Sidebar>
 
-      <CommandDialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+      <CommandDialog
+        open={isSearchOpen}
+        onOpenChange={setIsSearchOpen}
+        shouldFilter={false}
+      >
         <CommandInput
           placeholder="Rechercher un utilisateur (nom, email, téléphone)..."
           value={searchQuery}
@@ -374,17 +378,17 @@ export function AdminSidebar() {
                 <CommandItem
                   key={user.id}
                   onSelect={() => handleStartConversation(user.id)}
-                  className="cursor-pointer"
+                  className="cursor-pointer data-[selected=true]:bg-orange-600 data-[selected=true]:text-white"
                 >
                   <Avatar className="h-6 w-6 mr-2">
                     <AvatarImage src={user.image || undefined} />
-                    <AvatarFallback>
+                    <AvatarFallback className="text-black">
                       {user.name?.slice(0, 2).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-medium">{user.name}</span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="font-bold">{user.name}</span>
+                    <span className="text-xs font-normal opacity-80">
                       {user.email}
                     </span>
                   </div>
