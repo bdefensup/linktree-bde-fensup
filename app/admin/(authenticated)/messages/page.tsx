@@ -78,17 +78,17 @@ export default function MessagesPage() {
           table: "message",
           filter: `conversationId=eq.${chatIdParam}`,
         },
-        async () => {
-          // Fetch the full message with sender info (or optimistically update if we had sender info)
-          // For simplicity, we'll just append the payload if it matches, but we need sender info.
-          // Better approach: re-fetch or fetch single message.
-          // Let's re-fetch for now to ensure consistency and get relation data.
+        async (payload) => {
+          console.log("Realtime event received:", payload);
           const { getMessages } = await import("@/app/actions/messaging");
           const data = await getMessages(chatIdParam);
+          console.log("Fetched updated messages:", data.length);
           setMessages(data as unknown as Message[]);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Realtime subscription status:", status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -100,10 +100,15 @@ export default function MessagesPage() {
     if (!messageInput.trim() || !chatIdParam) return;
 
     try {
-      const { sendMessage } = await import("@/app/actions/messaging");
+      const { sendMessage, getMessages } = await import(
+        "@/app/actions/messaging"
+      );
       await sendMessage(chatIdParam, messageInput);
       setMessageInput("");
-      // Optimistic update could be added here, but Realtime will handle it.
+
+      // Immediate update for the sender
+      const data = await getMessages(chatIdParam);
+      setMessages(data as unknown as Message[]);
     } catch (error) {
       console.error("Failed to send message:", error);
     }
