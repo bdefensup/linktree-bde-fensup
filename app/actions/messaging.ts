@@ -153,3 +153,93 @@ export async function markAsRead(conversationId: string) {
     },
   });
 }
+
+export async function searchUsers(query: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!query || query.length < 2) {
+    return [];
+  }
+
+  const users = await prisma.user.findMany({
+    where: {
+      AND: [
+        {
+          id: {
+            not: session.user.id,
+          },
+        },
+        {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { email: { contains: query, mode: "insensitive" } },
+            { phoneNumber: { contains: query, mode: "insensitive" } },
+          ],
+        },
+      ],
+    },
+    take: 10,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      role: true,
+    },
+  });
+
+  return users;
+}
+
+export async function createConversation(targetUserId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Check if conversation already exists
+  const existingConversation = await prisma.conversation.findFirst({
+    where: {
+      AND: [
+        {
+          participants: {
+            some: {
+              userId: session.user.id,
+            },
+          },
+        },
+        {
+          participants: {
+            some: {
+              userId: targetUserId,
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  if (existingConversation) {
+    return existingConversation;
+  }
+
+  // Create new conversation
+  const conversation = await prisma.conversation.create({
+    data: {
+      participants: {
+        create: [{ userId: session.user.id }, { userId: targetUserId }],
+      },
+    },
+  });
+
+  return conversation;
+}
