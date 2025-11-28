@@ -52,10 +52,16 @@ Tu veux contribuer ou juste voir comment c'est fait ? Vas-y mon reuf, suis le gu
     ```
 
 5.  **Démarre le serveur de dev** :
+
     ```bash
     pnpm dev
     ```
+
     Et boum ! Rendez-vous sur `http://localhost:3000`.
+
+6.  **Initialisation de la Prod (Admin)** :
+    Si tu déploies en prod et que ta base est vide, tu peux générer le premier admin via cette URL secrète :
+    `https://ton-site.com/api/seed-admin?secret=SuperSecretAdminSeed2025!`
 
 ## � Tu veux voir comment c'est fait ?
 
