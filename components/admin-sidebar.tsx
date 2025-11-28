@@ -342,46 +342,44 @@ export function AdminSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Messagerie</SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="max-h-[280px] overflow-hidden">
-              <ScrollArea className="h-full">
-                <SidebarMenu>
-                  {[...mockConversations]
-                    .sort((a, b) => b.time.localeCompare(a.time))
-                    .map((chat) => (
-                      <SidebarMenuItem key={chat.id}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === `/admin/messages`}
-                          className="h-14"
+            <ScrollArea className="h-[280px]">
+              <SidebarMenu>
+                {[...mockConversations]
+                  .sort((a, b) => b.time.localeCompare(a.time))
+                  .map((chat) => (
+                    <SidebarMenuItem key={chat.id}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === `/admin/messages`}
+                        className="h-14"
+                      >
+                        <Link
+                          href={`/admin/messages?chatId=${chat.id}`}
+                          className="flex items-center gap-3"
                         >
-                          <Link
-                            href={`/admin/messages?chatId=${chat.id}`}
-                            className="flex items-center gap-3"
-                          >
-                            <Avatar className="h-8 w-8 border border-border/50">
-                              <AvatarImage src={chat.avatar} />
-                              <AvatarFallback className={chat.color}>
-                                {chat.initials}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col overflow-hidden">
-                              <span className="font-semibold text-sm truncate">
-                                {chat.name}
-                              </span>
-                              <span className="text-xs text-muted-foreground truncate">
-                                {chat.lastMessage}
-                              </span>
-                            </div>
-                            {chat.unread && (
-                              <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
-                            )}
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-              </ScrollArea>
-            </div>
+                          <Avatar className="h-8 w-8 border border-border/50">
+                            <AvatarImage src={chat.avatar} />
+                            <AvatarFallback className={chat.color}>
+                              {chat.initials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="font-semibold text-sm truncate">
+                              {chat.name}
+                            </span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              {chat.lastMessage}
+                            </span>
+                          </div>
+                          {chat.unread && (
+                            <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </ScrollArea>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
