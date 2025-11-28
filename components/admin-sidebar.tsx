@@ -9,6 +9,7 @@ import {
   Users,
   KeyRound,
   Home,
+  MessageSquare,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -50,6 +51,11 @@ const items = [
     title: "Réservations",
     url: "/admin/reservations",
     icon: Ticket,
+  },
+  {
+    title: "Messagerie",
+    url: "/admin/messages",
+    icon: MessageSquare,
   },
 ];
 
