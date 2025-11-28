@@ -16,6 +16,11 @@ export const auth = betterAuth({
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000"),
+  trustedOrigins: [
+    "https://www.bdefenelon.org",
+    "https://bdefenelon.org",
+    "http://localhost:3000",
+  ],
   plugins: [admin()],
   emailAndPassword: {
     enabled: true,

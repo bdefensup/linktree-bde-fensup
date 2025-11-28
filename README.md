@@ -6,7 +6,7 @@ Salut l'équipe ! Bienvenue sur le repo officiel du **BDE Fénelon Sup**. C'est 
 
 C'est pas juste un Linktree, c'est **LA** plateforme centrale pour tout ce qui se passe à Fénelon Sup. On a tout concentré ici pour que vous puissiez choper vos places de soirées, faire des dons (pour qu'on régale encore plus), et suivre toutes les infos croustillantes.
 
-### 🔥 Ce qu'on a sous le capot :
+### 🔥 Ce qu'on a sous le capot
 
 - **🎟️ Billetterie du Futur** : Achète tes places pour les soirées, les WEI, les afterworks en deux-deux. Fini la queue au local BDE !
 - **💸 Système de Dons** : Parce qu'on a besoin de moula pour vous mettre bien (et pour les assos caritatives aussi, on a un cœur ❤️).
@@ -28,40 +28,40 @@ On n'est pas là pour enfiler des perles, on utilise les meilleurs outils du mom
 
 Tu veux contribuer ou juste voir comment c'est fait ? Vas-y mon reuf, suis le guide :
 
-1.  **Clone le repo** (comme un vrai dev) :
+1. **Clone le repo** (comme un vrai dev) :
 
-    ```bash
-    git clone https://github.com/bdefensup/linktree-bde-fensup.git
-    cd linktree-bde-fensup
-    ```
+   ```bash
+   git clone https://github.com/bdefensup/linktree-bde-fensup.git
+   cd linktree-bde-fensup
+   ```
 
-2.  **Installe les dépendances** (avec pnpm, parce que npm c'est has-been) :
+2. **Installe les dépendances** (avec pnpm, parce que npm c'est has-been) :
 
-    ```bash
-    pnpm install
-    ```
+   ```bash
+   pnpm install
+   ```
 
-3.  **Configure tes variables d'env** :
-    Copie le `.env.example` en `.env` et mets tes clés secrètes (demande au resp numérique si t'es paumé).
+3. **Configure tes variables d'env** :
+   Copie le `.env.example` en `.env` et mets tes clés secrètes (demande au resp numérique si t'es paumé).
 
-4.  **Lance la base de données** :
+4. **Lance la base de données** :
 
-    ```bash
-    pnpm prisma generate
-    pnpm prisma db push
-    ```
+   ```bash
+   pnpm prisma generate
+   pnpm prisma db push
+   ```
 
-5.  **Démarre le serveur de dev** :
+5. **Démarre le serveur de dev** :
 
-    ```bash
-    pnpm dev
-    ```
+   ```bash
+   pnpm dev
+   ```
 
-    Et boum ! Rendez-vous sur `http://localhost:3000`.
+   Et boum ! Rendez-vous sur `http://localhost:3000`.
 
-6.  **Initialisation de la Prod (Admin)** :
-    Si tu déploies en prod et que ta base est vide, tu peux générer le premier admin via cette URL secrète :
-    `https://ton-site.com/api/seed-admin?secret=SuperSecretAdminSeed2025!`
+6. **Initialisation de la Prod (Admin)** :
+   Si tu déploies en prod et que ta base est vide, tu peux générer le premier admin via cette URL secrète :
+   `https://ton-site.com/api/seed-admin?secret=SuperSecretAdminSeed2025!`
 
 ## � Tu veux voir comment c'est fait ?
 
