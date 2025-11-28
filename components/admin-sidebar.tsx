@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ProfileModal } from "@/components/admin/profile-modal";
+import { useState, useEffect } from "react";
 
 // Menu items.
 const items = [
@@ -53,11 +55,6 @@ const items = [
     icon: Ticket,
   },
 ];
-
-import { ProfileModal } from "@/components/admin/profile-modal";
-import { useState, useEffect } from "react";
-
-// ... (imports)
 
 export function AdminSidebar() {
   const router = useRouter();

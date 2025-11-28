@@ -9,7 +9,6 @@ import {
   Video,
   Paperclip,
   Smile,
-  Check,
   CheckCheck,
   Search,
 } from "lucide-react";
@@ -29,133 +28,24 @@ import {
 } from "@/components/ui/tooltip";
 import { Card } from "@/components/ui/card";
 
-// Mock Data
-const conversations = [
-  {
-    id: 1,
-    name: "Ambre FENELON",
-    status: "En ligne",
-    avatar: "",
-    initials: "AF",
-    color: "bg-blue-500/20 text-blue-500",
-    lastMessage: "Un avec le...",
-    time: "21:43",
-    unread: 2,
-    messages: [
-      {
-        id: 1,
-        sender: "them",
-        content: "Salut ! Tu as le dossier pour l'event ?",
-        time: "21:40",
-      },
-      {
-        id: 2,
-        sender: "me",
-        content: "Oui je t'envoie ça tout de suite.",
-        time: "21:41",
-        status: "read",
-      },
-      {
-        id: 3,
-        sender: "them",
-        content: "Super merci ! Un avec le logo stp.",
-        time: "21:43",
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "BDE",
-    status: "Vu à 21:20",
-    avatar: "/logo.png",
-    initials: "BD",
-    color: "bg-orange-500/20 text-orange-500",
-    lastMessage: "Vous: Ta parler...",
-    time: "21:25",
-    unread: 0,
-    messages: [
-      {
-        id: 1,
-        sender: "them",
-        content: "On fait quoi pour la réunion de demain ?",
-        time: "21:00",
-      },
-      {
-        id: 2,
-        sender: "me",
-        content: "Ta parler avec le directeur ?",
-        time: "21:25",
-        status: "sent",
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Precieux",
-    status: "En ligne",
-    avatar: "",
-    initials: "PR",
-    color: "bg-red-500/20 text-red-500",
-    lastMessage: "le tien tu l'as avec...",
-    time: "20:16",
-    unread: 0,
-    messages: [],
-  },
-  {
-    id: 4,
-    name: "Général",
-    status: "32 participants",
-    avatar: "",
-    initials: "GN",
-    color: "bg-violet-500/20 text-violet-500",
-    lastMessage: "Ines: J'trouve il e...",
-    time: "20:15",
-    unread: 0,
-    messages: [],
-  },
-  {
-    id: 5,
-    name: "TEAM COM",
-    status: "En ligne",
-    avatar: "",
-    initials: "TC",
-    color: "bg-yellow-500/20 text-yellow-500",
-    lastMessage: "Vous: Bientôt l...",
-    time: "19:07",
-    unread: 1,
-    messages: [],
-  },
-  {
-    id: 6,
-    name: "TEAM COM",
-    status: "En ligne",
-    avatar: "",
-    initials: "TC",
-    color: "bg-yellow-500/20 text-yellow-500",
-    lastMessage: "Vous: Bientôt l...",
-    time: "19:07",
-    unread: 1,
-    messages: [],
-  },
-  {
-    id: 7,
-    name: "TEAM COM",
-    status: "En ligne",
-    avatar: "",
-    initials: "TC",
-    color: "bg-yellow-500/20 text-yellow-500",
-    lastMessage: "Vous: Bientôt l...",
-    time: "19:07",
-    unread: 1,
-    messages: [],
-  },
-];
+// Mock Data removed
+
+interface Message {
+  id: string;
+  content: string;
+  senderId: string;
+  createdAt: Date;
+  sender?: {
+    name: string | null;
+    image: string | null;
+  };
+}
 
 export default function MessagesPage() {
   const searchParams = useSearchParams();
   const chatIdParam = searchParams.get("chatId");
   const [messageInput, setMessageInput] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
@@ -167,7 +57,7 @@ export default function MessagesPage() {
       try {
         const { getMessages } = await import("@/app/actions/messaging");
         const data = await getMessages(chatIdParam);
-        setMessages(data);
+        setMessages(data as unknown as Message[]);
       } catch (error) {
         console.error("Failed to fetch messages:", error);
       } finally {
@@ -188,14 +78,14 @@ export default function MessagesPage() {
           table: "message",
           filter: `conversationId=eq.${chatIdParam}`,
         },
-        async (payload) => {
+        async () => {
           // Fetch the full message with sender info (or optimistically update if we had sender info)
           // For simplicity, we'll just append the payload if it matches, but we need sender info.
           // Better approach: re-fetch or fetch single message.
           // Let's re-fetch for now to ensure consistency and get relation data.
           const { getMessages } = await import("@/app/actions/messaging");
           const data = await getMessages(chatIdParam);
-          setMessages(data);
+          setMessages(data as unknown as Message[]);
         }
       )
       .subscribe();
