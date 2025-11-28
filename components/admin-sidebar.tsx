@@ -9,7 +9,6 @@ import {
   Users,
   KeyRound,
   Home,
-  MessageSquare,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -52,10 +51,58 @@ const items = [
     url: "/admin/reservations",
     icon: Ticket,
   },
+];
+
+const mockConversations = [
   {
-    title: "Messagerie",
-    url: "/admin/messages",
-    icon: MessageSquare,
+    id: 1,
+    name: "Ambre FENELON",
+    lastMessage: "Un avec le...",
+    time: "21:43",
+    avatar: "",
+    initials: "AF",
+    color: "bg-blue-500/20 text-blue-500",
+    unread: true,
+  },
+  {
+    id: 2,
+    name: "BDE",
+    lastMessage: "Vous: Ta parler...",
+    time: "21:25",
+    avatar: "/logo.png",
+    initials: "BD",
+    color: "bg-orange-500/20 text-orange-500",
+    unread: false,
+  },
+  {
+    id: 3,
+    name: "Precieux",
+    lastMessage: "le tien tu l'as avec...",
+    time: "20:16",
+    avatar: "",
+    initials: "PR",
+    color: "bg-red-500/20 text-red-500",
+    unread: false,
+  },
+  {
+    id: 4,
+    name: "Général",
+    lastMessage: "Ines: J'trouve il e...",
+    time: "20:15",
+    avatar: "",
+    initials: "GN",
+    color: "bg-violet-500/20 text-violet-500",
+    unread: false,
+  },
+  {
+    id: 5,
+    name: "TEAM COM",
+    lastMessage: "Vous: Bientôt l...",
+    time: "19:07",
+    avatar: "",
+    initials: "TC",
+    color: "bg-yellow-500/20 text-yellow-500",
+    unread: true,
   },
 ];
 
@@ -183,6 +230,46 @@ export function AdminSidebar() {
                     <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Messagerie</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mockConversations.map((chat) => (
+                <SidebarMenuItem key={chat.id}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === `/admin/messages`}
+                    className="h-14"
+                  >
+                    <Link
+                      href="/admin/messages"
+                      className="flex items-center gap-3"
+                    >
+                      <Avatar className="h-8 w-8 border border-border/50">
+                        <AvatarImage src={chat.avatar} />
+                        <AvatarFallback className={chat.color}>
+                          {chat.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="font-semibold text-sm truncate">
+                          {chat.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate">
+                          {chat.lastMessage}
+                        </span>
+                      </div>
+                      {chat.unread && (
+                        <div className="ml-auto h-2 w-2 rounded-full bg-blue-500" />
+                      )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
