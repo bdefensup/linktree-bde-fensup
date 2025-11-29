@@ -48,11 +48,15 @@ import { getColumns, User } from "./columns";
 interface DataTableProps {
   data: User[];
   userRole: string;
+  currentUserEmail?: string;
 }
 
-export function DataTable({ data, userRole }: DataTableProps) {
+export function DataTable({ data, userRole, currentUserEmail }: DataTableProps) {
   const router = useRouter();
-  const columns = React.useMemo(() => getColumns(userRole), [userRole]);
+  const columns = React.useMemo(
+    () => getColumns(userRole, currentUserEmail),
+    [userRole, currentUserEmail]
+  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");

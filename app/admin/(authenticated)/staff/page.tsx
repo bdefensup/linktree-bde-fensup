@@ -33,16 +33,14 @@ export default async function AdminStaffPage() {
     <div className="container mx-auto py-10 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Gestion du Staff
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Gestion du Staff</h1>
           <p className="text-muted-foreground mt-2">
             Gérez les membres, leurs rôles et les accès à la plateforme.
           </p>
         </div>
       </div>
 
-      <StaffTableWrapper data={users} userRole={userRole} />
+      <StaffTableWrapper data={users} userRole={userRole} currentUserEmail={session?.user?.email} />
     </div>
   );
 }

@@ -170,7 +170,6 @@ export function AdminSidebar() {
 
     // Realtime subscription for pinned status changes
     // Realtime subscription for pinned status changes
-    console.log("Setting up subscription for user:", session?.user?.id);
     const channel = supabase
       .channel("admin_sidebar_pins")
       .on(
@@ -181,18 +180,16 @@ export function AdminSidebar() {
           table: "conversation_participant",
           // filter: session?.user?.id ? `"userId"=eq.${session.user.id}` : undefined,
         },
-        (payload) => {
-          console.log("Realtime update received:", payload);
+        (_payload) => {
           fetchConversations();
         }
       )
-      .subscribe((status) => {
-        console.log("Subscription status:", status);
+      .subscribe((_status) => {
+        // Subscription status
       });
 
     // Custom event listener for instant updates
     const handleConversationUpdate = () => {
-      console.log("Custom event received: conversation:updated");
       fetchConversations();
     };
 
@@ -226,34 +223,38 @@ export function AdminSidebar() {
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16"
                   >
                     {session?.user ? (
                       <>
-                        <Avatar className="h-8 w-8 rounded-lg">
+                        <Avatar className="h-12 w-12 rounded-lg">
                           <AvatarImage
                             src={session.user.image || undefined}
                             alt={session.user.name || "User"}
                           />
-                          <AvatarFallback className="rounded-lg">
+                          <AvatarFallback className="rounded-lg text-lg">
                             {session.user.name?.slice(0, 2).toUpperCase() || "AD"}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="grid flex-1 text-left text-sm leading-tight">
-                          <span className="truncate font-semibold">{session.user.name}</span>
-                          <span className="truncate text-xs">{session.user.email}</span>
+                        <div className="grid flex-1 text-left text-base leading-tight">
+                          <span className="truncate font-bold">{session.user.name}</span>
+                          <span className="truncate text-sm text-muted-foreground">
+                            {session.user.email}
+                          </span>
                         </div>
-                        <ChevronDown className="ml-auto size-4" />
+                        <ChevronDown className="ml-auto size-5" />
                       </>
                     ) : (
                       <>
-                        <Avatar className="h-8 w-8 rounded-lg">
+                        <Avatar className="h-12 w-12 rounded-lg">
                           <AvatarImage src="/logo-full.png" alt="BDE FEN'SUP" />
                           <AvatarFallback className="rounded-lg">BDE</AvatarFallback>
                         </Avatar>
-                        <div className="grid flex-1 text-left text-sm leading-tight">
-                          <span className="truncate font-semibold">BDE FEN'SUP</span>
-                          <span className="truncate text-xs">Administration</span>
+                        <div className="grid flex-1 text-left text-base leading-tight">
+                          <span className="truncate font-bold">BDE FEN'SUP</span>
+                          <span className="truncate text-sm text-muted-foreground">
+                            Administration
+                          </span>
                         </div>
                       </>
                     )}

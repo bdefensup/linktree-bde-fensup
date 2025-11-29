@@ -15,13 +15,38 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const { id } = await params;
     const body = await req.json();
-    const { role, banned } = body;
+    const { role, banned, position } = body;
+
+    // Handle Position Update (Strict RBAC)
+    if (position !== undefined) {
+      // 1. Only Super Admin can assign positions
+      if (session.user.email !== "admin@bdefenelon.org") {
+        return NextResponse.json(
+          { error: "Seul le Super Admin peut attribuer des positions." },
+          { status: 403 }
+        );
+      }
+
+      // 2. Only Admins can have a position
+      const targetUser = await prisma.user.findUnique({
+        where: { id },
+        select: { role: true },
+      });
+
+      if (!targetUser || targetUser.role !== "admin") {
+        return NextResponse.json(
+          { error: "Seuls les administrateurs peuvent avoir une position officielle." },
+          { status: 400 }
+        );
+      }
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
         ...(role && { role }),
         ...(typeof banned === "boolean" && { banned }),
+        ...(position !== undefined && { position }),
       },
     });
 
