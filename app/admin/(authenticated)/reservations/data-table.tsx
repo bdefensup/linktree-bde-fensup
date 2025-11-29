@@ -93,7 +93,9 @@ export function DataTable<TData, TValue>({
   const handleBulkStatusChange = async (
     status: "CONFIRMED" | "PENDING" | "CANCELLED"
   ) => {
-    const bookingIds = selectedRows.map((row) => (row.original as any).id);
+    const bookingIds = selectedRows.map(
+      (row) => (row.original as { id: string }).id
+    );
 
     try {
       const response = await fetch("/api/admin/bookings/bulk", {
@@ -112,8 +114,12 @@ export function DataTable<TData, TValue>({
       router.refresh();
       // Force reload to ensure data is fresh if router.refresh is not enough for client components
       setTimeout(() => window.location.reload(), 500);
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la mise à jour.");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de la mise à jour.";
+      toast.error(errorMessage);
     }
   };
 
