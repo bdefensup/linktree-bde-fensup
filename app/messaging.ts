@@ -419,9 +419,6 @@ export async function getAdminTickets() {
   }
 
   const tickets = await prisma.ticket.findMany({
-    where: {
-      status: "OPEN",
-    },
     include: {
       conversation: {
         include: {

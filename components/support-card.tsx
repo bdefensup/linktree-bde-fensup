@@ -360,7 +360,7 @@ export function SupportCard() {
                   )}
                   <div
                     className={cn(
-                      "rounded-2xl px-3 py-2 text-xs max-w-[80%] break-words",
+                      "rounded-2xl px-3 py-2 text-xs max-w-[80%] wrap-break-word",
                       isMe
                         ? "bg-blue-500 text-white rounded-tr-none"
                         : "bg-muted text-foreground rounded-tl-none"

@@ -47,8 +47,8 @@ export function TicketList() {
     };
 
     fetchTickets();
-    // Poll every 10 seconds
-    const interval = setInterval(fetchTickets, 10000);
+    // Poll every 3 seconds
+    const interval = setInterval(fetchTickets, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -88,9 +88,11 @@ export function TicketList() {
                 <TableRow key={ticket.id}>
                   <TableCell>
                     <Badge
-                      variant={ticket.ticketStatus === "OPEN" ? "default" : "secondary"}
+                      variant="outline"
                       className={
-                        ticket.ticketStatus === "OPEN" ? "bg-green-500 hover:bg-green-600" : ""
+                        ticket.ticketStatus === "OPEN"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-200 hover:border-green-300 dark:hover:bg-green-900/50 transition-colors duration-200"
+                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200 dark:border-red-800 hover:bg-red-200 hover:border-red-300 dark:hover:bg-red-900/50 transition-colors duration-200"
                       }
                     >
                       {ticket.ticketStatus === "OPEN" ? "Ouvert" : "Résolu"}
