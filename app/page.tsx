@@ -81,39 +81,36 @@ export default function Home() {
           </div>
 
           {/* Quick Donate Section - Spans 1 col */}
-          <div className="col-span-1 md:col-span-1">
+          <div className="col-span-1 md:col-span-1 cursor-not-allowed opacity-70">
             <div className="w-full h-full relative group">
-              <div className="absolute -inset-1 bg-linear-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-3xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
-              <Card className="relative h-full border-amber-500/30 bg-card/80 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
+              <div className="absolute -inset-1 bg-linear-to-r from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-3xl blur-lg opacity-0 transition-opacity duration-500"></div>
+              <Card className="relative h-full border-border/50 bg-muted/50 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
                 <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
                   <div className="relative mt-1 mb-1">
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 animate-bounce duration-1500">
-                      <Heart className="w-6 h-6 text-red-500 fill-red-500 drop-shadow-md" />
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                      <Heart className="w-6 h-6 text-muted-foreground fill-muted-foreground drop-shadow-md" />
                     </div>
-                    <LuHandHelping className="w-12 h-12 text-amber-500" />
+                    <LuHandHelping className="w-12 h-12 text-muted-foreground" />
                   </div>
 
                   <div className="space-y-1">
-                    <h3 className="font-bold text-lg text-foreground">
-                      Soutenir le BDE
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Votre aide est précieuse
-                    </p>
+                    <div className="flex items-center justify-center gap-2">
+                      <h3 className="font-bold text-lg text-foreground">Soutenir le BDE</h3>
+                      <Badge variant="secondary" className="text-[10px] h-5 px-1.5">
+                        Bientôt
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Votre aide est précieuse</p>
                   </div>
 
-                  <div className="flex flex-col w-full gap-2">
+                  <div className="flex flex-col w-full gap-2 pointer-events-none grayscale">
                     <Button
                       asChild
                       size="sm"
-                      className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0 shadow-md shadow-amber-500/20"
+                      className="w-full bg-linear-to-r from-amber-500 to-orange-500 text-white border-0 shadow-md shadow-amber-500/20"
                     >
-                      <a
-                        href="https://BDE-FENSUP.short.gy/Dons"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Faire un don personnalisé
+                      <a href="#" target="_blank" rel="noopener noreferrer">
+                        Faire un don à l'association
                       </a>
                     </Button>
 
@@ -121,7 +118,7 @@ export default function Home() {
                       asChild
                       variant="outline"
                       size="sm"
-                      className="w-full border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-600 text-foreground"
+                      className="w-full border-amber-500/30 text-foreground"
                     >
                       <Link href="/don">Dons</Link>
                     </Button>
@@ -146,7 +143,7 @@ export default function Home() {
                 href={link.url}
                 onClick={(e) => link.comingSoon && e.preventDefault()}
                 className={`block group ${colSpan} ${
-                  link.comingSoon ? "cursor-not-allowed opacity-70" : ""
+                  link.comingSoon ? "cursor-not-allowed opacity-70 pointer-events-none" : ""
                 }`}
               >
                 <Card
@@ -155,9 +152,7 @@ export default function Home() {
                       ? "bg-muted/50 border-border/50"
                       : "hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm"
                   } ${"bg-card/80 border-border/50 hover:border-primary/50 hover:shadow-primary/5"} ${
-                    link.highlight
-                      ? "border-primary/50 shadow-md shadow-primary/10"
-                      : ""
+                    link.highlight ? "border-primary/50 shadow-md shadow-primary/10" : ""
                   }`}
                 >
                   {/* Hover Gradient Effect */}
