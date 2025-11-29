@@ -2,6 +2,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
+import PaymentReceivedEmail from "@/components/emails/payment-received";
+import BookingCancelledEmail from "@/components/emails/booking-cancelled";
 
 export async function PATCH(req: Request) {
   try {
@@ -31,6 +34,22 @@ export async function PATCH(req: Request) {
       );
     }
 
+    // Fetch bookings to send emails
+    const bookings = await prisma.booking.findMany({
+      where: {
+        id: {
+          in: bookingIds,
+        },
+      },
+      include: {
+        event: {
+          select: {
+            title: true,
+          },
+        },
+      },
+    });
+
     // Update bookings
     await prisma.booking.updateMany({
       where: {
@@ -42,6 +61,45 @@ export async function PATCH(req: Request) {
         status: status,
       },
     });
+
+    // Send emails
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const from = process.env.EMAIL_FROM || "onboarding@resend.dev";
+
+      // Send emails in parallel but don't block response
+      Promise.all(
+        bookings.map(async (booking) => {
+          try {
+            if (status === "CONFIRMED") {
+              await resend.emails.send({
+                from,
+                to: booking.email,
+                subject: `Paiement validé - ${booking.event.title}`,
+                react: PaymentReceivedEmail({
+                  firstName: booking.firstName,
+                  eventName: booking.event.title,
+                  bookingId: booking.id,
+                }),
+              });
+            } else if (status === "CANCELLED") {
+              await resend.emails.send({
+                from,
+                to: booking.email,
+                subject: `Mise à jour réservation - ${booking.event.title}`,
+                react: BookingCancelledEmail({
+                  firstName: booking.firstName,
+                  eventName: booking.event.title,
+                  bookingId: booking.id,
+                }),
+              });
+            }
+          } catch (err) {
+            console.error(`Failed to send email to ${booking.email}:`, err);
+          }
+        })
+      ).catch((err) => console.error("Error in bulk email sending:", err));
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

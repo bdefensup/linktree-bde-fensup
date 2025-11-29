@@ -33,9 +33,13 @@ export async function PATCH(
 
     // Send email based on status
     if (process.env.RESEND_API_KEY) {
+      const from = process.env.EMAIL_FROM || "onboarding@resend.dev";
+      let emailResult;
+
       if (status === "CONFIRMED") {
-        await resend.emails.send({
-          from: "onboarding@resend.dev",
+        console.log(`Sending payment received email to ${booking.email}`);
+        emailResult = await resend.emails.send({
+          from,
           to: booking.email,
           subject: `Paiement validé - ${booking.event.title}`,
           react: PaymentReceivedEmail({
@@ -45,8 +49,9 @@ export async function PATCH(
           }),
         });
       } else if (status === "CANCELLED") {
-        await resend.emails.send({
-          from: "onboarding@resend.dev",
+        console.log(`Sending booking cancelled email to ${booking.email}`);
+        emailResult = await resend.emails.send({
+          from,
           to: booking.email,
           subject: `Mise à jour réservation - ${booking.event.title}`,
           react: BookingCancelledEmail({
@@ -55,6 +60,14 @@ export async function PATCH(
             bookingId: booking.id,
           }),
         });
+      }
+
+      if (emailResult) {
+        if (emailResult.error) {
+          console.error("Resend API Error:", emailResult.error);
+        } else {
+          console.log("Email sent successfully:", emailResult.data);
+        }
       }
     } else {
       console.warn("RESEND_API_KEY is missing, skipping email sending.");
