@@ -1,11 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Booking, Event, User } from "@/lib/generated/prisma/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   CalendarDays,
@@ -40,7 +35,6 @@ import {
 } from "@/components/ui/table";
 
 export const dynamic = "force-dynamic";
-
 export default async function AdminDashboard() {
   // Fetch Data
 
@@ -49,12 +43,10 @@ export default async function AdminDashboard() {
   let totalBookings = 0;
   let pendingBookings = 0;
   let totalUsers = 0;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let nextEvent: any = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let recentBookings: any[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let recentUsers: any[] = [];
+
+  let nextEvent: Event | null = null;
+  let recentBookings: (Booking & { event: Event })[] = [];
+  let recentUsers: User[] = [];
 
   try {
     // Execute queries sequentially to avoid exhausting the connection pool
@@ -102,9 +94,7 @@ export default async function AdminDashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Tableau de Bord</h1>
-          <p className="text-muted-foreground">
-            Vue d'ensemble de l'activité du BDE.
-          </p>
+          <p className="text-muted-foreground">Vue d'ensemble de l'activité du BDE.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button asChild className="shadow-lg shadow-primary/20">
@@ -123,9 +113,7 @@ export default async function AdminDashboard() {
         {/* 1. Quick Actions (Top Left) */}
         <Card className="bg-card/50 backdrop-blur-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Actions Rapides
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Actions Rapides</CardTitle>
             <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="space-y-2">
@@ -175,9 +163,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{pendingBookings}</div>
-            <p className="text-xs text-muted-foreground">
-              en attente ({totalBookings} total)
-            </p>
+            <p className="text-xs text-muted-foreground">en attente ({totalBookings} total)</p>
           </CardContent>
         </Card>
 
@@ -189,9 +175,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              inscrits sur la plateforme
-            </p>
+            <p className="text-xs text-muted-foreground">inscrits sur la plateforme</p>
           </CardContent>
         </Card>
 
@@ -203,9 +187,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{upcomingEventsCount}</div>
-            <p className="text-xs text-muted-foreground">
-              à venir ({totalEvents} total)
-            </p>
+            <p className="text-xs text-muted-foreground">à venir ({totalEvents} total)</p>
           </CardContent>
         </Card>
 
@@ -272,13 +254,9 @@ export default async function AdminDashboard() {
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
                       <span className="capitalize">
-                        {format(
-                          new Date(nextEvent.date),
-                          "EEE dd MMM • HH:mm",
-                          {
-                            locale: fr,
-                          }
-                        )}
+                        {format(new Date(nextEvent.date), "EEE dd MMM • HH:mm", {
+                          locale: fr,
+                        })}
                       </span>
                     </div>
                   </div>
@@ -287,11 +265,7 @@ export default async function AdminDashboard() {
                 <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                   <CalendarDays className="w-10 h-10 mb-2 opacity-50" />
                   <p className="text-sm">Aucun événement à venir.</p>
-                  <Button
-                    variant="link"
-                    asChild
-                    className="mt-1 h-auto p-0 text-primary"
-                  >
+                  <Button variant="link" asChild className="mt-1 h-auto p-0 text-primary">
                     <Link href="/admin/events/new">Créer un événement</Link>
                   </Button>
                 </div>
@@ -307,9 +281,7 @@ export default async function AdminDashboard() {
               <Activity className="w-5 h-5 text-primary" />
               Activité Récente
             </CardTitle>
-            <CardDescription>
-              Dernières réservations et inscriptions.
-            </CardDescription>
+            <CardDescription>Dernières réservations et inscriptions.</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/50">
@@ -318,9 +290,7 @@ export default async function AdminDashboard() {
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
                     <Ticket className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-semibold">
-                      Dernières Réservations
-                    </h3>
+                    <h3 className="text-sm font-semibold">Dernières Réservations</h3>
                   </div>
                   <Table>
                     <TableHeader>
@@ -451,8 +421,7 @@ export default async function AdminDashboard() {
                                     Staff
                                   </Badge>
                                 )}
-                                {(user.role === "adherent" ||
-                                  user.role === "user") && (
+                                {(user.role === "adherent" || user.role === "user") && (
                                   <Badge
                                     variant="outline"
                                     className="bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800 gap-1 hover:bg-violet-100 dark:hover:bg-violet-900/60 px-2 py-0.5 h-5 flex items-center"

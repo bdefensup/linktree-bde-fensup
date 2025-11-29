@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Body,
   Container,
@@ -39,13 +38,11 @@ export const VerifyEmail = ({ url, firstName }: VerifyEmailProps) => (
         <Section style={contentContainer}>
           <Heading style={h1}>Bienvenue ! 👋</Heading>
 
+          <Text style={text}>Bonjour {firstName ? <strong>{firstName}</strong> : "!"},</Text>
           <Text style={text}>
-            Bonjour {firstName ? <strong>{firstName}</strong> : "!"},
-          </Text>
-          <Text style={text}>
-            Merci de vous être inscrit. Pour activer votre compte et accéder à
-            toutes les fonctionnalités exclusives du BDE, veuillez vérifier
-            votre adresse email en cliquant sur le bouton ci-dessous.
+            Merci de vous être inscrit. Pour activer votre compte et accéder à toutes les
+            fonctionnalités exclusives du BDE, veuillez vérifier votre adresse email en cliquant sur
+            le bouton ci-dessous.
           </Text>
 
           <Section style={buttonContainer}>
@@ -115,8 +112,7 @@ const contentContainer = {
   backgroundColor: "#ffffff",
   borderRadius: "12px",
   padding: "40px",
-  boxShadow:
-    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 };
 
 const h1 = {
@@ -169,9 +165,7 @@ const link = {
   textDecoration: "none",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? process.env.NEXT_PUBLIC_APP_URL
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL : "";
 
 const logo = {
   margin: "0 auto 20px",

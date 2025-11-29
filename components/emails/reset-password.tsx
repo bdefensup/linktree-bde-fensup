@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Body,
   Container,
@@ -19,10 +18,7 @@ interface ResetPasswordEmailProps {
   firstName?: string;
 }
 
-export const ResetPasswordEmail = ({
-  url,
-  firstName,
-}: ResetPasswordEmailProps) => (
+export const ResetPasswordEmail = ({ url, firstName }: ResetPasswordEmailProps) => (
   <Html>
     <Head />
     <Preview>Réinitialisation de votre mot de passe BDE FEN'SUP</Preview>
@@ -43,13 +39,10 @@ export const ResetPasswordEmail = ({
         <Section style={contentContainer}>
           <Heading style={h1}>Mot de passe oublié ? 🔒</Heading>
 
+          <Text style={text}>Bonjour {firstName ? <strong>{firstName}</strong> : "!"},</Text>
           <Text style={text}>
-            Bonjour {firstName ? <strong>{firstName}</strong> : "!"},
-          </Text>
-          <Text style={text}>
-            Nous avons reçu une demande de réinitialisation de mot de passe pour
-            votre compte. Si vous n'êtes pas à l'origine de cette demande, vous
-            pouvez ignorer cet email.
+            Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte. Si
+            vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.
           </Text>
 
           <Section style={buttonContainer}>
@@ -109,8 +102,7 @@ const contentContainer = {
   backgroundColor: "#ffffff",
   borderRadius: "12px",
   padding: "40px",
-  boxShadow:
-    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 };
 
 const h1 = {
@@ -163,9 +155,7 @@ const link = {
   textDecoration: "none",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? process.env.NEXT_PUBLIC_APP_URL
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL : "";
 
 const logo = {
   margin: "0 auto 20px",

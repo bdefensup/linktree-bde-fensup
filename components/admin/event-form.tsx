@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Control, FieldValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
@@ -22,39 +22,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(2, "Le titre doit contenir au moins 2 caractères"),
-  description: z
-    .string()
-    .min(10, "La description doit contenir au moins 10 caractères"),
+  description: z.string().min(10, "La description doit contenir au moins 10 caractères"),
   date: z.date(),
-  time: z
-    .string()
-    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Format invalide (HH:MM)"),
+  time: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Format invalide (HH:MM)"),
   location: z.string().min(2, "Le lieu est requis"),
   price: z.coerce.number().min(0, "Le prix ne peut pas être négatif"),
-  memberPrice: z.coerce
-    .number()
-    .min(0, "Le prix membre ne peut pas être négatif")
-    .optional(),
+  memberPrice: z.coerce.number().min(0, "Le prix membre ne peut pas être négatif").optional(),
   capacity: z.coerce.number().min(1, "La capacité doit être d'au moins 1"),
-  image: z
-    .string()
-    .url("L'URL de l'image est invalide")
-    .optional()
-    .or(z.literal("")),
-  externalPrice: z.coerce
-    .number()
-    .min(0, "Le prix extérieur ne peut pas être négatif")
-    .optional(),
+  image: z.string().url("L'URL de l'image est invalide").optional().or(z.literal("")),
+  externalPrice: z.coerce.number().min(0, "Le prix extérieur ne peut pas être négatif").optional(),
 });
 
 type EventFormValues = z.infer<typeof formSchema>;
@@ -90,8 +72,7 @@ export function EventForm({ initialData }: EventFormProps) {
       };
 
   const form = useForm<EventFormValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(formSchema) as any,
+    resolver: zodResolver(formSchema),
     defaultValues,
   });
 
@@ -108,9 +89,7 @@ export function EventForm({ initialData }: EventFormProps) {
         date: eventDate.toISOString(),
       };
 
-      const url = initialData
-        ? `/api/admin/events/${initialData.id}`
-        : "/api/admin/events";
+      const url = initialData ? `/api/admin/events/${initialData.id}` : "/api/admin/events";
       const method = initialData ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -146,7 +125,7 @@ export function EventForm({ initialData }: EventFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid gap-4 md:grid-cols-2">
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="title"
             render={({ field }) => (
               <FormItem>
@@ -159,7 +138,7 @@ export function EventForm({ initialData }: EventFormProps) {
             )}
           />
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="location"
             render={({ field }) => (
               <FormItem>
@@ -174,7 +153,7 @@ export function EventForm({ initialData }: EventFormProps) {
         </div>
 
         <FormField
-          control={form.control}
+          control={form.control as unknown as Control<FieldValues>}
           name="description"
           render={({ field }) => (
             <FormItem>
@@ -193,7 +172,7 @@ export function EventForm({ initialData }: EventFormProps) {
 
         <div className="grid gap-4 md:grid-cols-2">
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
@@ -222,9 +201,7 @@ export function EventForm({ initialData }: EventFormProps) {
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date(new Date().setHours(0, 0, 0, 0))
-                      }
+                      disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                       initialFocus
                     />
                   </PopoverContent>
@@ -234,7 +211,7 @@ export function EventForm({ initialData }: EventFormProps) {
             )}
           />
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="time"
             render={({ field }) => (
               <FormItem>
@@ -250,43 +227,33 @@ export function EventForm({ initialData }: EventFormProps) {
 
         <div className="grid gap-4 md:grid-cols-3">
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="price"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Prix Standard (€)</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="memberPrice"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Prix Adhérent (€)</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="capacity"
             render={({ field }) => (
               <FormItem>
@@ -302,18 +269,13 @@ export function EventForm({ initialData }: EventFormProps) {
 
         <div className="grid gap-4 md:grid-cols-3">
           <FormField
-            control={form.control}
+            control={form.control as unknown as Control<FieldValues>}
             name="externalPrice"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Prix Extérieur (€) (Optionnel)</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
+                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -322,17 +284,13 @@ export function EventForm({ initialData }: EventFormProps) {
         </div>
 
         <FormField
-          control={form.control}
+          control={form.control as unknown as Control<FieldValues>}
           name="image"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Image de l'événement</FormLabel>
               <FormControl>
-                <ImageUpload
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={loading}
-                />
+                <ImageUpload value={field.value} onChange={field.onChange} disabled={loading} />
               </FormControl>
               <FormDescription>
                 Glissez une image ou cliquez pour télécharger (Max 5MB).
@@ -343,11 +301,7 @@ export function EventForm({ initialData }: EventFormProps) {
         />
 
         <div className="flex gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/admin/events")}
-          >
+          <Button type="button" variant="outline" onClick={() => router.push("/admin/events")}>
             Annuler
           </Button>
           <Button type="submit" disabled={loading}>

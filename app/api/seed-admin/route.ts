@@ -45,10 +45,7 @@ export async function GET(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Failed to create user" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
     }
 
     // 3. Force verify and admin role
@@ -64,8 +61,8 @@ export async function GET(request: Request) {
       message: "User created and verified",
       user: finalUser,
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

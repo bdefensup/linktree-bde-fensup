@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Body,
   Container,
@@ -26,9 +25,7 @@ export const BookingConfirmationEmail = ({
 }: BookingConfirmationEmailProps) => (
   <Html>
     <Head />
-    <Preview>
-      Confirmation de votre demande de réservation pour {eventName}
-    </Preview>
+    <Preview>Confirmation de votre demande de réservation pour {eventName}</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header with Logo Placeholder and Brand Name */}
@@ -59,19 +56,15 @@ export const BookingConfirmationEmail = ({
           </Section>
 
           <Section style={highlightSection}>
-            <Text style={highlightText}>
-              ⚠️ Important : Votre place n'est pas encore validée.
-            </Text>
+            <Text style={highlightText}>⚠️ Important : Votre place n'est pas encore validée.</Text>
             <Text style={highlightSubText}>
-              Nous reviendrons vers vous 48h avant l'événement pour vous
-              confirmer le paiement et la réservation définitive par mail et
-              SMS.
+              Nous reviendrons vers vous 48h avant l'événement pour vous confirmer le paiement et la
+              réservation définitive par mail et SMS.
             </Text>
           </Section>
 
           <Text style={text}>
-            Si vous avez des questions, n'hésitez pas à nous contacter sur nos
-            réseaux sociaux.
+            Si vous avez des questions, n'hésitez pas à nous contacter sur nos réseaux sociaux.
           </Text>
 
           <Hr style={hr} />
@@ -123,8 +116,7 @@ const contentContainer = {
   backgroundColor: "#ffffff",
   borderRadius: "12px",
   padding: "40px",
-  boxShadow:
-    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 };
 
 const h1 = {
@@ -204,9 +196,7 @@ const link = {
   textDecoration: "none",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? process.env.NEXT_PUBLIC_APP_URL
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL : "";
 
 const logo = {
   margin: "0 auto 20px",

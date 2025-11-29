@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Body,
   Container,
@@ -48,8 +47,8 @@ export const BookingCancelledEmail = ({
             Bonjour <strong>{firstName}</strong>,
           </Text>
           <Text style={text}>
-            Nous vous informons que votre réservation pour l'événement suivant a
-            été annulée ou refusée :
+            Nous vous informons que votre réservation pour l'événement suivant a été annulée ou
+            refusée :
           </Text>
 
           <Section style={eventCard}>
@@ -60,14 +59,12 @@ export const BookingCancelledEmail = ({
           <Section style={highlightSection}>
             <Text style={highlightText}>❌ Statut : Annulé / Refusé</Text>
             <Text style={highlightSubText}>
-              Si vous pensez qu'il s'agit d'une erreur ou si vous avez déjà
-              effectué un paiement, merci de nous contacter rapidement.
+              Si vous pensez qu'il s'agit d'une erreur ou si vous avez déjà effectué un paiement,
+              merci de nous contacter rapidement.
             </Text>
           </Section>
 
-          <Text style={text}>
-            Nous restons à votre disposition pour toute question.
-          </Text>
+          <Text style={text}>Nous restons à votre disposition pour toute question.</Text>
 
           <Hr style={hr} />
 
@@ -118,8 +115,7 @@ const contentContainer = {
   backgroundColor: "#ffffff",
   borderRadius: "12px",
   padding: "40px",
-  boxShadow:
-    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 };
 
 const h1 = {
@@ -199,9 +195,7 @@ const link = {
   textDecoration: "none",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? process.env.NEXT_PUBLIC_APP_URL
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL : "";
 
 const logo = {
   margin: "0 auto 20px",

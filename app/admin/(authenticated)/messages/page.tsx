@@ -20,12 +20,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card } from "@/components/ui/card";
 
 // Mock Data removed
@@ -80,10 +75,7 @@ export default function MessagesPage() {
         },
         async (payload) => {
           // Only refresh if it matches our chat
-          if (
-            (payload.new as { conversationId: string }).conversationId ===
-            chatIdParam
-          ) {
+          if ((payload.new as { conversationId: string }).conversationId === chatIdParam) {
             const { getMessages } = await import("@/app/actions/messaging");
             const data = await getMessages(chatIdParam);
             setMessages(data as unknown as Message[]);
@@ -102,9 +94,7 @@ export default function MessagesPage() {
     if (!messageInput.trim() || !chatIdParam) return;
 
     try {
-      const { sendMessage, getMessages } = await import(
-        "@/app/actions/messaging"
-      );
+      const { sendMessage, getMessages } = await import("@/app/actions/messaging");
       await sendMessage(chatIdParam, messageInput);
       setMessageInput("");
 
@@ -118,28 +108,23 @@ export default function MessagesPage() {
 
   if (!chatIdParam) {
     return (
-      <div className="h-[calc(100vh-6rem)] rounded-xl border bg-background shadow-sm overflow-hidden flex flex-col">
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <Card className="max-w-md w-full p-8 flex flex-col items-center text-center bg-muted/10 border-dashed">
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Search className="h-8 w-8 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">
-              Sélectionnez une conversation
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              Choisissez une discussion dans la barre latérale pour commencer à
-              échanger.
-            </p>
-          </Card>
-        </div>
+      <div className="flex flex-col h-full items-center justify-center p-8">
+        <Card className="max-w-md w-full p-8 flex flex-col items-center text-center bg-muted/10 border-dashed">
+          <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Search className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Sélectionnez une conversation</h3>
+          <p className="text-muted-foreground text-sm">
+            Choisissez une discussion dans la barre latérale pour commencer à échanger.
+          </p>
+        </Card>
       </div>
     );
   }
 
   return (
     <TooltipProvider>
-      <div className="h-[calc(100vh-6rem)] rounded-xl border bg-background shadow-sm overflow-hidden flex flex-col">
+      <div className="flex flex-col h-full">
         <>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b h-16">
@@ -198,9 +183,7 @@ export default function MessagesPage() {
                       key={msg.id}
                       className={cn(
                         "flex gap-2 ",
-                        msg.senderId === session?.user?.id
-                          ? "ml-auto flex-row-reverse"
-                          : ""
+                        msg.senderId === session?.user?.id ? "ml-auto flex-row-reverse" : ""
                       )}
                     >
                       <Avatar className="h-8 w-8 mt-1 border border-border/50">
@@ -244,9 +227,7 @@ export default function MessagesPage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                     <p>Aucun message pour le moment.</p>
-                    <p className="text-sm">
-                      Envoyez un message pour démarrer la discussion.
-                    </p>
+                    <p className="text-sm">Envoyez un message pour démarrer la discussion.</p>
                   </div>
                 )}
               </div>
@@ -255,10 +236,7 @@ export default function MessagesPage() {
 
           {/* Input */}
           <div className="p-4 border-t bg-background">
-            <form
-              onSubmit={handleSendMessage}
-              className="flex items-end gap-2 max-w-3xl mx-auto"
-            >
+            <form onSubmit={handleSendMessage} className="flex items-end gap-2 max-w-3xl mx-auto">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button

@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Body,
   Container,
@@ -26,9 +25,7 @@ export const PaymentReceivedEmail = ({
 }: PaymentReceivedEmailProps) => (
   <Html>
     <Head />
-    <Preview>
-      Confirmation de paiement pour {eventName} - Réservation validée !
-    </Preview>
+    <Preview>Confirmation de paiement pour {eventName} - Réservation validée !</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header with Logo */}
@@ -50,12 +47,11 @@ export const PaymentReceivedEmail = ({
             Bonjour <strong>{firstName}</strong>,
           </Text>
           <Text style={text}>
-            Bonne nouvelle ! Nous avons bien reçu votre paiement (ou validé
-            votre réservation manuellement).
+            Bonne nouvelle ! Nous avons bien reçu votre paiement (ou validé votre réservation
+            manuellement).
           </Text>
           <Text style={text}>
-            Votre place pour l'événement est désormais{" "}
-            <strong>confirmée</strong>.
+            Votre place pour l'événement est désormais <strong>confirmée</strong>.
           </Text>
 
           <Section style={eventCard}>
@@ -66,8 +62,7 @@ export const PaymentReceivedEmail = ({
           <Section style={highlightSection}>
             <Text style={highlightText}>✅ Réservation Confirmée</Text>
             <Text style={highlightSubText}>
-              Présentez ce mail ou votre pièce d'identité à l'entrée de
-              l'événement.
+              Présentez ce mail ou votre pièce d'identité à l'entrée de l'événement.
             </Text>
           </Section>
 
@@ -122,8 +117,7 @@ const contentContainer = {
   backgroundColor: "#ffffff",
   borderRadius: "12px",
   padding: "40px",
-  boxShadow:
-    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 };
 
 const h1 = {
@@ -203,9 +197,7 @@ const link = {
   textDecoration: "none",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL
-  ? process.env.NEXT_PUBLIC_APP_URL
-  : "";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL : "";
 
 const logo = {
   margin: "0 auto 20px",

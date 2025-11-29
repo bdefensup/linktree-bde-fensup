@@ -3,10 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -40,10 +37,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -82,18 +76,14 @@ export async function DELETE(
     });
 
     if (!targetUser) {
-      return NextResponse.json(
-        { error: "Utilisateur introuvable." },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Utilisateur introuvable." }, { status: 404 });
     }
 
     // Staff cannot delete Admin
     if (currentUserRole === "staff" && targetUser.role === "admin") {
       return NextResponse.json(
         {
-          error:
-            "Les membres du staff ne peuvent pas supprimer un administrateur.",
+          error: "Les membres du staff ne peuvent pas supprimer un administrateur.",
         },
         { status: 403 }
       );
