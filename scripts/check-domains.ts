@@ -13,7 +13,7 @@ async function main() {
         console.log(`- ${d.name}: ${d.status} (Region: ${d.region})`);
       });
     } else {
-      console.log("No domains found or failed to list.");
+      console.log("No dos found or failed to list.");
     }
   } catch (error) {
     console.error("Error listing domains:", error);
