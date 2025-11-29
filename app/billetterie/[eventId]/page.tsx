@@ -183,11 +183,11 @@ export default function EventDetailPage() {
                   priority
                 />
               ) : (
-                <div className="h-full w-full bg-gradient-to-br from-primary/20 via-background to-secondary/20 flex items-center justify-center">
+                <div className="h-full w-full bg-linear-to-br from-primary/20 via-background to-secondary/20 flex items-center justify-center">
                   <Ticket className="w-32 h-32 text-primary/20" />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-background/90 via-transparent to-transparent" />
 
               <div className="absolute bottom-0 left-0 p-4 w-full">
                 <Badge className="mb-1.5 bg-primary/90 hover:bg-primary text-primary-foreground border-none text-[10px] px-2 py-0.5 h-auto">
