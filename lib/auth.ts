@@ -47,13 +47,14 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      console.log(`Attempting to send verification email to ${user.email}`);
       const resend = new Resend(process.env.RESEND_API_KEY);
       if (!process.env.RESEND_API_KEY) {
         console.error("RESEND_API_KEY is missing!");
         return;
       }
       try {
-        await resend.emails.send({
+        const { data, error } = await resend.emails.send({
           from: process.env.EMAIL_FROM || "onboarding@resend.dev",
           to: user.email,
           subject: "Vérifiez votre adresse email",
@@ -62,6 +63,12 @@ export const auth = betterAuth({
             firstName: user.name.split(" ")[0],
           }),
         });
+
+        if (error) {
+          console.error("Resend API Error:", error);
+        } else {
+          console.log("Verification email sent successfully:", data);
+        }
       } catch (error) {
         console.error("Error sending verification email:", error);
       }
