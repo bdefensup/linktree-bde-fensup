@@ -160,11 +160,8 @@ export function SupportCard() {
           <div className="absolute -inset-1 bg-linear-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 rounded-3xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
           <Card className="relative h-[450px] border-blue-500/30 bg-card/80 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
             <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
-              <div className="relative mt-1 mb-1">
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 animate-bounce duration-1500">
-                  <MessageCircle className="w-6 h-6 text-blue-500 fill-blue-500 drop-shadow-md" />
-                </div>
-                <Ticket className="w-12 h-12 text-cyan-500" />
+              <div className="mb-2">
+                <MessageCircle className="w-12 h-12 text-blue-500" />
               </div>
 
               <div className="space-y-1">
@@ -219,7 +216,7 @@ export function SupportCard() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="h-8 text-sm"
+                  className="h-8 text-base md:text-sm"
                 />
               </div>
 
@@ -228,7 +225,7 @@ export function SupportCard() {
                   Sujet
                 </Label>
                 <Select value={subject} onValueChange={setSubject} required>
-                  <SelectTrigger className="h-8 text-sm">
+                  <SelectTrigger className="h-8 text-base md:text-sm">
                     <SelectValue placeholder="Choisir un sujet" />
                   </SelectTrigger>
                   <SelectContent>
@@ -353,7 +350,7 @@ export function SupportCard() {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Écrivez votre message..."
-                className="h-9 text-xs rounded-full bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-blue-500"
+                className="h-9 text-base md:text-xs rounded-full bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-blue-500"
               />
               <Button
                 type="submit"
