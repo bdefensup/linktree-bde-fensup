@@ -13,10 +13,15 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
-  // AJOUT : Désactivation de la règle sur les apostrophes
   {
     rules: {
       "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
 ]);
