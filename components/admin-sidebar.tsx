@@ -163,6 +163,11 @@ export function AdminSidebar() {
 
     fetchConversations();
 
+    // Polling fallback (every 3 seconds)
+    const interval = setInterval(() => {
+      fetchConversations();
+    }, 3000);
+
     // Realtime subscription for pinned status changes
     // Realtime subscription for pinned status changes
     console.log("Setting up subscription for user:", session?.user?.id);
@@ -194,6 +199,7 @@ export function AdminSidebar() {
     window.addEventListener("conversation:updated", handleConversationUpdate);
 
     return () => {
+      clearInterval(interval);
       supabase.removeChannel(channel);
       window.removeEventListener("conversation:updated", handleConversationUpdate);
     };
