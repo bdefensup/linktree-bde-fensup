@@ -12,20 +12,11 @@ import {
   Filter,
   X,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import {
   format,
@@ -159,8 +150,7 @@ export default function BilletteriePage() {
             Billetterie Officielle
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
-            Découvrez et réservez vos places pour les événements exclusifs du
-            BDE FENELON.
+            Découvrez et réservez vos places pour les événements exclusifs du BDE FENELON.
           </p>
         </div>
 
@@ -214,10 +204,7 @@ export default function BilletteriePage() {
                   <Button
                     variant={filterType === "custom" ? "default" : "outline"}
                     size="sm"
-                    className={cn(
-                      "rounded-full gap-2",
-                      !dateRange && "text-muted-foreground"
-                    )}
+                    className={cn("rounded-full gap-2", !dateRange && "text-muted-foreground")}
                   >
                     <CalendarIcon className="h-4 w-4" />
                     {dateRange?.from ? (
@@ -270,10 +257,7 @@ export default function BilletteriePage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <Card
-                key={i}
-                className="overflow-hidden border-border/50 shadow-sm"
-              >
+              <Card key={i} className="overflow-hidden border-border/50 shadow-sm">
                 <Skeleton className="h-48 w-full" />
                 <CardHeader className="space-y-2">
                   <Skeleton className="h-6 w-3/4" />
@@ -293,31 +277,22 @@ export default function BilletteriePage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
               <Filter className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">
-              Aucun événement trouvé
-            </h3>
+            <h3 className="text-xl font-semibold mb-2">Aucun événement trouvé</h3>
             <p className="text-muted-foreground mb-6">
               Aucun événement ne correspond à vos filtres.
             </p>
-            <Button
-              onClick={clearFilters}
-              variant="outline"
-              className="rounded-full"
-            >
+            <Button onClick={clearFilters} variant="outline" className="rounded-full">
               Effacer les filtres
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredEvents.map((event) => {
-              const availableSeats =
-                event.maxSeats - (event._count?.bookings || 0);
+              const availableSeats = event.maxSeats - (event._count?.bookings || 0);
               const isSoldOut = availableSeats <= 0;
               // Only feature the first event if we are viewing ALL events, otherwise standard grid
               const isFeatured = filterType === "all" && event.isFeatured;
-              const colSpan = isFeatured
-                ? "col-span-1 md:col-span-2 md:row-span-2"
-                : "col-span-1";
+              const colSpan = isFeatured ? "col-span-1 md:col-span-2 md:row-span-2" : "col-span-1";
 
               return (
                 <div
@@ -356,10 +331,7 @@ export default function BilletteriePage() {
                         {/* Status Badges */}
                         <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
                           {isSoldOut ? (
-                            <Badge
-                              variant="destructive"
-                              className="font-semibold shadow-lg"
-                            >
+                            <Badge variant="destructive" className="font-semibold shadow-lg">
                               Complet
                             </Badge>
                           ) : (

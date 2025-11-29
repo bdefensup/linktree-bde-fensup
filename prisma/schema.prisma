@@ -19,6 +19,7 @@ model User {
   image         String?
   phoneNumber   String?
   role          String    @default("adherent")
+  position      String?
   banned        Boolean   @default(false)
   sessions      Session[]
   accounts      Account[]
@@ -158,6 +159,7 @@ model ConversationParticipant {
   userId         String
   joinedAt       DateTime     @default(now())
   lastReadAt     DateTime     @default(now())
+  isPinned       Boolean      @default(false)
   
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)

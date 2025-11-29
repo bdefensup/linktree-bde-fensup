@@ -20,7 +20,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { searchUsers, createConversation } from "@/app/actions/messaging";
+import { searchUsers, createConversation } from "@/app/messaging";
 import { toast } from "sonner";
 
 interface User {

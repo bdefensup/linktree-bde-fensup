@@ -4,7 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
+import { unstable_noStore as noStore } from "next/cache";
+
 export async function getConversations() {
+  noStore();
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -42,7 +45,158 @@ export async function getConversations() {
   return conversations;
 }
 
+export async function getConversation(conversationId: string) {
+  noStore();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const conversation = await prisma.conversation.findUnique({
+    where: {
+      id: conversationId,
+    },
+    include: {
+      participants: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+
+  if (!conversation) return null;
+
+  // Verify participation
+  const isParticipant = conversation.participants.some((p) => p.userId === session.user.id);
+
+  if (!isParticipant) {
+    throw new Error("Unauthorized");
+  }
+
+  return conversation;
+}
+
+export async function getPinnedConversations() {
+  noStore();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const conversations = await prisma.conversation.findMany({
+    where: {
+      AND: [
+        {
+          participants: {
+            some: {
+              userId: session.user.id,
+            },
+          },
+        },
+        {
+          OR: [
+            {
+              participants: {
+                some: {
+                  userId: session.user.id,
+                  isPinned: true,
+                },
+              },
+            },
+            {
+              participants: {
+                some: {
+                  user: {
+                    position: {
+                      in: ["President", "Tresorier", "Secretaire"],
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
+    take: 10,
+    include: {
+      participants: {
+        include: {
+          user: true,
+        },
+      },
+      messages: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      },
+    },
+    orderBy: {
+      lastMessageAt: "desc",
+    },
+  });
+
+  return conversations;
+}
+
+export async function togglePinConversation(conversationId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const participant = await prisma.conversationParticipant.findUnique({
+    where: {
+      conversationId_userId: {
+        conversationId,
+        userId: session.user.id,
+      },
+    },
+  });
+
+  if (!participant) {
+    throw new Error("Not found");
+  }
+
+  // If we are pinning (currently false), check the limit
+  if (!participant.isPinned) {
+    const pinnedCount = await prisma.conversationParticipant.count({
+      where: {
+        userId: session.user.id,
+        isPinned: true,
+      },
+    });
+
+    if (pinnedCount >= 4) {
+      throw new Error("Maximum 4 conversations pinned");
+    }
+  }
+
+  await prisma.conversationParticipant.update({
+    where: {
+      id: participant.id,
+    },
+    data: {
+      isPinned: !participant.isPinned,
+    },
+  });
+
+  return !participant.isPinned;
+}
+
 export async function getMessages(conversationId: string) {
+  noStore();
   const session = await auth.api.getSession({
     headers: await headers(),
   });

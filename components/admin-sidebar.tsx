@@ -11,10 +11,13 @@ import {
   Home,
   Plus,
   Loader2,
+  Pin,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { signOut, useSession } from "@/lib/auth-client";
+import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 import {
   Sidebar,
   SidebarContent,
@@ -72,11 +75,13 @@ interface Conversation {
   lastMessageAt: Date;
   participants: {
     userId: string;
+    isPinned: boolean;
     user: {
       id: string;
       name: string | null;
       image: string | null;
       email: string;
+      position: string | null;
     };
   }[];
   messages: {
@@ -112,7 +117,7 @@ export function AdminSidebar() {
       if (searchQuery.length >= 2) {
         setIsSearching(true);
         try {
-          const { searchUsers } = await import("@/app/actions/messaging");
+          const { searchUsers } = await import("@/app/messaging");
           const results = await searchUsers(searchQuery);
           setSearchResults(results);
         } catch (error) {
@@ -131,13 +136,13 @@ export function AdminSidebar() {
   const handleStartConversation = async (userId: string) => {
     try {
       setIsSearchOpen(false);
-      const { createConversation } = await import("@/app/actions/messaging");
+      const { createConversation } = await import("@/app/messaging");
       const conversation = await createConversation(userId);
       router.push(`/admin/messages?chatId=${conversation.id}`);
 
       // Refresh conversations list
-      const { getConversations } = await import("@/app/actions/messaging");
-      const data = await getConversations();
+      const { getPinnedConversations } = await import("@/app/messaging");
+      const data = await getPinnedConversations();
       setConversations(data as unknown as Conversation[]);
     } catch (error) {
       console.error("Failed to create conversation:", error);
@@ -148,15 +153,51 @@ export function AdminSidebar() {
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        const { getConversations } = await import("@/app/actions/messaging");
-        const data = await getConversations();
+        const { getPinnedConversations } = await import("@/app/messaging");
+        const data = await getPinnedConversations();
         setConversations(data as unknown as Conversation[]);
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
       }
     };
+
     fetchConversations();
-  }, []);
+
+    // Realtime subscription for pinned status changes
+    // Realtime subscription for pinned status changes
+    console.log("Setting up subscription for user:", session?.user?.id);
+    const channel = supabase
+      .channel("admin_sidebar_pins")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "conversation_participant",
+          // filter: session?.user?.id ? `"userId"=eq.${session.user.id}` : undefined,
+        },
+        (payload) => {
+          console.log("Realtime update received:", payload);
+          fetchConversations();
+        }
+      )
+      .subscribe((status) => {
+        console.log("Subscription status:", status);
+      });
+
+    // Custom event listener for instant updates
+    const handleConversationUpdate = () => {
+      console.log("Custom event received: conversation:updated");
+      fetchConversations();
+    };
+
+    window.addEventListener("conversation:updated", handleConversationUpdate);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("conversation:updated", handleConversationUpdate);
+    };
+  }, [session?.user?.id]);
 
   const handleLogout = async () => {
     await signOut({
@@ -189,17 +230,12 @@ export function AdminSidebar() {
                             alt={session.user.name || "User"}
                           />
                           <AvatarFallback className="rounded-lg">
-                            {session.user.name?.slice(0, 2).toUpperCase() ||
-                              "AD"}
+                            {session.user.name?.slice(0, 2).toUpperCase() || "AD"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
-                          <span className="truncate font-semibold">
-                            {session.user.name}
-                          </span>
-                          <span className="truncate text-xs">
-                            {session.user.email}
-                          </span>
+                          <span className="truncate font-semibold">{session.user.name}</span>
+                          <span className="truncate text-xs">{session.user.email}</span>
                         </div>
                         <ChevronDown className="ml-auto size-4" />
                       </>
@@ -207,17 +243,11 @@ export function AdminSidebar() {
                       <>
                         <Avatar className="h-8 w-8 rounded-lg">
                           <AvatarImage src="/logo-full.png" alt="BDE FEN'SUP" />
-                          <AvatarFallback className="rounded-lg">
-                            BDE
-                          </AvatarFallback>
+                          <AvatarFallback className="rounded-lg">BDE</AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
-                          <span className="truncate font-semibold">
-                            BDE FEN'SUP
-                          </span>
-                          <span className="truncate text-xs">
-                            Administration
-                          </span>
+                          <span className="truncate font-semibold">BDE FEN'SUP</span>
+                          <span className="truncate text-xs">Administration</span>
                         </div>
                       </>
                     )}
@@ -286,57 +316,96 @@ export function AdminSidebar() {
           <SidebarGroup>
             <SidebarGroupLabel>
               Messagerie
-              <SidebarGroupAction
-                title="Nouvelle discussion"
-                onClick={() => setIsSearchOpen(true)}
-              >
+              <SidebarGroupAction title="Nouvelle discussion" onClick={() => setIsSearchOpen(true)}>
                 <Plus /> <span className="sr-only">Nouvelle discussion</span>
               </SidebarGroupAction>
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <ScrollArea className="h-[280px]">
                 <SidebarMenu>
-                  {conversations.map((chat) => {
-                    const otherParticipant = chat.participants.find(
-                      (p) => p.userId !== session?.user?.id
-                    )?.user;
-                    const lastMessage = chat.messages[0];
+                  {conversations
+                    .sort((a, b) => {
+                      const otherA = a.participants.find(
+                        (p) => p.userId !== session?.user?.id
+                      )?.user;
+                      const myA = a.participants.find((p) => p.userId === session?.user?.id);
+                      const isMandatoryA = ["President", "Tresorier", "Secretaire"].includes(
+                        otherA?.position || ""
+                      );
+                      const isPinnedA = myA?.isPinned;
 
-                    return (
-                      <SidebarMenuItem key={chat.id}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === `/admin/messages`}
-                          className="h-14"
-                        >
-                          <Link
-                            href={`/admin/messages?chatId=${chat.id}`}
-                            className="flex items-center gap-3"
+                      const otherB = b.participants.find(
+                        (p) => p.userId !== session?.user?.id
+                      )?.user;
+                      const myB = b.participants.find((p) => p.userId === session?.user?.id);
+                      const isMandatoryB = ["President", "Tresorier", "Secretaire"].includes(
+                        otherB?.position || ""
+                      );
+                      const isPinnedB = myB?.isPinned;
+
+                      if (isMandatoryA && !isMandatoryB) return -1;
+                      if (!isMandatoryA && isMandatoryB) return 1;
+                      if (isPinnedA && !isPinnedB) return -1;
+                      if (!isPinnedA && isPinnedB) return 1;
+                      return (
+                        new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+                      );
+                    })
+                    .map((chat) => {
+                      const otherParticipant = chat.participants.find(
+                        (p) => p.userId !== session?.user?.id
+                      )?.user;
+                      const myParticipant = chat.participants.find(
+                        (p) => p.userId === session?.user?.id
+                      );
+                      const isPinned = myParticipant?.isPinned;
+                      const isMandatory = ["President", "Tresorier", "Secretaire"].includes(
+                        otherParticipant?.position || ""
+                      );
+                      const lastMessage = chat.messages[0];
+
+                      return (
+                        <SidebarMenuItem key={chat.id}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={pathname === `/admin/messages`}
+                            className="h-14"
                           >
-                            <Avatar className="h-8 w-8 border border-border/50">
-                              <AvatarImage
-                                src={otherParticipant?.image || ""}
-                              />
-                              <AvatarFallback>
-                                {otherParticipant?.name
-                                  ?.slice(0, 2)
-                                  .toUpperCase() || "U"}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col overflow-hidden">
-                              <span className="font-semibold text-sm truncate">
-                                {otherParticipant?.name || "Utilisateur"}
-                              </span>
-                              <span className="text-xs text-muted-foreground truncate">
-                                {lastMessage?.content ||
-                                  "Nouvelle conversation"}
-                              </span>
-                            </div>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
+                            <Link
+                              href={`/admin/messages?chatId=${chat.id}`}
+                              className="flex items-center gap-3"
+                            >
+                              <Avatar className="h-8 w-8 border border-border/50">
+                                <AvatarImage src={otherParticipant?.image || undefined} />
+                                <AvatarFallback>
+                                  {otherParticipant?.name?.slice(0, 2).toUpperCase() || "U"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col overflow-hidden flex-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold text-sm truncate">
+                                    {otherParticipant?.name || "Utilisateur"}
+                                  </span>
+                                  {(isPinned || isMandatory) && (
+                                    <Pin
+                                      className={cn(
+                                        "h-3 w-3 transform rotate-45 ml-1 shrink-0",
+                                        isMandatory
+                                          ? "text-red-500 fill-red-500"
+                                          : "text-primary fill-primary"
+                                      )}
+                                    />
+                                  )}
+                                </div>
+                                <span className="text-xs text-muted-foreground truncate">
+                                  {lastMessage?.content || "Nouvelle conversation"}
+                                </span>
+                              </div>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
                 </SidebarMenu>
               </ScrollArea>
             </SidebarGroupContent>
@@ -349,11 +418,7 @@ export function AdminSidebar() {
         </SidebarFooter>
       </Sidebar>
 
-      <CommandDialog
-        open={isSearchOpen}
-        onOpenChange={setIsSearchOpen}
-        shouldFilter={false}
-      >
+      <CommandDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} shouldFilter={false}>
         <CommandInput
           placeholder="Rechercher un utilisateur (nom, email, téléphone)..."
           value={searchQuery}
@@ -365,8 +430,7 @@ export function AdminSidebar() {
               "Tapez au moins 2 caractères..."
             ) : isSearching ? (
               <div className="flex items-center justify-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" /> Recherche en
-                cours...
+                <Loader2 className="h-4 w-4 animate-spin" /> Recherche en cours...
               </div>
             ) : (
               "Aucun utilisateur trouvé."
@@ -388,9 +452,7 @@ export function AdminSidebar() {
                   </Avatar>
                   <div className="flex flex-col">
                     <span className="font-bold">{user.name}</span>
-                    <span className="text-xs font-normal opacity-80">
-                      {user.email}
-                    </span>
+                    <span className="text-xs font-normal opacity-80">{user.email}</span>
                   </div>
                 </CommandItem>
               ))}

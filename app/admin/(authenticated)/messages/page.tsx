@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import {
@@ -11,6 +12,7 @@ import {
   Smile,
   CheckCheck,
   Search,
+  Pin,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { supabase } from "@/lib/supabase";
@@ -23,8 +25,6 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card } from "@/components/ui/card";
 
-// Mock Data removed
-
 interface Message {
   id: string;
   content: string;
@@ -36,31 +36,65 @@ interface Message {
   };
 }
 
+interface Conversation {
+  id: string;
+  participants: {
+    userId: string;
+    isPinned: boolean;
+    user: {
+      id: string;
+      name: string | null;
+      image: string | null;
+      email: string;
+      position: string | null;
+    };
+  }[];
+}
+
 export default function MessagesPage() {
   const searchParams = useSearchParams();
   const chatIdParam = searchParams.get("chatId");
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
     if (!chatIdParam) return;
 
-    const fetchMessages = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const { getMessages } = await import("@/app/actions/messaging");
-        const data = await getMessages(chatIdParam);
-        setMessages(data as unknown as Message[]);
+        const { getMessages, getConversation } = await import("@/app/messaging");
+        const [msgs, conv] = await Promise.all([
+          getMessages(chatIdParam),
+          getConversation(chatIdParam),
+        ]);
+        setMessages(msgs as unknown as Message[]);
+        setConversation(conv as unknown as Conversation);
       } catch (error) {
-        console.error("Failed to fetch messages:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMessages();
+    fetchData();
+
+    // Polling fallback
+    const interval = setInterval(() => {
+      const fetchLatest = async () => {
+        const { getMessages, getConversation } = await import("@/app/messaging");
+        const [msgs, conv] = await Promise.all([
+          getMessages(chatIdParam),
+          getConversation(chatIdParam),
+        ]);
+        setMessages(msgs as unknown as Message[]);
+        setConversation(conv as unknown as Conversation);
+      };
+      fetchLatest();
+    }, 3000);
 
     // Realtime subscription
     const channel = supabase
@@ -74,9 +108,8 @@ export default function MessagesPage() {
           filter: `conversationId=eq.${chatIdParam}`,
         },
         async (payload) => {
-          // Only refresh if it matches our chat
           if ((payload.new as { conversationId: string }).conversationId === chatIdParam) {
-            const { getMessages } = await import("@/app/actions/messaging");
+            const { getMessages } = await import("@/app/messaging");
             const data = await getMessages(chatIdParam);
             setMessages(data as unknown as Message[]);
           }
@@ -85,6 +118,7 @@ export default function MessagesPage() {
       .subscribe();
 
     return () => {
+      clearInterval(interval);
       supabase.removeChannel(channel);
     };
   }, [chatIdParam]);
@@ -94,7 +128,7 @@ export default function MessagesPage() {
     if (!messageInput.trim() || !chatIdParam) return;
 
     try {
-      const { sendMessage, getMessages } = await import("@/app/actions/messaging");
+      const { sendMessage, getMessages } = await import("@/app/messaging");
       await sendMessage(chatIdParam, messageInput);
       setMessageInput("");
 
@@ -103,6 +137,25 @@ export default function MessagesPage() {
       setMessages(data as unknown as Message[]);
     } catch (error) {
       console.error("Failed to send message:", error);
+    }
+  };
+
+  const handleTogglePin = async () => {
+    if (!chatIdParam) return;
+    try {
+      const { togglePinConversation, getConversation } = await import("@/app/messaging");
+      await togglePinConversation(chatIdParam);
+      const updatedConv = await getConversation(chatIdParam);
+      setConversation(updatedConv as unknown as Conversation);
+      window.dispatchEvent(new Event("conversation:updated"));
+      toast.success("Statut de l'épingle mis à jour");
+    } catch (error) {
+      console.error("Failed to toggle pin:", error);
+      if (error instanceof Error && error.message === "Maximum 4 conversations pinned") {
+        toast.error("Vous ne pouvez épingler que 4 conversations maximum.");
+      } else {
+        toast.error("Erreur lors de la mise à jour de l'épingle");
+      }
     }
   };
 
@@ -122,6 +175,17 @@ export default function MessagesPage() {
     );
   }
 
+  const otherParticipant = conversation?.participants.find(
+    (p) => p.userId !== session?.user?.id
+  )?.user;
+
+  const myParticipant = conversation?.participants.find((p) => p.userId === session?.user?.id);
+
+  const isPinned = myParticipant?.isPinned;
+  const isMandatory = ["President", "Tresorier", "Secretaire"].includes(
+    otherParticipant?.position || ""
+  );
+
   return (
     <TooltipProvider>
       <div className="flex flex-col h-full">
@@ -130,16 +194,44 @@ export default function MessagesPage() {
           <div className="flex items-center justify-between p-4 border-b h-16">
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9 border border-border/50">
-                {/* Placeholder for chat info - ideally fetched or passed */}
-                <AvatarImage src="" />
-                <AvatarFallback>CH</AvatarFallback>
+                <AvatarImage src={otherParticipant?.image || undefined} />
+                <AvatarFallback>
+                  {otherParticipant?.name?.slice(0, 2).toUpperCase() || "CH"}
+                </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold text-sm">Discussion</h2>
-                <p className="text-xs text-muted-foreground">En ligne</p>
+                <h2 className="font-semibold text-sm">
+                  {otherParticipant?.name || "Chargement..."}
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  {otherParticipant?.email || "En ligne"}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={!isMandatory ? handleTogglePin : undefined}
+                    disabled={isMandatory}
+                  >
+                    <Pin
+                      className={cn(
+                        "h-4 w-4 transform rotate-45",
+                        (isPinned || isMandatory) && "text-primary fill-primary",
+                        isMandatory && "text-red-500 fill-red-500"
+                      )}
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isMandatory ? "Conversation obligatoire" : isPinned ? "Désépingler" : "Épingler"}
+                </TooltipContent>
+              </Tooltip>
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -175,7 +267,7 @@ export default function MessagesPage() {
           <div className="flex-1 min-h-0 overflow-hidden bg-muted/5">
             <ScrollArea className="h-full p-4">
               <div className="flex flex-col gap-4 max-w-3xl mx-auto">
-                {loading ? (
+                {loading && messages.length === 0 ? (
                   <div className="flex justify-center py-4">Chargement...</div>
                 ) : messages.length > 0 ? (
                   messages.map((msg) => (
@@ -187,7 +279,7 @@ export default function MessagesPage() {
                       )}
                     >
                       <Avatar className="h-8 w-8 mt-1 border border-border/50">
-                        <AvatarImage src={msg.sender?.image || ""} />
+                        <AvatarImage src={msg.sender?.image || undefined} />
                         <AvatarFallback>
                           {msg.sender?.name?.slice(0, 2).toUpperCase() || "U"}
                         </AvatarFallback>

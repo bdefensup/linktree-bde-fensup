@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, Control, FieldValues } from "react-hook-form";
+import { useForm, Control, FieldValues, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
@@ -72,7 +72,7 @@ export function EventForm({ initialData }: EventFormProps) {
       };
 
   const form = useForm<EventFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as unknown as Resolver<EventFormValues>,
     defaultValues,
   });
 
