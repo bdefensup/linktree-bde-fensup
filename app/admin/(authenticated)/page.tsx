@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Booking, Event, User } from "@/lib/generated/prisma/client";
+import { Booking, Event, User } from "@prisma/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {

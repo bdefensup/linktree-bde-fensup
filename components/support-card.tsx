@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MessageCircle, Send, X, Loader2, User, Ticket, Trash2 } from "lucide-react";
+import { MessageCircle, Send, X, Loader2, Ticket, Trash2 } from "lucide-react";
 import { createTicket, sendGuestMessage, getTicketMessages } from "@/app/actions/ticket";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,6 +24,17 @@ type ViewState = "IDLE" | "FORM" | "CHAT";
 
 const SUBJECTS = ["Question générale", "Problème billetterie", "Partenariat", "Événement", "Autre"];
 
+interface MessageWithSender {
+  id: string;
+  content: string;
+  createdAt: Date;
+  senderId: string;
+  sender: {
+    image: string | null;
+    name: string | null;
+  };
+}
+
 export function SupportCard() {
   const [view, setView] = useState<ViewState>("IDLE");
   const [name, setName] = useState("");
@@ -31,9 +42,9 @@ export function SupportCard() {
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [guestId, setGuestId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<MessageWithSender[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [ticketStatus, setTicketStatus] = useState("OPEN");
+  const [ticketStatus, setTicketStatus] = useState<string | null>("OPEN");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Restore session from localStorage
@@ -56,14 +67,10 @@ export function SupportCard() {
       const fetchMessages = async () => {
         try {
           const data = await getTicketMessages(conversationId, guestId);
-          setMessages(data.messages);
+          setMessages(data.messages as unknown as MessageWithSender[]);
           setTicketStatus(data.ticketStatus);
         } catch (error) {
           console.error("Polling error:", error);
-          // If unauthorized or not found, maybe clear session?
-          // localStorage.removeItem("bde_support_conversationId");
-          // localStorage.removeItem("bde_support_guestId");
-          // setView("IDLE");
         }
       };
 
@@ -72,14 +79,19 @@ export function SupportCard() {
 
       return () => clearInterval(interval);
     }
+    return;
   }, [view, conversationId, guestId]);
 
   // Scroll to bottom on new messages
+  const prevMessagesLength = useRef(0);
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    if (messages.length > prevMessagesLength.current) {
+      if (scrollRef.current) {
+        scrollRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+      prevMessagesLength.current = messages.length;
     }
-  }, [messages]);
+  }, [messages.length]);
 
   const handleStartChat = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +132,7 @@ export function SupportCard() {
       await sendGuestMessage(conversationId, guestId, content);
       // Immediate fetch to show message
       const data = await getTicketMessages(conversationId, guestId);
-      setMessages(data.messages);
+      setMessages(data.messages as unknown as MessageWithSender[]);
     } catch (error) {
       console.error("Failed to send message:", error);
       setNewMessage(content); // Restore on error
@@ -146,7 +158,7 @@ export function SupportCard() {
       <div className="col-span-1 md:col-span-1">
         <div className="w-full h-full relative group">
           <div className="absolute -inset-1 bg-linear-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 rounded-3xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
-          <Card className="relative h-full border-blue-500/30 bg-card/80 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
+          <Card className="relative h-[450px] border-blue-500/30 bg-card/80 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
             <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
               <div className="relative mt-1 mb-1">
                 <div className="absolute -top-5 left-1/2 -translate-x-1/2 animate-bounce duration-1500">
@@ -179,7 +191,7 @@ export function SupportCard() {
   if (view === "FORM") {
     return (
       <div className="col-span-1 md:col-span-1">
-        <Card className="relative h-full border-blue-500/30 bg-card/95 backdrop-blur-md overflow-hidden rounded-3xl flex flex-col">
+        <Card className="relative h-[450px] border-blue-500/30 bg-card/95 backdrop-blur-md overflow-hidden rounded-3xl flex flex-col">
           <CardContent className="p-4 flex flex-col h-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-sm">Nouveau Ticket</h3>
@@ -246,10 +258,10 @@ export function SupportCard() {
 
   // CHAT VIEW
   return (
-    <div className="col-span-1 md:col-span-1 md:row-span-2">
-      <Card className="relative h-[400px] md:h-full border-blue-500/30 bg-card/95 backdrop-blur-md overflow-hidden rounded-3xl flex flex-col shadow-xl">
+    <div className="col-span-1 md:col-span-1">
+      <Card className="relative h-[450px] border-blue-500/30 bg-card/95 backdrop-blur-md overflow-hidden rounded-3xl flex flex-col shadow-xl">
         {/* Header */}
-        <div className="p-3 border-b border-border/50 bg-muted/30 flex justify-between items-center">
+        <div className="p-3 border-b border-border/50 bg-muted/30 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-2">
             <div className="bg-blue-500/10 p-1.5 rounded-full">
               <Ticket className="h-4 w-4 text-blue-500" />
@@ -288,8 +300,8 @@ export function SupportCard() {
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 p-3">
-          <div className="space-y-3">
+        <ScrollArea className="flex-1 min-h-0 p-3">
+          <div className="space-y-3 pb-2">
             {messages.length === 0 && (
               <div className="text-center text-xs text-muted-foreground py-4">
                 Un membre du staff va vous répondre bientôt.
@@ -303,14 +315,14 @@ export function SupportCard() {
                   className={cn("flex w-full gap-2", isMe ? "justify-end" : "justify-start")}
                 >
                   {!isMe && (
-                    <Avatar className="h-6 w-6 mt-1">
-                      <AvatarImage src={msg.sender.image} />
+                    <Avatar className="h-6 w-6 mt-1 shrink-0">
+                      <AvatarImage src={msg.sender.image || undefined} />
                       <AvatarFallback className="text-[10px]">ST</AvatarFallback>
                     </Avatar>
                   )}
                   <div
                     className={cn(
-                      "rounded-2xl px-3 py-2 text-xs max-w-[80%]",
+                      "rounded-2xl px-3 py-2 text-xs max-w-[80%] break-words",
                       isMe
                         ? "bg-blue-500 text-white rounded-tr-none"
                         : "bg-muted text-foreground rounded-tl-none"
@@ -334,7 +346,7 @@ export function SupportCard() {
         </ScrollArea>
 
         {/* Input */}
-        <div className="p-3 border-t border-border/50 bg-background/50">
+        <div className="p-3 border-t border-border/50 bg-background/50 shrink-0">
           {ticketStatus === "OPEN" ? (
             <form onSubmit={handleSendMessage} className="flex gap-2">
               <Input

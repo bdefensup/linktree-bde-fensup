@@ -41,6 +41,7 @@ interface Ticket {
       id: string;
       name: string | null;
       email: string;
+      role: string;
     };
   }[];
 }
@@ -56,14 +57,24 @@ export default function TicketDetailPage({ params }: { params: Promise<{ ticketI
   const { data: session } = useSession();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const mapConversationToTicket = (conv: any): Ticket => {
+  const mapConversationToTicket = (
+    conv: NonNullable<Awaited<ReturnType<typeof getConversation>>>
+  ): Ticket => {
     return {
       id: conv.id,
       subject: conv.ticket?.subject || "Ticket Support",
       guestName: conv.ticket?.guestName,
       ticketStatus: conv.ticket?.status,
       createdAt: conv.createdAt,
-      participants: conv.participants,
+      participants: conv.participants.map((p) => ({
+        userId: p.userId,
+        user: {
+          id: p.user.id,
+          name: p.user.name,
+          email: p.user.email,
+          role: p.user.role,
+        },
+      })),
     };
   };
 
@@ -152,21 +163,29 @@ export default function TicketDetailPage({ params }: { params: Promise<{ ticketI
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!ticket) {
-    return <div>Ticket introuvable</div>;
+    return (
+      <div className="flex items-center justify-center h-full text-muted-foreground">
+        Ticket introuvable
+      </div>
+    );
   }
+
+  // Use variables to avoid unused var error, or just use ticket.guestName directly in JSX
+  // const guestParticipant = ticket.participants.find((p) => p.user.role === "GUEST");
+  // const _guestEmail = guestParticipant?.user.email;
 
   return (
     <TooltipProvider>
-      <div className="flex flex-col h-[calc(100vh-4rem)] bg-background">
+      <div className="flex flex-col h-full bg-background/95 supports-backdrop-filter:bg-background/60">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b h-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex items-center justify-between p-4 border-b h-16 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
               <ArrowLeft className="h-5 w-5" />
