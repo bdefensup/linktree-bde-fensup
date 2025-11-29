@@ -49,7 +49,18 @@ import { SidebarGroupAction } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProfileModal } from "@/components/admin/profile-modal";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+
+// ... imports
+
+import {
+  getConversations,
+  getPinnedConversations,
+  togglePinConversation,
+  searchUsers,
+  createConversation,
+  getAdminTickets,
+} from "@/app/messaging";
 
 // Menu items.
 const items = [
@@ -73,6 +84,10 @@ const items = [
 interface Conversation {
   id: string;
   lastMessageAt: Date;
+  subject?: string | null;
+  isTicket?: boolean;
+  ticketStatus?: string;
+  guestName?: string | null;
   participants: {
     userId: string;
     isPinned: boolean;
@@ -104,12 +119,30 @@ export function AdminSidebar() {
   const { data: session } = useSession();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [tickets, setTickets] = useState<Conversation[]>([]);
+  const [pinnedConversations, setPinnedConversations] = useState<Conversation[]>([]);
 
   // Search state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isNewChatOpen, setIsNewChatOpen] = useState(false);
+
+  const fetchConversations = useCallback(async () => {
+    try {
+      const [convs, pinned, tix] = await Promise.all([
+        getConversations(),
+        getPinnedConversations(),
+        getAdminTickets(),
+      ]);
+      setConversations(convs);
+      setPinnedConversations(pinned);
+      setTickets(tix);
+    } catch (error) {
+      console.error("Failed to fetch conversations:", error);
+    }
+  }, []);
 
   // Debounced search
   useEffect(() => {
@@ -117,11 +150,10 @@ export function AdminSidebar() {
       if (searchQuery.length >= 2) {
         setIsSearching(true);
         try {
-          const { searchUsers } = await import("@/app/messaging");
           const results = await searchUsers(searchQuery);
           setSearchResults(results);
         } catch (error) {
-          console.error("Search error:", error);
+          console.error("Search failed:", error);
         } finally {
           setIsSearching(false);
         }
@@ -133,15 +165,28 @@ export function AdminSidebar() {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
+  // Initial fetch and polling
+  useEffect(() => {
+    fetchConversations();
+    const interval = setInterval(fetchConversations, 5000); // Poll every 5s
+
+    // Listen for custom event
+    const handleUpdate = () => fetchConversations();
+    window.addEventListener("conversation:updated", handleUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("conversation:updated", handleUpdate);
+    };
+  }, [fetchConversations]);
+
   const handleStartConversation = async (userId: string) => {
     try {
       setIsSearchOpen(false);
-      const { createConversation } = await import("@/app/messaging");
       const conversation = await createConversation(userId);
       router.push(`/admin/messages?chatId=${conversation.id}`);
 
       // Refresh conversations list
-      const { getPinnedConversations } = await import("@/app/messaging");
       const data = await getPinnedConversations();
       setConversations(data as unknown as Conversation[]);
     } catch (error) {
@@ -330,6 +375,65 @@ export function AdminSidebar() {
             <SidebarGroupContent>
               <ScrollArea className="h-[280px]">
                 <SidebarMenu>
+                  {/* Tickets Section */}
+                  {tickets.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-xs font-semibold text-muted-foreground mb-2 px-2 flex items-center gap-2">
+                        <Ticket className="w-3 h-3" />
+                        TICKETS ({tickets.length})
+                      </h3>
+                      <div className="space-y-1">
+                        {tickets.map((chat) => {
+                          const lastMessage = chat.messages[0];
+                          return (
+                            <SidebarMenuItem key={chat.id}>
+                              <SidebarMenuButton
+                                asChild
+                                isActive={
+                                  pathname === `/admin/messages` &&
+                                  typeof window !== "undefined" &&
+                                  window.location.search.includes(chat.id)
+                                }
+                                className="h-14"
+                              >
+                                <Link
+                                  href={`/admin/messages?chatId=${chat.id}`}
+                                  className="flex items-center gap-3"
+                                >
+                                  <div className="relative">
+                                    <Avatar className="h-8 w-8 border border-border/50">
+                                      <AvatarFallback className="bg-blue-500/10 text-blue-500">
+                                        <Ticket className="h-4 w-4" />
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                      <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500 border-2 border-background"></span>
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-col overflow-hidden flex-1">
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-semibold text-sm truncate">
+                                        {chat.subject || "Ticket Support"}
+                                      </span>
+                                      <span className="text-[10px] bg-blue-500/10 text-blue-500 px-1.5 py-0.5 rounded-full">
+                                        {chat.guestName?.split(" ")[0]}
+                                      </span>
+                                    </div>
+                                    <span className="text-xs text-muted-foreground truncate">
+                                      {lastMessage?.content || "Nouveau ticket"}
+                                    </span>
+                                  </div>
+                                </Link>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Conversations List */}
                   {conversations
                     .sort((a, b) => {
                       const otherA = a.participants.find(

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LandingLogo } from "@/components/landing-logo";
+import { SupportCard } from "@/components/support-card";
 
 import { ExternalLink, Heart } from "lucide-react";
 import { LuHandHelping } from "react-icons/lu";
@@ -127,6 +128,9 @@ export default function Home() {
               </Card>
             </div>
           </div>
+
+          {/* Support Chat Card - Spans 1 col */}
+          <SupportCard />
 
           {/* Links Section - Grid Items */}
           {links.map((link) => {

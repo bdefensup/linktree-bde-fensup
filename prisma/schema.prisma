@@ -147,6 +147,11 @@ model Conversation {
   updatedAt     DateTime  @updatedAt
   lastMessageAt DateTime  @default(now())
   
+  subject       String?
+  isTicket      Boolean   @default(false)
+  ticketStatus  String    @default("OPEN") // OPEN, RESOLVED
+  guestName     String?
+
   participants  ConversationParticipant[]
   messages      Message[]
 

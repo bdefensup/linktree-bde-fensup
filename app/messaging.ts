@@ -397,3 +397,39 @@ export async function createConversation(targetUserId: string) {
 
   return conversation;
 }
+
+export async function getAdminTickets() {
+  noStore();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const tickets = await prisma.conversation.findMany({
+    where: {
+      isTicket: true,
+      ticketStatus: "OPEN",
+    },
+    include: {
+      participants: {
+        include: {
+          user: true,
+        },
+      },
+      messages: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      },
+    },
+    orderBy: {
+      lastMessageAt: "desc",
+    },
+  });
+
+  return tickets;
+}
