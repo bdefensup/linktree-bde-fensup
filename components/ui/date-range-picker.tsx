@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import {
-  addDays,
   format,
-  startOfWeek,
-  endOfWeek,
   startOfMonth,
   endOfMonth,
   startOfYear,
@@ -22,11 +19,7 @@ import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -43,11 +36,7 @@ interface DateRangePickerProps {
 
 type PickerMode = "range" | "month" | "year" | "single";
 
-export function DateRangePicker({
-  date,
-  setDate,
-  className,
-}: DateRangePickerProps) {
+export function DateRangePicker({ date, setDate, className }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [mode, setMode] = React.useState<PickerMode>("range");
 
@@ -242,11 +231,7 @@ export function DateRangePicker({
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Année</label>
                     <Select
-                      value={
-                        date?.from
-                          ? getYear(date.from).toString()
-                          : currentYear.toString()
-                      }
+                      value={date?.from ? getYear(date.from).toString() : currentYear.toString()}
                       onValueChange={handleYearChange}
                     >
                       <SelectTrigger className="w-[180px]">
@@ -269,11 +254,7 @@ export function DateRangePicker({
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Année</label>
                     <Select
-                      value={
-                        date?.from
-                          ? getYear(date.from).toString()
-                          : currentYear.toString()
-                      }
+                      value={date?.from ? getYear(date.from).toString() : currentYear.toString()}
                       onValueChange={handleYearChange}
                     >
                       <SelectTrigger className="w-[180px]">

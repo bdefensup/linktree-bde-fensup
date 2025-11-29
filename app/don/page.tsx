@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
+
 import Link from "next/link";
 import { ArrowLeft, Heart, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -136,8 +136,8 @@ function DonationForm() {
             Soutenir le BDE FEN'SUP
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Votre soutien nous aide à organiser des événements inoubliables et à
-            améliorer la vie étudiante. Merci pour votre générosité ! ❤️
+            Votre soutien nous aide à organiser des événements inoubliables et à améliorer la vie
+            étudiante. Merci pour votre générosité ! ❤️
           </p>
         </div>
 
@@ -147,9 +147,7 @@ function DonationForm() {
               <Sparkles className="w-5 h-5 text-yellow-500" />
               Faire un don
             </CardTitle>
-            <CardDescription>
-              Choisissez un montant ou saisissez une somme libre.
-            </CardDescription>
+            <CardDescription>Choisissez un montant ou saisissez une somme libre.</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -162,9 +160,7 @@ function DonationForm() {
                     <Button
                       key={val}
                       type="button"
-                      variant={
-                        amount === val && !customAmount ? "default" : "outline"
-                      }
+                      variant={amount === val && !customAmount ? "default" : "outline"}
                       className={`h-12 text-lg font-medium transition-all ${
                         amount === val && !customAmount
                           ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
@@ -182,9 +178,7 @@ function DonationForm() {
                       value={customAmount}
                       onChange={handleCustomAmountChange}
                       className={`h-12 text-center text-lg transition-all ${
-                        customAmount
-                          ? "border-primary ring-2 ring-primary/20"
-                          : ""
+                        customAmount ? "border-primary ring-2 ring-primary/20" : ""
                       }`}
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
@@ -208,9 +202,7 @@ function DonationForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="message">
-                    Un petit message ? (optionnel)
-                  </Label>
+                  <Label htmlFor="message">Un petit message ? (optionnel)</Label>
                   <Textarea
                     id="message"
                     placeholder="Force à vous pour l'orga ! 💪"

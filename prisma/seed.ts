@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { PrismaClient } from "../lib/generated/prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";

@@ -15,11 +15,7 @@ export const auth = betterAuth({
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : process.env.NEXT_PUBLIC_APP_URL || "https://www.bdefenelon.org",
-  trustedOrigins: [
-    "https://www.bdefenelon.org",
-    "https://bdefenelon.org",
-    "http://localhost:3000",
-  ],
+  trustedOrigins: ["https://www.bdefenelon.org", "https://bdefenelon.org", "http://localhost:3000"],
   plugins: [admin()],
   emailAndPassword: {
     enabled: true,
@@ -47,6 +43,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      // eslint-disable-next-line no-console
       console.log(`Attempting to send verification email to ${user.email}`);
       const resend = new Resend(process.env.RESEND_API_KEY);
       if (!process.env.RESEND_API_KEY) {
@@ -67,6 +64,7 @@ export const auth = betterAuth({
         if (error) {
           console.error("Resend API Error:", error);
         } else {
+          // eslint-disable-next-line no-console
           console.log("Verification email sent successfully:", data);
         }
       } catch (error) {

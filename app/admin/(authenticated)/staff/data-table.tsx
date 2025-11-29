@@ -36,15 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import {
-  Shield,
-  ShieldAlert,
-  User as UserIcon,
-  Check,
-  X,
-  Trash2,
-  Users,
-} from "lucide-react";
+import { Shield, ShieldAlert, User as UserIcon, Check, X, Trash2, Users } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,9 +54,7 @@ export function DataTable({ data, userRole }: DataTableProps) {
   const router = useRouter();
   const columns = React.useMemo(() => getColumns(userRole), [userRole]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowSelection, setRowSelection] = React.useState({});
 
@@ -123,11 +113,7 @@ export function DataTable({ data, userRole }: DataTableProps) {
   const isBulkActionsVisible = selectedRows.length > 0;
 
   const handleBulkDelete = async () => {
-    if (
-      !confirm(
-        `Êtes-vous sûr de vouloir supprimer ${selectedRows.length} utilisateurs ?`
-      )
-    ) {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${selectedRows.length} utilisateurs ?`)) {
       return;
     }
 
@@ -148,8 +134,10 @@ export function DataTable({ data, userRole }: DataTableProps) {
       toast.success(`${selectedRows.length} utilisateurs supprimés.`);
       setRowSelection({});
       router.refresh();
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la suppression.");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur lors de la suppression.";
+      toast.error(errorMessage);
     }
   };
 
@@ -168,13 +156,13 @@ export function DataTable({ data, userRole }: DataTableProps) {
         throw new Error(data.error || "Failed to update roles");
       }
 
-      toast.success(
-        `Rôle mis à jour pour ${selectedRows.length} utilisateurs.`
-      );
+      toast.success(`Rôle mis à jour pour ${selectedRows.length} utilisateurs.`);
       setRowSelection({});
       router.refresh();
-    } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la mise à jour.");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur lors de la mise à jour.";
+      toast.error(errorMessage);
     }
   };
 
@@ -184,17 +172,10 @@ export function DataTable({ data, userRole }: DataTableProps) {
         {/* Bulk Actions Toolbar */}
         {isBulkActionsVisible && (
           <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md border border-border/50 animate-in fade-in slide-in-from-top-2">
-            <span className="text-sm font-medium px-2">
-              {selectedRows.length} sélectionné(s)
-            </span>
+            <span className="text-sm font-medium px-2">{selectedRows.length} sélectionné(s)</span>
             <div className="h-4 w-px bg-border/50 mx-2" />
 
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleBulkDelete}
-              className="gap-2"
-            >
+            <Button variant="destructive" size="sm" onClick={handleBulkDelete} className="gap-2">
               <Trash2 className="w-4 h-4" />
               Supprimer
             </Button>
@@ -207,9 +188,7 @@ export function DataTable({ data, userRole }: DataTableProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuItem
-                  onClick={() => handleBulkRoleChange("adherent")}
-                >
+                <DropdownMenuItem onClick={() => handleBulkRoleChange("adherent")}>
                   <UserIcon className="w-4 h-4 mr-2 text-violet-600" />
                   Adhérent
                 </DropdownMenuItem>
@@ -241,13 +220,9 @@ export function DataTable({ data, userRole }: DataTableProps) {
               className="max-w-sm bg-background/50"
             />
             <Select
-              value={
-                (table.getColumn("role")?.getFilterValue() as string) ?? "ALL"
-              }
+              value={(table.getColumn("role")?.getFilterValue() as string) ?? "ALL"}
               onValueChange={(value) =>
-                table
-                  .getColumn("role")
-                  ?.setFilterValue(value === "ALL" ? "" : value)
+                table.getColumn("role")?.setFilterValue(value === "ALL" ? "" : value)
               }
             >
               <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background/50">
@@ -297,18 +272,14 @@ export function DataTable({ data, userRole }: DataTableProps) {
             </Select>
             <Select
               value={
-                (table
-                  .getColumn("emailVerified")
-                  ?.getFilterValue() as string) === undefined
+                (table.getColumn("emailVerified")?.getFilterValue() as string) === undefined
                   ? "ALL"
                   : String(table.getColumn("emailVerified")?.getFilterValue())
               }
               onValueChange={(value) =>
                 table
                   .getColumn("emailVerified")
-                  ?.setFilterValue(
-                    value === "ALL" ? undefined : value === "true"
-                  )
+                  ?.setFilterValue(value === "ALL" ? undefined : value === "true")
               }
             >
               <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background/50">
@@ -359,10 +330,7 @@ export function DataTable({ data, userRole }: DataTableProps) {
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   );
                 })}
@@ -372,26 +340,17 @@ export function DataTable({ data, userRole }: DataTableProps) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   Aucun résultat.
                 </TableCell>
               </TableRow>

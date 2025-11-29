@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-
-export async function GET(request: Request) {
+export async function GET() {
   try {
     // Basic auth check using headers (better-auth usually works with cookies/headers)
     // Since we have middleware protecting /admin, we can assume some level of safety,
@@ -27,9 +24,6 @@ export async function GET(request: Request) {
     return NextResponse.json(bookings);
   } catch (error) {
     console.error("Error fetching bookings:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch bookings" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
   }
 }

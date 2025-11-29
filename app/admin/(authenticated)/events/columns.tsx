@@ -1,14 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  MoreHorizontal,
-  ArrowUpDown,
-  Pencil,
-  Trash,
-  Star,
-  TriangleAlert,
-} from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Pencil, Trash, Star, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -50,9 +43,7 @@ const toggleFeatured = async (id: string, currentStatus: boolean) => {
 
     if (!response.ok) throw new Error("Failed to update event");
 
-    toast.success(
-      !currentStatus ? "Événement mis en avant" : "Événement retiré de la une"
-    );
+    toast.success(!currentStatus ? "Événement mis en avant" : "Événement retiré de la une");
     window.location.reload();
   } catch {
     toast.error("Impossible de mettre à jour l'événement.");
@@ -70,7 +61,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function EventActionsCell({ event }: { event: Event }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -128,8 +118,8 @@ function EventActionsCell({ event }: { event: Event }) {
               Suppression d'événement
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base text-red-700/90 dark:text-red-300/90 mt-2">
-              Attention, cette action est{" "}
-              <span className="font-black uppercase">irréversible</span>.
+              Attention, cette action est <span className="font-black uppercase">irréversible</span>
+              .
               <br />
               <br />
               Vous êtes sur le point de supprimer définitivement l'événement :
@@ -138,9 +128,8 @@ function EventActionsCell({ event }: { event: Event }) {
                 {event.title}
               </span>
               <br />
-              Toutes les{" "}
-              <span className="font-bold">réservations associées</span> seront
-              également supprimées.
+              Toutes les <span className="font-bold">réservations associées</span> seront également
+              supprimées.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -168,12 +157,7 @@ export const columns: ColumnDef<Event>[] = [
       return (
         <div className="relative h-10 w-16 overflow-hidden rounded-md">
           {image ? (
-            <Image
-              src={image}
-              alt={row.getValue("title")}
-              fill
-              className="object-cover"
-            />
+            <Image src={image} alt={row.getValue("title")} fill className="object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
               No img
@@ -273,15 +257,9 @@ export const columns: ColumnDef<Event>[] = [
       return (
         <div className="flex flex-col text-sm">
           <span>Std: {formatPrice(price)}</span>
-          {memberPrice && (
-            <span className="text-green-600">
-              Mbr: {formatPrice(memberPrice)}
-            </span>
-          )}
+          {memberPrice && <span className="text-green-600">Mbr: {formatPrice(memberPrice)}</span>}
           {externalPrice && (
-            <span className="text-blue-600">
-              Ext: {formatPrice(externalPrice)}
-            </span>
+            <span className="text-blue-600">Ext: {formatPrice(externalPrice)}</span>
           )}
         </div>
       );
