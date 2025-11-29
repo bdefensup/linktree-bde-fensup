@@ -153,12 +153,53 @@ export function SupportCard() {
     }
   };
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
   if (view === "IDLE") {
     return (
       <div className="col-span-1 md:col-span-1">
-        <div className="w-full h-full relative group">
+        {/* Mobile Compact View */}
+        <div className={cn("md:hidden", isExpanded ? "hidden" : "block")}>
+          <Card
+            className="relative h-full overflow-hidden border border-border/50 bg-card/80 hover:border-primary/50 hover:shadow-primary/5 transition-all duration-300 rounded-3xl"
+            onClick={() => setIsExpanded(true)}
+          >
+            <CardContent className="flex items-center p-2 h-full justify-between">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 text-lg">
+                <MessageCircle className="w-4 h-4" />
+              </div>
+
+              <div className="flex-1 min-w-0 text-left ml-2">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-bold text-sm truncate group-hover:text-primary">
+                    Support BDE
+                  </h3>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-0">
+                  Une question ? Discutez avec nous !
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Desktop / Expanded Mobile View */}
+        <div className={cn("w-full h-full relative group", !isExpanded && "hidden md:block")}>
           <div className="absolute -inset-1 bg-linear-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 rounded-3xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
           <Card className="relative h-[450px] border-blue-500/30 bg-card/80 backdrop-blur-sm overflow-hidden rounded-3xl flex flex-col justify-center">
+            {/* Mobile Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 md:hidden z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(false);
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+
             <CardContent className="p-4 md:p-6 flex flex-col items-center text-center space-y-4">
               <div className="mb-2">
                 <MessageCircle className="w-12 h-12 text-blue-500" />
