@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { ConversationParticipant, Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -65,20 +66,26 @@ export async function getConversation(conversationId: string) {
           user: true,
         },
       },
+      ticket: true,
     },
   });
 
   if (!conversation) return null;
 
-  // Verify participation
-  const isParticipant = conversation.participants.some((p) => p.userId === session.user.id);
+  // Verify participation or admin role
+  const isParticipant = conversation.participants.some(
+    (p: ConversationParticipant) => p.userId === session.user.id
+  );
+  const isAdmin = session.user.role === "admin" || session.user.role === "superadmin";
 
-  if (!isParticipant) {
+  if (!isParticipant && !isAdmin) {
     throw new Error("Unauthorized");
   }
 
   return conversation;
 }
+
+// ... (getConversation above)
 
 export async function getPinnedConversations() {
   noStore();
@@ -205,7 +212,7 @@ export async function getMessages(conversationId: string) {
     throw new Error("Unauthorized");
   }
 
-  // Verify participant
+  // Verify participant or admin role
   const participant = await prisma.conversationParticipant.findUnique({
     where: {
       conversationId_userId: {
@@ -215,7 +222,9 @@ export async function getMessages(conversationId: string) {
     },
   });
 
-  if (!participant) {
+  const isAdmin = session.user.role === "admin" || session.user.role === "superadmin";
+
+  if (!participant && !isAdmin) {
     throw new Error("Unauthorized");
   }
 
@@ -249,7 +258,7 @@ export async function sendMessage(conversationId: string, content: string) {
     throw new Error("Unauthorized");
   }
 
-  // Verify participant
+  // Verify participant or admin role
   const participant = await prisma.conversationParticipant.findUnique({
     where: {
       conversationId_userId: {
@@ -259,7 +268,9 @@ export async function sendMessage(conversationId: string, content: string) {
     },
   });
 
-  if (!participant) {
+  const isAdmin = session.user.role === "admin" || session.user.role === "superadmin";
+
+  if (!participant && !isAdmin) {
     throw new Error("Unauthorized");
   }
 
@@ -399,7 +410,6 @@ export async function createConversation(targetUserId: string) {
 }
 
 export async function getAdminTickets() {
-  noStore();
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -408,28 +418,45 @@ export async function getAdminTickets() {
     throw new Error("Unauthorized");
   }
 
-  const tickets = await prisma.conversation.findMany({
+  const tickets = await prisma.ticket.findMany({
     where: {
-      isTicket: true,
-      ticketStatus: "OPEN",
+      status: "OPEN",
     },
     include: {
-      participants: {
+      conversation: {
         include: {
-          user: true,
+          messages: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 1,
+          },
         },
-      },
-      messages: {
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 1,
       },
     },
     orderBy: {
-      lastMessageAt: "desc",
+      createdAt: "desc",
     },
   });
 
-  return tickets;
+  type TicketWithConversation = Prisma.TicketGetPayload<{
+    include: {
+      conversation: {
+        include: {
+          messages: true;
+        };
+      };
+    };
+  }>;
+
+  return tickets.map((t: TicketWithConversation) => ({
+    id: t.conversationId, // Use conversationId as the main ID for consistency in UI
+    ticketId: t.id,
+    subject: t.subject,
+    guestName: t.guestName,
+    ticketStatus: t.status,
+    createdAt: t.createdAt,
+    lastMessageAt: t.conversation.lastMessageAt,
+    messages: t.conversation.messages,
+  }));
 }

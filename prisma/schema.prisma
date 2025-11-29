@@ -1,8 +1,7 @@
 
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -26,6 +25,7 @@ model User {
   
   conversations ConversationParticipant[]
   messages      Message[]
+  tickets       Ticket[]
 
   @@map("user")
 }
@@ -147,15 +147,40 @@ model Conversation {
   updatedAt     DateTime  @updatedAt
   lastMessageAt DateTime  @default(now())
   
-  subject       String?
-  isTicket      Boolean   @default(false)
-  ticketStatus  String    @default("OPEN") // OPEN, RESOLVED
-  guestName     String?
+  ticket        Ticket?
 
   participants  ConversationParticipant[]
   messages      Message[]
 
   @@map("conversation")
+}
+
+model Ticket {
+  id             String       @id @default(cuid())
+  subject        String
+  status         TicketStatus @default(OPEN)
+  priority       String       @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  
+  guestName      String?
+  guestEmail     String?
+  
+  conversationId String       @unique
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id])
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("ticket")
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }
 
 model ConversationParticipant {

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import "dotenv/config";
-import { PrismaClient, User } from "../lib/generated/prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";

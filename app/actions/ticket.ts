@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { ConversationParticipant } from "@prisma/client";
 
 export async function createTicket(subject: string, name: string) {
   if (!subject || !name) {
@@ -24,23 +25,30 @@ export async function createTicket(subject: string, name: string) {
     },
   });
 
-  // Create Conversation
+  // 2. Create conversation
   const conversation = await prisma.conversation.create({
     data: {
-      subject: subject,
-      isTicket: true,
-      ticketStatus: "OPEN",
-      guestName: name,
       participants: {
-        create: [{ userId: guestUser.id }],
+        create: {
+          userId: guestUser.id,
+        },
       },
+      ticket: {
+        create: {
+          subject,
+          guestName: name,
+          status: "OPEN",
+        },
+      },
+    },
+    include: {
+      ticket: true,
     },
   });
 
-  // We don't add admins automatically to avoid notification spam
-  // Admins will see the ticket in a "Unassigned" or "Tickets" list
-
   return {
+    success: true,
+    ticketId: conversation.ticket?.id,
     conversationId: conversation.id,
     guestId: guestUser.id,
   };
@@ -49,14 +57,23 @@ export async function createTicket(subject: string, name: string) {
 export async function sendGuestMessage(conversationId: string, guestId: string, content: string) {
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
-    include: { participants: true },
+    include: {
+      participants: true,
+      ticket: true,
+    },
   });
 
-  if (!conversation) throw new Error("Conversation not found");
-  if (conversation.ticketStatus !== "OPEN") throw new Error("Ticket is closed");
+  if (!conversation || !conversation.ticket) {
+    return { success: false, error: "Conversation not found" };
+  }
 
+  if (conversation.ticket.status !== "OPEN") {
+    return { success: false, error: "Ticket is closed" };
+  }
   // Verify guest is participant
-  const isParticipant = conversation.participants.some((p) => p.userId === guestId);
+  const isParticipant = conversation.participants.some(
+    (p: ConversationParticipant) => p.userId === guestId
+  );
   if (!isParticipant) throw new Error("Unauthorized");
 
   const message = await prisma.message.create({
@@ -81,13 +98,15 @@ export async function sendGuestMessage(conversationId: string, guestId: string, 
 export async function getTicketMessages(conversationId: string, guestId: string) {
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
-    include: { participants: true },
+    include: { participants: true, ticket: true },
   });
 
   if (!conversation) throw new Error("Conversation not found");
 
   // Verify guest is participant
-  const isParticipant = conversation.participants.some((p) => p.userId === guestId);
+  const isParticipant = conversation.participants.some(
+    (p: ConversationParticipant) => p.userId === guestId
+  );
   if (!isParticipant) throw new Error("Unauthorized");
 
   const messages = await prisma.message.findMany({
@@ -98,25 +117,30 @@ export async function getTicketMessages(conversationId: string, guestId: string)
 
   return {
     messages,
-    ticketStatus: conversation.ticketStatus,
+    ticketStatus: conversation.ticket?.status || null,
   };
 }
 
-export async function resolveTicket(conversationId: string) {
+export async function toggleTicketStatus(conversationId: string, newStatus: "OPEN" | "RESOLVED") {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (!session?.user) throw new Error("Unauthorized");
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
 
-  // Only admins/staff can resolve
-  // Assuming any logged in user (who is not the guest) can resolve for now,
-  // or check role if needed.
+  // Verify user has permission (admin/staff)
+  // TODO: Add proper role check
 
-  await prisma.conversation.update({
-    where: { id: conversationId },
-    data: { ticketStatus: "RESOLVED" },
+  await prisma.ticket.update({
+    where: { conversationId: conversationId },
+    data: {
+      status: newStatus,
+    },
   });
 
   revalidatePath("/admin/messages");
+  revalidatePath(`/admin/tickets/${conversationId}`);
+  return { success: true };
 }

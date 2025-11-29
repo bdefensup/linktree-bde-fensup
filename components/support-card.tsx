@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MessageCircle, Send, X, Loader2, User, Ticket } from "lucide-react";
+import { MessageCircle, Send, X, Loader2, User, Ticket, Trash2 } from "lucide-react";
 import { createTicket, sendGuestMessage, getTicketMessages } from "@/app/actions/ticket";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,22 +36,43 @@ export function SupportCard() {
   const [ticketStatus, setTicketStatus] = useState("OPEN");
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Restore session from localStorage
+  useEffect(() => {
+    const savedConversationId = localStorage.getItem("bde_support_conversationId");
+    const savedGuestId = localStorage.getItem("bde_support_guestId");
+    const savedSubject = localStorage.getItem("bde_support_subject");
+
+    if (savedConversationId && savedGuestId) {
+      setConversationId(savedConversationId);
+      setGuestId(savedGuestId);
+      if (savedSubject) setSubject(savedSubject);
+      setView("CHAT");
+    }
+  }, []);
+
   // Polling for messages
   useEffect(() => {
-    if (view === "CHAT" && conversationId && guestId && ticketStatus === "OPEN") {
-      const interval = setInterval(async () => {
+    if (view === "CHAT" && conversationId && guestId) {
+      const fetchMessages = async () => {
         try {
           const data = await getTicketMessages(conversationId, guestId);
           setMessages(data.messages);
           setTicketStatus(data.ticketStatus);
         } catch (error) {
           console.error("Polling error:", error);
+          // If unauthorized or not found, maybe clear session?
+          // localStorage.removeItem("bde_support_conversationId");
+          // localStorage.removeItem("bde_support_guestId");
+          // setView("IDLE");
         }
-      }, 3000); // Poll every 3 seconds
+      };
+
+      fetchMessages(); // Initial fetch
+      const interval = setInterval(fetchMessages, 3000); // Poll every 3 seconds
 
       return () => clearInterval(interval);
     }
-  }, [view, conversationId, guestId, ticketStatus]);
+  }, [view, conversationId, guestId]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -67,9 +88,19 @@ export function SupportCard() {
     setLoading(true);
     try {
       const result = await createTicket(subject, name);
-      setConversationId(result.conversationId);
-      setGuestId(result.guestId);
-      setView("CHAT");
+      if (result.success && result.conversationId && result.guestId) {
+        setConversationId(result.conversationId);
+        setGuestId(result.guestId);
+
+        // Save to localStorage
+        localStorage.setItem("bde_support_conversationId", result.conversationId);
+        localStorage.setItem("bde_support_guestId", result.guestId);
+        localStorage.setItem("bde_support_subject", subject);
+
+        setView("CHAT");
+      } else {
+        throw new Error("Invalid response from createTicket");
+      }
     } catch (error) {
       console.error("Failed to create ticket:", error);
       alert("Erreur lors de la création du ticket.");
@@ -93,6 +124,20 @@ export function SupportCard() {
     } catch (error) {
       console.error("Failed to send message:", error);
       setNewMessage(content); // Restore on error
+    }
+  };
+
+  const handleEndSession = () => {
+    if (
+      confirm("Voulez-vous vraiment quitter cette conversation ? Vous ne pourrez plus y accéder.")
+    ) {
+      localStorage.removeItem("bde_support_conversationId");
+      localStorage.removeItem("bde_support_guestId");
+      localStorage.removeItem("bde_support_subject");
+      setConversationId(null);
+      setGuestId(null);
+      setMessages([]);
+      setView("IDLE");
     }
   };
 
@@ -226,11 +271,20 @@ export function SupportCard() {
               </span>
             </div>
           </div>
-          {ticketStatus === "RESOLVED" && (
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-muted-foreground hover:text-destructive"
+              onClick={handleEndSession}
+              title="Quitter la conversation"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setView("IDLE")}>
               <X className="h-4 w-4" />
             </Button>
-          )}
+          </div>
         </div>
 
         {/* Messages */}
