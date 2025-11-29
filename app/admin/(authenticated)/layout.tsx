@@ -15,12 +15,6 @@ export default async function AdminLayout({
     headers: headersList,
   });
 
-  console.log("AdminLayout Session Check:", {
-    hasSession: !!session,
-    role: session?.user?.role,
-    path: "/admin",
-  });
-
   if (!session) {
     redirect("/admin/login");
   }

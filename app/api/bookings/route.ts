@@ -101,9 +101,8 @@ export async function POST(request: Request) {
 
     // Send confirmation email
     if (process.env.RESEND_API_KEY) {
-      console.log("Attempting to send email to:", email);
       try {
-        const emailResult = await resend.emails.send({
+        await resend.emails.send({
           from: "BDE FEN'SUP <onboarding@resend.dev>", // Default Resend testing domain
           to: email,
           subject: `Confirmation de réservation - ${event.title}`,
@@ -113,7 +112,6 @@ export async function POST(request: Request) {
             bookingId: booking.id,
           }),
         });
-        console.log("Email sent successfully:", emailResult);
       } catch (emailError) {
         console.error("Error sending email:", emailError);
         // Don't fail the request if email fails

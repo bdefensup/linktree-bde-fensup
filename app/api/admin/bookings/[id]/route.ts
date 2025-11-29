@@ -37,7 +37,6 @@ export async function PATCH(
       let emailResult;
 
       if (status === "CONFIRMED") {
-        console.log(`Sending payment received email to ${booking.email}`);
         emailResult = await resend.emails.send({
           from,
           to: booking.email,
@@ -49,7 +48,6 @@ export async function PATCH(
           }),
         });
       } else if (status === "CANCELLED") {
-        console.log(`Sending booking cancelled email to ${booking.email}`);
         emailResult = await resend.emails.send({
           from,
           to: booking.email,
@@ -66,7 +64,6 @@ export async function PATCH(
         if (emailResult.error) {
           console.error("Resend API Error:", emailResult.error);
         } else {
-          console.log("Email sent successfully:", emailResult.data);
         }
       }
     } else {

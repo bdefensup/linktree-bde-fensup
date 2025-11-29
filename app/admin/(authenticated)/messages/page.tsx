@@ -51,7 +51,6 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (!chatIdParam) return;
-    console.log("Setting up subscription for chat:", chatIdParam);
 
     const fetchMessages = async () => {
       setLoading(true);
@@ -81,7 +80,10 @@ export default function MessagesPage() {
         },
         async (payload) => {
           // Only refresh if it matches our chat
-          if ((payload.new as any).conversationId === chatIdParam) {
+          if (
+            (payload.new as { conversationId: string }).conversationId ===
+            chatIdParam
+          ) {
             const { getMessages } = await import("@/app/actions/messaging");
             const data = await getMessages(chatIdParam);
             setMessages(data as unknown as Message[]);
