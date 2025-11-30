@@ -299,7 +299,7 @@ export default function EventDetailPage() {
 
                     <div className="grid grid-cols-3 gap-2 sm:gap-3">
                       {/* Prix Adhérent (Cyan) */}
-                      {event.memberPrice && (
+                      {event.memberPrice !== undefined && event.memberPrice !== null && (
                         <div className="flex flex-col items-center p-1.5 sm:p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 relative overflow-hidden group hover:scale-105 transition-transform duration-300">
                           <div className="absolute top-0 left-0 w-full h-1 bg-cyan-500" />
                           <span className="text-[9px] sm:text-[10px] font-bold text-cyan-400 uppercase mb-0.5 text-center leading-tight">
@@ -328,7 +328,7 @@ export default function EventDetailPage() {
                       </div>
 
                       {/* Prix Extérieur (Blue) */}
-                      {event.externalPrice && (
+                      {event.externalPrice !== undefined && event.externalPrice !== null && (
                         <div className="flex flex-col items-center p-1.5 sm:p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 relative overflow-hidden group hover:scale-105 transition-transform duration-300">
                           <div className="absolute top-0 left-0 w-full h-1 bg-blue-500" />
                           <span className="text-[9px] sm:text-[10px] font-bold text-blue-400 uppercase mb-0.5 text-center leading-tight">
@@ -490,7 +490,7 @@ export default function EventDetailPage() {
                           />
                         </div>
 
-                        {event.memberPrice && (
+                        {event.memberPrice !== undefined && event.memberPrice !== null && (
                           <div className="flex items-start space-x-3 p-4 border border-cyan-500/20 rounded-xl bg-cyan-500/5">
                             <Checkbox
                               id="isMember"
@@ -526,7 +526,7 @@ export default function EventDetailPage() {
                           </div>
                         )}
 
-                        {event.externalPrice && (
+                        {event.externalPrice !== undefined && event.externalPrice !== null && (
                           <div className="flex items-start space-x-3 p-4 border border-blue-500/20 rounded-xl bg-blue-500/5">
                             <Checkbox
                               id="isExternal"
