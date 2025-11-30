@@ -155,19 +155,7 @@ export default function BilletteriePage() {
             </Button>
             <h1 className="text-lg font-bold tracking-tight md:text-xl">Billetterie</h1>
           </div>
-          <div className="flex items-center gap-2">
-            {/* Search Input (Desktop) */}
-            <div className="hidden md:flex relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Rechercher..."
-                className="w-[200px] rounded-full pl-8 bg-secondary/50 border-none focus-visible:ring-1"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
+          <div className="flex items-center gap-2">{/* Search Input moved to filter bar */}</div>
         </div>
 
         {/* Filter Bar (Scrollable) */}
@@ -229,28 +217,41 @@ export default function BilletteriePage() {
 
                 <div className="h-6 w-px bg-border/50 mx-1 hidden md:block" />
 
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-1 bg-background/60 backdrop-blur-xl p-1 rounded-full border border-border/40 shadow-sm">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Rechercher..."
+                      className="w-[200px] rounded-full pl-9 h-9 bg-muted/50 border-transparent focus:bg-background focus:border-primary/20 focus:w-[260px] transition-all duration-300"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="h-6 w-px bg-border/50 mx-2" />
+
                   <Button
-                    variant={filterType === "all" ? "secondary" : "ghost"}
+                    variant={filterType === "all" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => handleFilterChange("all")}
-                    className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+                    className="rounded-full text-sm h-9 px-5"
                   >
                     Tout
                   </Button>
                   <Button
-                    variant={filterType === "week" ? "secondary" : "ghost"}
+                    variant={filterType === "week" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => handleFilterChange("week")}
-                    className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+                    className="rounded-full text-sm h-9 px-5"
                   >
                     Cette semaine
                   </Button>
                   <Button
-                    variant={filterType === "month" ? "secondary" : "ghost"}
+                    variant={filterType === "month" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => handleFilterChange("month")}
-                    className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+                    className="rounded-full text-sm h-9 px-5"
                   >
                     Ce mois
                   </Button>
@@ -264,12 +265,12 @@ export default function BilletteriePage() {
                   variant={filterType === "custom" ? "secondary" : "ghost"}
                   size="sm"
                   className={cn(
-                    "rounded-full text-xs h-8 px-4 whitespace-nowrap gap-2",
+                    "rounded-full text-sm h-10 px-6 whitespace-nowrap gap-2 font-medium",
                     !selectedDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="h-3.5 w-3.5" />
-                  {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Date"}
+                  <CalendarIcon className="h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "dd MMMM", { locale: fr }) : "Date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -330,139 +331,262 @@ export default function BilletteriePage() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {filteredEvents.map((event) => {
-              const availableSeats = event.maxSeats - (event._count?.bookings || 0);
-              const isSoldOut = availableSeats <= 0;
-              const eventDate = new Date(event.date);
+          <div className="space-y-8">
+            {/* Featured Event */}
+            {filteredEvents.find((e) => e.isFeatured) &&
+              (() => {
+                const featuredEvent = filteredEvents.find((e) => e.isFeatured)!;
+                const availableSeats =
+                  featuredEvent.maxSeats - (featuredEvent._count?.bookings || 0);
+                const isSoldOut = availableSeats <= 0;
+                const eventDate = new Date(featuredEvent.date);
 
-              return (
-                <Link
-                  key={event.id}
-                  href={isSoldOut ? "#" : `/billetterie/${event.id}`}
-                  className={cn(
-                    "group block transition-all duration-300",
-                    isSoldOut && "opacity-75 grayscale pointer-events-none"
-                  )}
-                >
-                  <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm rounded-3xl hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 h-full flex flex-col p-0 gap-0">
-                    {/* Image Section */}
-                    <div className="relative aspect-4/3 md:aspect-video w-full overflow-hidden">
-                      {event.image ? (
-                        <Image
-                          src={event.image}
-                          alt={event.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-secondary/10 flex items-center justify-center">
-                          <Ticket className="w-12 h-12 text-muted-foreground/20" />
-                        </div>
-                      )}
-
-                      {/* Overlay Gradient */}
-                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60" />
-
-                      {/* Badges */}
-                      <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
-                        {isSoldOut ? (
-                          <Badge variant="destructive" className="font-bold shadow-sm">
-                            Complet
-                          </Badge>
+                return (
+                  <Link
+                    href={isSoldOut ? "#" : `/billetterie/${featuredEvent.id}`}
+                    className={cn(
+                      "group block transition-all duration-300",
+                      isSoldOut && "opacity-75 grayscale pointer-events-none"
+                    )}
+                  >
+                    <Card className="overflow-hidden border-primary/20 bg-card/50 backdrop-blur-sm rounded-3xl hover:shadow-2xl hover:shadow-primary/10 hover:border-primary/40 h-full flex flex-col md:flex-row p-0 gap-0">
+                      {/* Image Section */}
+                      <div className="relative w-full md:w-1/2 lg:w-3/5 min-h-[250px] md:min-h-[400px]">
+                        {featuredEvent.image ? (
+                          <Image
+                            src={featuredEvent.image}
+                            alt={featuredEvent.title}
+                            fill
+                            className="object-cover"
+                          />
                         ) : (
-                          availableSeats < 10 && (
-                            <Badge className="bg-orange-500 hover:bg-orange-600 text-white font-bold shadow-sm animate-pulse">
-                              Dernières places
-                            </Badge>
-                          )
-                        )}
-                      </div>
-
-                      {/* Price Tag & Seats */}
-                      <div className="absolute bottom-3 right-3 flex items-center gap-2">
-                        {!isSoldOut && (
-                          <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/10">
-                            {availableSeats} places
+                          <div className="h-full w-full bg-secondary/10 flex items-center justify-center">
+                            <Ticket className="w-16 h-16 text-muted-foreground/20" />
                           </div>
                         )}
-                        <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-sm border border-white/10">
-                          {event.memberPrice || event.price}€
-                        </div>
-                      </div>
-                    </div>
+                        <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-60" />
 
-                    {/* Content Section */}
-                    <CardContent className="p-4 flex flex-col gap-3 grow">
-                      <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
-                          {event.title}
-                        </h3>
-                      </div>
-
-                      <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
-                          <span className="capitalize font-medium text-foreground/80">
-                            {format(eventDate, "EEEE d MMMM", { locale: fr })}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-primary shrink-0" />
-                          <span>{format(eventDate, "HH:mm")}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-primary shrink-0" />
-                          <span className="line-clamp-1">{event.location}</span>
-                        </div>
-                      </div>
-
-                      {/* Detailed Prices */}
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {event.memberPrice && (
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] px-2 h-5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                          >
-                            Adhérent: {event.memberPrice}€
+                        <div className="absolute top-4 left-4">
+                          <Badge className="bg-primary text-primary-foreground font-bold text-sm px-3 py-1 shadow-lg animate-pulse">
+                            À la une
                           </Badge>
-                        )}
-                        <Badge
-                          variant="outline"
-                          className="text-[10px] px-2 h-5 text-muted-foreground"
-                        >
-                          Non Adh: {event.price}€
-                        </Badge>
-                        {event.externalPrice && (
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] px-2 h-5 text-muted-foreground border-dashed"
-                          >
-                            Ext: {event.externalPrice}€
-                          </Badge>
-                        )}
+                        </div>
                       </div>
-                    </CardContent>
 
-                    {/* Footer Action */}
-                    <CardFooter className="p-4 pt-0 mt-auto">
-                      <Button
-                        className={cn(
-                          "w-full rounded-xl font-bold",
-                          isSoldOut
-                            ? "bg-muted text-muted-foreground"
-                            : "group-hover:bg-primary group-hover:text-primary-foreground"
-                        )}
-                        variant={isSoldOut ? "secondary" : "outline"}
-                      >
-                        {isSoldOut ? "Événement Complet" : "Réserver ma place"}
-                        {!isSoldOut && <ArrowRight className="w-4 h-4 ml-2" />}
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </Link>
-              );
-            })}
+                      {/* Content Section */}
+                      <CardContent className="w-full md:w-1/2 lg:w-2/5 p-6 md:p-8 flex flex-col justify-between gap-6 bg-card/50 backdrop-blur-sm">
+                        <div className="space-y-4">
+                          <div>
+                            <h2 className="text-2xl md:text-3xl font-bold mb-3 leading-tight group-hover:text-primary transition-colors">
+                              {featuredEvent.title}
+                            </h2>
+                            <p className="text-muted-foreground line-clamp-3 text-base md:text-lg">
+                              {featuredEvent.description}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap gap-3 text-sm font-medium">
+                            <div className="flex items-center gap-2 bg-orange-500/10 text-orange-600 px-3 py-1.5 rounded-full">
+                              <CalendarIcon className="w-4 h-4 text-orange-500" />
+                              <span className="capitalize">
+                                {format(eventDate, "EEE d MMM", { locale: fr })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-orange-500/10 text-orange-600 px-3 py-1.5 rounded-full">
+                              <Clock className="w-4 h-4 text-orange-500" />
+                              <span>{format(eventDate, "HH:mm")}</span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-orange-500/10 text-orange-600 px-3 py-1.5 rounded-full">
+                              <MapPin className="w-4 h-4 text-orange-500" />
+                              <span className="line-clamp-1">{featuredEvent.location}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t border-border/50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <span className="text-sm text-muted-foreground">Prix adhérent</span>
+                              <span className="text-2xl font-bold text-primary">
+                                {featuredEvent.memberPrice || featuredEvent.price}€
+                              </span>
+                            </div>
+                            {featuredEvent.externalPrice && (
+                              <div className="flex flex-col items-end">
+                                <span className="text-sm text-muted-foreground">Prix externe</span>
+                                <span className="font-medium">{featuredEvent.externalPrice}€</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Places restantes</span>
+                            <span
+                              className={cn(
+                                "font-bold",
+                                availableSeats < 20 ? "text-orange-500" : "text-green-500"
+                              )}
+                            >
+                              {availableSeats} places
+                            </span>
+                          </div>
+
+                          <Button
+                            size="lg"
+                            className={cn(
+                              "w-full rounded-xl font-bold text-lg h-12",
+                              isSoldOut
+                                ? "bg-muted text-muted-foreground"
+                                : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
+                            )}
+                            variant={isSoldOut ? "secondary" : "default"}
+                          >
+                            {isSoldOut ? "Complet" : "Réserver maintenant"}
+                            {!isSoldOut && <ArrowRight className="w-5 h-5 ml-2" />}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })()}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+              {filteredEvents
+                .filter((e) => !e.isFeatured)
+                .map((event) => {
+                  const availableSeats = event.maxSeats - (event._count?.bookings || 0);
+                  const isSoldOut = availableSeats <= 0;
+                  const eventDate = new Date(event.date);
+
+                  return (
+                    <Link
+                      key={event.id}
+                      href={isSoldOut ? "#" : `/billetterie/${event.id}`}
+                      className={cn(
+                        "group block transition-all duration-300",
+                        isSoldOut && "opacity-75 grayscale pointer-events-none"
+                      )}
+                    >
+                      <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm rounded-3xl hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 h-full flex flex-col p-0 gap-0">
+                        {/* Image Section */}
+                        <div className="relative aspect-4/3 md:aspect-video w-full overflow-hidden">
+                          {event.image ? (
+                            <Image
+                              src={event.image}
+                              alt={event.title}
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-secondary/10 flex items-center justify-center">
+                              <Ticket className="w-12 h-12 text-muted-foreground/20" />
+                            </div>
+                          )}
+
+                          {/* Overlay Gradient */}
+                          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60" />
+
+                          {/* Badges */}
+                          <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+                            {isSoldOut ? (
+                              <Badge variant="destructive" className="font-bold shadow-sm">
+                                Complet
+                              </Badge>
+                            ) : (
+                              availableSeats < 10 && (
+                                <Badge className="bg-orange-500 hover:bg-orange-600 text-white font-bold shadow-sm animate-pulse">
+                                  Dernières places
+                                </Badge>
+                              )
+                            )}
+                          </div>
+
+                          {/* Price Tag & Seats */}
+                          <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                            {!isSoldOut && (
+                              <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/10">
+                                {availableSeats} places
+                              </div>
+                            )}
+                            <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-sm border border-white/10">
+                              {event.memberPrice || event.price}€
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Content Section */}
+                        <CardContent className="p-4 flex flex-col gap-3 grow">
+                          <div className="flex justify-between items-start gap-2">
+                            <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                              {event.title}
+                            </h3>
+                          </div>
+
+                          <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                              <span className="capitalize font-medium text-foreground/80">
+                                {format(eventDate, "EEEE d MMMM", { locale: fr })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-primary shrink-0" />
+                              <span>{format(eventDate, "HH:mm")}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="w-4 h-4 text-primary shrink-0" />
+                              <span className="line-clamp-1">{event.location}</span>
+                            </div>
+                          </div>
+
+                          {/* Detailed Prices */}
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {event.memberPrice && (
+                              <Badge
+                                variant="secondary"
+                                className="text-[10px] px-2 h-5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                              >
+                                Adhérent: {event.memberPrice}€
+                              </Badge>
+                            )}
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-2 h-5 text-muted-foreground"
+                            >
+                              Non Adh: {event.price}€
+                            </Badge>
+                            {event.externalPrice && (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] px-2 h-5 text-muted-foreground border-dashed"
+                              >
+                                Ext: {event.externalPrice}€
+                              </Badge>
+                            )}
+                          </div>
+                        </CardContent>
+
+                        {/* Footer Action */}
+                        <CardFooter className="p-4 pt-0 mt-auto">
+                          <Button
+                            className={cn(
+                              "w-full rounded-xl font-bold",
+                              isSoldOut
+                                ? "bg-muted text-muted-foreground"
+                                : "group-hover:bg-primary group-hover:text-primary-foreground"
+                            )}
+                            variant={isSoldOut ? "secondary" : "outline"}
+                          >
+                            {isSoldOut ? "Événement Complet" : "Réserver ma place"}
+                            {!isSoldOut && <ArrowRight className="w-4 h-4 ml-2" />}
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    </Link>
+                  );
+                })}
+            </div>
           </div>
         )}
       </main>
