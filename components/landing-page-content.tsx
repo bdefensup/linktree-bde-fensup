@@ -67,7 +67,7 @@ export function LandingPageContent({ latestEvent }: LandingPageContentProps) {
       <main className="flex-1 w-full max-w-lg md:max-w-7xl px-6 py-16 z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 w-full">
           {/* Hero Section (Logo + Text) - Spans 2 cols on mobile and desktop */}
-          <div className="col-span-1 md:col-span-2 md:row-span-2 md:bg-card/40 md:backdrop-blur-md md:border md:border-white/10 md:rounded-3xl md:p-8 flex flex-col items-center justify-center text-center md:shadow-xl relative overflow-visible md:overflow-hidden group order-1 md:order-none">
+          <div className="col-span-1 md:col-span-2 md:row-span-2 md:bg-card/40 md:backdrop-blur-md md:border md:border-white/10 md:rounded-3xl md:p-8 flex flex-col items-center justify-center text-center md:shadow-xl relative overflow-visible md:overflow-hidden group order-1 md:order-0">
             <div className="hidden md:block absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <LandingLogo className="mb-6 md:mb-6" />
             <div className="space-y-3 z-10">
@@ -86,7 +86,7 @@ export function LandingPageContent({ latestEvent }: LandingPageContentProps) {
           </div>
 
           {/* Quick Donate Section - Spans 1 col */}
-          <div className="col-span-1 md:col-span-1 cursor-not-allowed opacity-70 order-3 md:order-none">
+          <div className="col-span-1 md:col-span-1 cursor-not-allowed opacity-70 order-3 md:order-0">
             {/* Mobile Version: Instagram-like Link Card */}
             <Link
               href="/don"
@@ -164,7 +164,7 @@ export function LandingPageContent({ latestEvent }: LandingPageContentProps) {
           </div>
 
           {/* Support Chat Card - Spans 1 col */}
-          <div className="order-4 md:order-none col-span-1">
+          <div className="order-4 md:order-0 col-span-1">
             <SupportCard />
           </div>
 
@@ -186,7 +186,7 @@ export function LandingPageContent({ latestEvent }: LandingPageContentProps) {
 
             if (isWide) {
               return (
-                <div key={link.name} className={`col-span-1 md:col-span-2 order-2 md:order-none`}>
+                <div key={link.name} className={`col-span-1 md:col-span-2 order-2 md:order-0`}>
                   <div className="w-full h-full relative group">
                     <div className="absolute -inset-1 bg-linear-to-r from-primary/20 via-secondary/20 to-primary/20 rounded-3xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <Card className="relative h-full min-h-[300px] border-border/50 overflow-hidden rounded-3xl flex flex-col justify-end transition-all duration-300 hover:-translate-y-1 group/card">
@@ -200,7 +200,7 @@ export function LandingPageContent({ latestEvent }: LandingPageContentProps) {
                         }}
                       />
                       {/* Dark Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
 
                       <CardContent className="relative px-6 md:p-6 flex flex-col h-full justify-between items-start text-left space-y-4 z-10 w-full">
                         <Badge
@@ -260,7 +260,7 @@ export function LandingPageContent({ latestEvent }: LandingPageContentProps) {
                 key={link.name}
                 href={link.url}
                 onClick={(e) => link.comingSoon && e.preventDefault()}
-                className={`block group ${colSpan} ${mobileOrder} md:order-none ${
+                className={`block group ${colSpan} ${mobileOrder} md:order-0 ${
                   link.comingSoon ? "cursor-not-allowed opacity-70 pointer-events-none" : ""
                 }`}
               >

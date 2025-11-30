@@ -14,7 +14,7 @@ export default function AdminMobileRestrictionPage() {
 
       <Card className="max-w-md w-full border-white/10 bg-black/40 backdrop-blur-2xl shadow-2xl relative z-10 overflow-hidden">
         {/* Decorative top border */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-red-500 via-purple-500 to-blue-500" />
 
         <CardHeader className="text-center space-y-6 pt-10 pb-2">
           <div className="relative mx-auto w-24 h-24 flex items-center justify-center">

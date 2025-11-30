@@ -112,6 +112,7 @@ export function DateRangePicker({ date, setDate, className }: DateRangePickerPro
           <Button
             id="date"
             variant={"outline"}
+            suppressHydrationWarning={true}
             className={cn(
               "w-[260px] justify-start text-left font-normal",
               !date && "text-muted-foreground"

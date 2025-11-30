@@ -86,7 +86,7 @@ function EventActionsCell({ event }: { event: Event }) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
+          <Button variant="ghost" className="h-8 w-8 p-0" suppressHydrationWarning={true}>
             <span className="sr-only">Ouvrir menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>

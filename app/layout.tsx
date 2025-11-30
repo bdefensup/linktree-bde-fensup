@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BDE FENELON - L'association des étudiants de l'FENELON SUP PARIS",
+  title: "BDE FENELON SUP PARIS",
   description: "BDE FENELON - L'association des étudiants de l'FENELON SUP PARIS",
 };
 

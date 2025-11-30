@@ -288,7 +288,7 @@ export default function EventDetailPage() {
           </div>
 
           {/* Sidebar / Booking Card */}
-          <div className="lg:col-span-1 order-first lg:order-none">
+          <div className="lg:col-span-1 order-first lg:order-0">
             <div className="sticky top-24">
               <Card className="border-primary/20 bg-card/60 backdrop-blur-xl shadow-2xl rounded-3xl overflow-hidden ring-1 ring-white/5">
                 <CardHeader className="p-0 border-b border-white/10 bg-[#2a2a4a]">
