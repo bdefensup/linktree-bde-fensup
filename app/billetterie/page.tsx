@@ -11,13 +11,16 @@ import {
   ArrowLeft,
   Filter,
   X,
+  Search,
+  Clock,
 } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   format,
   isSameDay,
@@ -40,6 +43,7 @@ interface Event {
   location: string;
   price: number;
   memberPrice?: number;
+  externalPrice?: number;
   maxSeats: number;
   image: string | null;
   isFeatured: boolean;
@@ -56,6 +60,7 @@ export default function BilletteriePage() {
   const [filterType, setFilterType] = useState<FilterType>("all");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetch("/api/events")
@@ -79,6 +84,18 @@ export default function BilletteriePage() {
     const eventDate = new Date(event.date);
     const now = new Date();
 
+    // Search Filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      if (
+        !event.title.toLowerCase().includes(query) &&
+        !event.location.toLowerCase().includes(query)
+      ) {
+        return false;
+      }
+    }
+
+    // Date Filters
     switch (filterType) {
       case "day":
         return isSameDay(eventDate, now);
@@ -115,320 +132,294 @@ export default function BilletteriePage() {
   const clearFilters = () => {
     setFilterType("all");
     setDateRange(undefined);
+    setSearchQuery("");
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 py-16 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-12 space-y-4 relative">
-          <div className="flex justify-start md:absolute md:left-0 md:top-0 mb-6 md:mb-0 z-20">
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="rounded-full bg-background/50 backdrop-blur-md border-border/50 hover:bg-background/80 hover:border-primary/50 transition-all duration-300 group"
-            >
-              <Link href="/" className="gap-2 pl-2 pr-4">
-                <div className="bg-primary/10 p-1 rounded-full group-hover:bg-primary/20 transition-colors">
-                  <ArrowLeft className="h-3 w-3 text-primary" />
-                </div>
-                <span className="hidden md:inline text-muted-foreground group-hover:text-foreground transition-colors">
-                  Retour à l'accueil
-                </span>
-                <span className="md:hidden text-muted-foreground group-hover:text-foreground transition-colors">
-                  Retour
-                </span>
+    <div className="min-h-screen bg-background text-foreground relative pb-20">
+      {/* Mobile Header */}
+      <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60">
+        <div className="flex h-16 items-center px-4 md:px-6 max-w-7xl mx-auto justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild className="rounded-full -ml-2">
+              <Link href="/">
+                <ArrowLeft className="h-5 w-5" />
+                <span className="sr-only">Retour</span>
               </Link>
             </Button>
+            <h1 className="text-lg font-bold tracking-tight md:text-xl">Billetterie</h1>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-primary via-accent to-secondary">
-            Billetterie Officielle
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
-            Découvrez et réservez vos places pour les événements exclusifs du BDE FENELON.
-          </p>
-        </div>
-
-        {/* Filter Bar */}
-        <div className="mb-10 flex flex-col items-center gap-4">
-          <div className="w-full max-w-4xl overflow-x-auto pb-4 md:pb-0 scrollbar-hide">
-            <div className="flex items-center gap-2 px-2 md:justify-center min-w-max">
-              <Button
-                variant={filterType === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleFilterChange("all")}
-                className="rounded-full"
-              >
-                Tout
-              </Button>
-              <Button
-                variant={filterType === "day" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleFilterChange("day")}
-                className="rounded-full"
-              >
-                Aujourd'hui
-              </Button>
-              <Button
-                variant={filterType === "week" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleFilterChange("week")}
-                className="rounded-full"
-              >
-                Cette semaine
-              </Button>
-              <Button
-                variant={filterType === "month" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleFilterChange("month")}
-                className="rounded-full"
-              >
-                Ce mois
-              </Button>
-              <Button
-                variant={filterType === "year" ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleFilterChange("year")}
-                className="rounded-full"
-              >
-                Cette année
-              </Button>
-
-              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={filterType === "custom" ? "default" : "outline"}
-                    size="sm"
-                    className={cn("rounded-full gap-2", !dateRange && "text-muted-foreground")}
-                  >
-                    <CalendarIcon className="h-4 w-4" />
-                    {dateRange?.from ? (
-                      dateRange.to ? (
-                        <>
-                          {format(dateRange.from, "dd/MM", { locale: fr })} -{" "}
-                          {format(dateRange.to, "dd/MM", { locale: fr })}
-                        </>
-                      ) : (
-                        format(dateRange.from, "dd/MM", { locale: fr })
-                      )
-                    ) : (
-                      "Période..."
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={dateRange?.from}
-                    selected={dateRange}
-                    onSelect={(range) => {
-                      setDateRange(range);
-                      if (range?.from) {
-                        setFilterType("custom");
-                      }
-                    }}
-                    numberOfMonths={2}
-                    locale={fr}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              {filterType !== "all" && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={clearFilters}
-                  className="rounded-full h-8 w-8 ml-2 hover:bg-destructive/10 hover:text-destructive"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+          <div className="flex items-center gap-2">
+            {/* Search Input (Desktop) */}
+            <div className="hidden md:flex relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Rechercher..."
+                className="w-[200px] rounded-full pl-8 bg-secondary/50 border-none focus-visible:ring-1"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
           </div>
         </div>
 
-        {/* Events Grid */}
+        {/* Filter Bar (Scrollable) */}
+        <div className="border-t border-border/10">
+          <div className="flex items-center gap-2 px-4 py-3 overflow-x-auto scrollbar-hide max-w-7xl mx-auto">
+            {/* Search Input (Mobile) */}
+            <div className="md:hidden relative min-w-[40px]">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="h-6 w-px bg-border/50 mx-1 hidden md:block" />
+
+            <Button
+              variant={filterType === "all" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => handleFilterChange("all")}
+              className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+            >
+              Tout
+            </Button>
+            <Button
+              variant={filterType === "week" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => handleFilterChange("week")}
+              className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+            >
+              Cette semaine
+            </Button>
+            <Button
+              variant={filterType === "month" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => handleFilterChange("month")}
+              className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+            >
+              Ce mois
+            </Button>
+
+            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={filterType === "custom" ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "rounded-full text-xs h-8 px-4 whitespace-nowrap gap-2",
+                    !dateRange && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "dd/MM")} - {format(dateRange.to, "dd/MM")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "dd/MM")
+                    )
+                  ) : (
+                    "Date"
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={(range) => {
+                    setDateRange(range);
+                    if (range?.from) {
+                      setFilterType("custom");
+                    }
+                  }}
+                  numberOfMonths={1}
+                  locale={fr}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {(filterType !== "all" || searchQuery) && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={clearFilters}
+                className="rounded-full h-8 w-8 ml-auto shrink-0 hover:bg-destructive/10 hover:text-destructive"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 py-6 md:py-8">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="overflow-hidden border-border/50 shadow-sm">
-                <Skeleton className="h-48 w-full" />
-                <CardHeader className="space-y-2">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-20 w-full" />
-                </CardContent>
-                <CardFooter>
-                  <Skeleton className="h-10 w-full rounded-lg" />
-                </CardFooter>
-              </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex flex-col gap-3">
+                <Skeleton className="h-48 w-full rounded-2xl" />
+                <div className="space-y-2 px-1">
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-4 w-1/3" />
+                </div>
+              </div>
             ))}
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-20 bg-card/50 backdrop-blur-sm rounded-3xl border border-border/50 shadow-sm">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-              <Filter className="w-8 h-8 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+            <div className="bg-muted/50 p-4 rounded-full mb-4">
+              <Filter className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Aucun événement trouvé</h3>
-            <p className="text-muted-foreground mb-6">
-              Aucun événement ne correspond à vos filtres.
+            <h3 className="text-lg font-semibold">Aucun événement trouvé</h3>
+            <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
+              Essayez de modifier vos filtres ou revenez plus tard.
             </p>
-            <Button onClick={clearFilters} variant="outline" className="rounded-full">
-              Effacer les filtres
+            <Button onClick={clearFilters} variant="outline" className="mt-6 rounded-full">
+              Tout effacer
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {filteredEvents.map((event) => {
               const availableSeats = event.maxSeats - (event._count?.bookings || 0);
               const isSoldOut = availableSeats <= 0;
-              // Only feature the first event if we are viewing ALL events, otherwise standard grid
-              const isFeatured = filterType === "all" && event.isFeatured;
-              const colSpan = isFeatured ? "col-span-1 md:col-span-2 md:row-span-2" : "col-span-1";
+              const eventDate = new Date(event.date);
 
               return (
-                <div
+                <Link
                   key={event.id}
-                  className={`group block h-full ${colSpan} ${isSoldOut ? "pointer-events-none opacity-75 grayscale" : ""}`}
+                  href={isSoldOut ? "#" : `/billetterie/${event.id}`}
+                  className={cn(
+                    "group block transition-all duration-300",
+                    isSoldOut && "opacity-75 grayscale pointer-events-none"
+                  )}
                 >
-                  <Link
-                    href={isSoldOut ? "#" : `/billetterie/${event.id}`}
-                    className={isSoldOut ? "cursor-not-allowed" : ""}
-                    aria-disabled={isSoldOut}
-                  >
-                    <Card
-                      className={`h-full flex flex-col overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 rounded-3xl ${
-                        !isSoldOut
-                          ? "hover:bg-card hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
-                          : ""
-                      }`}
-                    >
-                      {/* Image Container */}
-                      <div
-                        className={`relative w-full overflow-hidden ${isFeatured ? "h-64 md:h-80" : "h-56"}`}
-                      >
-                        {event.image ? (
-                          <Image
-                            src={event.image}
-                            alt={event.title}
-                            fill
-                            className={`object-cover transition-transform duration-500 ${!isSoldOut ? "group-hover:scale-105" : ""}`}
-                          />
+                  <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm rounded-3xl hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 h-full flex flex-col">
+                    {/* Image Section */}
+                    <div className="relative aspect-4/3 md:aspect-video w-full overflow-hidden">
+                      {event.image ? (
+                        <Image
+                          src={event.image}
+                          alt={event.title}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-secondary/10 flex items-center justify-center">
+                          <Ticket className="w-12 h-12 text-muted-foreground/20" />
+                        </div>
+                      )}
+
+                      {/* Overlay Gradient */}
+                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60" />
+
+                      {/* Badges */}
+                      <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+                        {isSoldOut ? (
+                          <Badge variant="destructive" className="font-bold shadow-sm">
+                            Complet
+                          </Badge>
                         ) : (
-                          <div className="h-full w-full bg-linear-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center">
-                            <Ticket className="w-16 h-16 text-primary/20" />
+                          availableSeats < 10 && (
+                            <Badge className="bg-orange-500 hover:bg-orange-600 text-white font-bold shadow-sm animate-pulse">
+                              Dernières places
+                            </Badge>
+                          )
+                        )}
+                      </div>
+
+                      {/* Price Tag & Seats */}
+                      <div className="absolute bottom-3 right-3 flex items-center gap-2">
+                        {!isSoldOut && (
+                          <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs font-medium shadow-sm border border-white/10">
+                            {availableSeats} places
                           </div>
                         )}
+                        <div className="bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-sm border border-white/10">
+                          {event.memberPrice || event.price}€
+                        </div>
+                      </div>
+                    </div>
 
-                        {/* Status Badges */}
-                        <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
-                          {isSoldOut ? (
-                            <Badge variant="destructive" className="font-semibold shadow-lg">
-                              Complet
-                            </Badge>
-                          ) : (
-                            <Badge
-                              variant="secondary"
-                              className="bg-background/80 backdrop-blur-md text-foreground font-medium shadow-sm"
-                            >
-                              {availableSeats} places restantes
-                            </Badge>
-                          )}
+                    {/* Content Section */}
+                    <CardContent className="p-4 flex flex-col gap-3 grow">
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                          {event.title}
+                        </h3>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                          <span className="capitalize font-medium text-foreground/80">
+                            {format(eventDate, "EEEE d MMMM", { locale: fr })}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-primary shrink-0" />
+                          <span>{format(eventDate, "HH:mm")}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-primary shrink-0" />
+                          <span className="line-clamp-1">{event.location}</span>
                         </div>
                       </div>
 
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start gap-4">
-                          <h3
-                            className={`font-bold leading-tight transition-colors ${isFeatured ? "text-3xl" : "text-xl"} ${!isSoldOut ? "group-hover:text-primary" : ""}`}
+                      {/* Detailed Prices */}
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {event.memberPrice && (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] px-2 h-5 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
                           >
-                            {event.title}
-                          </h3>
-                        </div>
-                      </CardHeader>
-
-                      <CardContent className="grow space-y-4">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <CalendarIcon className="w-4 h-4 text-primary" />
-                          <span className="font-medium">
-                            {new Date(event.date).toLocaleDateString("fr-FR", {
-                              weekday: "long",
-                              day: "numeric",
-                              month: "long",
-                            })}
-                          </span>
-                          <span className="text-border">•</span>
-                          <span className="font-medium">
-                            {new Date(event.date).toLocaleTimeString("fr-FR", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <MapPin className="w-4 h-4 text-secondary" />
-                          <span>{event.location}</span>
-                        </div>
-
-                        <p
-                          className={`text-muted-foreground leading-relaxed ${isFeatured ? "text-base line-clamp-3" : "text-sm line-clamp-2"}`}
+                            Adhérent: {event.memberPrice}€
+                          </Badge>
+                        )}
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] px-2 h-5 text-muted-foreground"
                         >
-                          {event.description}
-                        </p>
-                      </CardContent>
-
-                      <CardFooter className="pt-2 pb-6 px-6 border-t border-border/50 mt-auto">
-                        <div className="w-full flex items-center justify-between">
-                          <div className="flex flex-col">
-                            <span className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                              À partir de
-                            </span>
-                            <div className="flex items-baseline gap-2">
-                              <span
-                                className={`font-bold text-primary ${isFeatured ? "text-3xl" : "text-2xl"}`}
-                              >
-                                {event.memberPrice || event.price}€
-                              </span>
-                              {event.memberPrice && (
-                                <span className="text-sm text-muted-foreground line-through decoration-destructive/50">
-                                  {event.price}€
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          <Button
-                            variant={isSoldOut ? "secondary" : "default"}
-                            disabled={isSoldOut}
-                            className={`rounded-full px-6 transition-all ${
-                              !isSoldOut &&
-                              "group-hover:bg-primary group-hover:text-primary-foreground shadow-lg shadow-primary/20"
-                            }`}
+                          Non Adh: {event.price}€
+                        </Badge>
+                        {event.externalPrice && (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] px-2 h-5 text-muted-foreground border-dashed"
                           >
-                            {isSoldOut ? "Complet" : "Réserver"}
-                            {!isSoldOut && (
-                              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                            )}
-                          </Button>
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  </Link>
-                </div>
+                            Ext: {event.externalPrice}€
+                          </Badge>
+                        )}
+                      </div>
+                    </CardContent>
+
+                    {/* Footer Action */}
+                    <CardFooter className="p-4 pt-0 mt-auto">
+                      <Button
+                        className={cn(
+                          "w-full rounded-xl font-bold",
+                          isSoldOut
+                            ? "bg-muted text-muted-foreground"
+                            : "group-hover:bg-primary group-hover:text-primary-foreground"
+                        )}
+                        variant={isSoldOut ? "secondary" : "outline"}
+                      >
+                        {isSoldOut ? "Événement Complet" : "Réserver ma place"}
+                        {!isSoldOut && <ArrowRight className="w-4 h-4 ml-2" />}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </Link>
               );
             })}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
