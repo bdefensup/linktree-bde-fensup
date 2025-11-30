@@ -17,9 +17,22 @@ export default function proxy(request: NextRequest) {
 
   // 2. Protect /admin/* routes (excluding login and signup)
   const isAdminSignup = pathname === "/admin/signup";
-  if (isAdminRoute && !isAdminLogin && !isAdminSignup) {
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
+
+  // Mobile detection
+  const userAgent = request.headers.get("user-agent") || "";
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  const isRestrictionPage = pathname === "/admin-mobile-restriction";
+
+  if (isAdminRoute && !isRestrictionPage) {
+    // Block mobile access to admin routes
+    if (isMobile) {
+      return NextResponse.redirect(new URL("/admin-mobile-restriction", request.url));
+    }
+
+    if (!isAdminLogin && !isAdminSignup) {
+      if (!isAuthenticated) {
+        return NextResponse.redirect(new URL("/admin/login", request.url));
+      }
     }
   }
 
