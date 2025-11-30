@@ -168,7 +168,7 @@ export default function MessagesPage() {
           </div>
           <h3 className="text-lg font-semibold mb-2">Sélectionnez une conversation</h3>
           <p className="text-muted-foreground text-sm">
-            Choisissez une discussion dans la barre latérale pour commencer à échanger.
+            Choisissez une discussion dans la liste pour commencer à échanger.
           </p>
         </Card>
       </div>

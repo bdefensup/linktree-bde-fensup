@@ -14,7 +14,7 @@ import { useSession } from "@/lib/auth-client";
 import { supabase } from "@/lib/supabase";
 import { NewConversationDialog } from "./new-conversation-dialog";
 
-import { Pin, Crown, Landmark, PenLine } from "lucide-react";
+import { Pin, Crown, Landmark, PenLine, Trash2 } from "lucide-react";
 import { togglePinConversation } from "@/app/messaging";
 
 interface Conversation {
@@ -285,26 +285,59 @@ export function ConversationList() {
                           )}
                         </div>
                         {/* Pin Button */}
-                        {(isPinned || isMandatory) && (
-                          <button
-                            onClick={(e) => !isMandatory && handleTogglePin(e, conversation.id)}
-                            className={cn(
-                              "ml-2 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100",
-                              (isPinned || isMandatory) && "opacity-100"
-                            )}
-                            title={isMandatory ? "Conversation obligatoire" : "Désépingler"}
-                            disabled={isMandatory}
-                          >
-                            <Pin
+                        <div className="flex items-center gap-1">
+                          {(isPinned || isMandatory) && (
+                            <button
+                              onClick={(e) => !isMandatory && handleTogglePin(e, conversation.id)}
                               className={cn(
-                                "h-3.5 w-3.5 transform rotate-45",
-                                isMandatory
-                                  ? "text-red-500 fill-red-500"
-                                  : "text-primary fill-primary"
+                                "opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100",
+                                (isPinned || isMandatory) && "opacity-100"
                               )}
-                            />
-                          </button>
-                        )}
+                              title={isMandatory ? "Conversation obligatoire" : "Désépingler"}
+                              disabled={isMandatory}
+                            >
+                              <Pin
+                                className={cn(
+                                  "h-3.5 w-3.5 transform rotate-45",
+                                  isMandatory
+                                    ? "text-red-500 fill-red-500"
+                                    : "text-primary fill-primary"
+                                )}
+                              />
+                            </button>
+                          )}
+
+                          {!isMandatory && !isPinned && (
+                            <button
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (
+                                  confirm("Êtes-vous sûr de vouloir supprimer cette conversation ?")
+                                ) {
+                                  try {
+                                    const { deleteConversation } = await import("@/app/messaging");
+                                    await deleteConversation(conversation.id);
+                                    fetchConversations();
+                                    window.dispatchEvent(new Event("conversation:updated"));
+                                    toast.success("Conversation supprimée");
+                                    // If we are currently on this conversation, redirect to messages root
+                                    if (currentChatId === conversation.id) {
+                                      window.location.href = "/admin/messages";
+                                    }
+                                  } catch (error) {
+                                    console.error("Failed to delete conversation:", error);
+                                    toast.error("Erreur lors de la suppression");
+                                  }
+                                }
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full"
+                              title="Supprimer la conversation"
+                            >
+                              <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {lastMessage && (

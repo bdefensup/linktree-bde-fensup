@@ -16,6 +16,7 @@ import {
   Crown,
   Landmark,
   PenLine,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { usePathname, useRouter } from "next/navigation";

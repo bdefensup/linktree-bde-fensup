@@ -341,6 +341,11 @@ export async function searchUsers(query: string) {
           },
         },
         {
+          role: {
+            in: ["admin", "staff"],
+          },
+        },
+        {
           OR: [
             { name: { contains: query, mode: "insensitive" } },
             { email: { contains: query, mode: "insensitive" } },
@@ -498,4 +503,38 @@ export async function getAdminTickets() {
     lastMessageAt: t.conversation.lastMessageAt,
     messages: t.conversation.messages,
   }));
+}
+
+export async function deleteConversation(conversationId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify participant or admin role
+  const participant = await prisma.conversationParticipant.findUnique({
+    where: {
+      conversationId_userId: {
+        conversationId,
+        userId: session.user.id,
+      },
+    },
+  });
+
+  const isAdmin = session.user.role === "admin" || session.user.role === "superadmin";
+
+  if (!participant && !isAdmin) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.conversation.delete({
+    where: {
+      id: conversationId,
+    },
+  });
+
+  return { success: true };
 }
