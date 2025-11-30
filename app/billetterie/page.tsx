@@ -22,17 +22,24 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   format,
   isSameDay,
-  isSameWeek,
   isSameMonth,
   isSameYear,
   isWithinInterval,
   startOfDay,
   endOfDay,
+  addMonths,
+  addDays,
 } from "date-fns";
 import { fr } from "date-fns/locale";
-import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 
 interface Event {
@@ -52,14 +59,15 @@ interface Event {
   };
 }
 
-type FilterType = "all" | "day" | "week" | "month" | "year" | "custom";
+type FilterType = "all" | "day" | "week" | "month" | "next_month" | "year" | "custom";
 
 export default function BilletteriePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<FilterType>("all");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -87,10 +95,7 @@ export default function BilletteriePage() {
     // Search Filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      if (
-        !event.title.toLowerCase().includes(query) &&
-        !event.location.toLowerCase().includes(query)
-      ) {
+      if (!event.title.toLowerCase().includes(query)) {
         return false;
       }
     }
@@ -100,19 +105,19 @@ export default function BilletteriePage() {
       case "day":
         return isSameDay(eventDate, now);
       case "week":
-        return isSameWeek(eventDate, now, { locale: fr });
+        return isWithinInterval(eventDate, {
+          start: startOfDay(now),
+          end: endOfDay(addDays(now, 7)),
+        });
       case "month":
         return isSameMonth(eventDate, now);
+      case "next_month":
+        return isSameMonth(eventDate, addMonths(now, 1));
       case "year":
         return isSameYear(eventDate, now);
       case "custom":
-        if (dateRange?.from && dateRange?.to) {
-          return isWithinInterval(eventDate, {
-            start: startOfDay(dateRange.from),
-            end: endOfDay(dateRange.to),
-          });
-        } else if (dateRange?.from) {
-          return isSameDay(eventDate, dateRange.from);
+        if (selectedDate) {
+          return isSameDay(eventDate, selectedDate);
         }
         return true;
       default:
@@ -125,14 +130,15 @@ export default function BilletteriePage() {
       setIsCalendarOpen(true);
     } else {
       setFilterType(type);
-      setDateRange(undefined);
+      setSelectedDate(undefined);
     }
   };
 
   const clearFilters = () => {
     setFilterType("all");
-    setDateRange(undefined);
+    setSelectedDate(undefined);
     setSearchQuery("");
+    setIsMobileSearchOpen(false);
   };
 
   return (
@@ -167,39 +173,90 @@ export default function BilletteriePage() {
         {/* Filter Bar (Scrollable) */}
         <div className="border-t border-border/10">
           <div className="flex items-center gap-2 px-4 py-3 overflow-x-auto scrollbar-hide max-w-7xl mx-auto">
-            {/* Search Input (Mobile) */}
-            <div className="md:hidden relative min-w-[40px]">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
+            {isMobileSearchOpen ? (
+              <div className="flex items-center w-full gap-2 md:hidden animate-in fade-in slide-in-from-left-5 duration-200">
+                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+                <Input
+                  autoFocus
+                  placeholder="Rechercher un événement..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-8 text-xs rounded-full bg-secondary/50 border-none focus-visible:ring-1"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0 rounded-full"
+                  onClick={() => {
+                    setIsMobileSearchOpen(false);
+                    setSearchQuery("");
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* Search Input (Mobile) */}
+                <div className="md:hidden relative min-w-[40px]">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    onClick={() => setIsMobileSearchOpen(true)}
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
 
-            <div className="h-6 w-px bg-border/50 mx-1 hidden md:block" />
+                {/* Mobile Filter Select */}
+                <div className="md:hidden w-full max-w-[200px]">
+                  <Select
+                    value={filterType === "custom" ? "all" : filterType}
+                    onValueChange={(value) => handleFilterChange(value as FilterType)}
+                  >
+                    <SelectTrigger className="w-full h-8 rounded-full text-xs bg-secondary/50 border-none">
+                      <SelectValue placeholder="Filtrer par..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tout voir</SelectItem>
+                      <SelectItem value="week">Cette semaine</SelectItem>
+                      <SelectItem value="month">Ce mois-ci</SelectItem>
+                      <SelectItem value="next_month">Le mois prochain</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <Button
-              variant={filterType === "all" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => handleFilterChange("all")}
-              className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
-            >
-              Tout
-            </Button>
-            <Button
-              variant={filterType === "week" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => handleFilterChange("week")}
-              className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
-            >
-              Cette semaine
-            </Button>
-            <Button
-              variant={filterType === "month" ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => handleFilterChange("month")}
-              className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
-            >
-              Ce mois
-            </Button>
+                <div className="h-6 w-px bg-border/50 mx-1 hidden md:block" />
+
+                <div className="hidden md:flex items-center gap-2">
+                  <Button
+                    variant={filterType === "all" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => handleFilterChange("all")}
+                    className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+                  >
+                    Tout
+                  </Button>
+                  <Button
+                    variant={filterType === "week" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => handleFilterChange("week")}
+                    className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+                  >
+                    Cette semaine
+                  </Button>
+                  <Button
+                    variant={filterType === "month" ? "secondary" : "ghost"}
+                    size="sm"
+                    onClick={() => handleFilterChange("month")}
+                    className="rounded-full text-xs h-8 px-4 whitespace-nowrap"
+                  >
+                    Ce mois
+                  </Button>
+                </div>
+              </>
+            )}
 
             <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
               <PopoverTrigger asChild>
@@ -208,36 +265,25 @@ export default function BilletteriePage() {
                   size="sm"
                   className={cn(
                     "rounded-full text-xs h-8 px-4 whitespace-nowrap gap-2",
-                    !dateRange && "text-muted-foreground"
+                    !selectedDate && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="h-3.5 w-3.5" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>
-                        {format(dateRange.from, "dd/MM")} - {format(dateRange.to, "dd/MM")}
-                      </>
-                    ) : (
-                      format(dateRange.from, "dd/MM")
-                    )
-                  ) : (
-                    "Date"
-                  )}
+                  {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={(range) => {
-                    setDateRange(range);
-                    if (range?.from) {
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    if (date) {
                       setFilterType("custom");
+                      setIsCalendarOpen(false);
                     }
                   }}
-                  numberOfMonths={1}
                   locale={fr}
                 />
               </PopoverContent>
@@ -299,7 +345,7 @@ export default function BilletteriePage() {
                     isSoldOut && "opacity-75 grayscale pointer-events-none"
                   )}
                 >
-                  <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm rounded-3xl hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 h-full flex flex-col">
+                  <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm rounded-3xl hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 h-full flex flex-col p-0 gap-0">
                     {/* Image Section */}
                     <div className="relative aspect-4/3 md:aspect-video w-full overflow-hidden">
                       {event.image ? (
