@@ -110,6 +110,17 @@ function StaffActionsCell({ user, currentUserRole, currentUserEmail }: StaffActi
 
       if (!response.ok) {
         const data = await response.json();
+
+        if (data.code === "POSITION_TAKEN") {
+          toast.error(
+            <span>
+              Cette position est déjà occupée par{" "}
+              <span className="font-bold">{data.holderName}</span>. Veuillez d'abord lui retirer.
+            </span>
+          );
+          return;
+        }
+
         throw new Error(data.error || "Failed to update position");
       }
 

@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BDE FEN'SUP",
-  description: "Bureau des Étudiants de FEN'SUP - Retrouvez tous nos liens",
+  title: "BDE FENELON - L'association des étudiants de l'FENELON SUP PARIS",
+  description: "BDE FENELON - L'association des étudiants de l'FENELON SUP PARIS",
 };
 
 export const viewport: Viewport = {

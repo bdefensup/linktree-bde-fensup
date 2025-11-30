@@ -144,3 +144,32 @@ export async function toggleTicketStatus(conversationId: string, newStatus: "OPE
   revalidatePath(`/admin/tickets/${conversationId}`);
   return { success: true };
 }
+
+export async function deleteTickets(conversationIds: string[]) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify user has permission (admin/staff)
+  // TODO: Add proper role check if needed
+
+  try {
+    await prisma.conversation.deleteMany({
+      where: {
+        id: {
+          in: conversationIds,
+        },
+      },
+    });
+
+    revalidatePath("/admin/tickets");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete tickets:", error);
+    return { success: false, error: "Failed to delete tickets" };
+  }
+}

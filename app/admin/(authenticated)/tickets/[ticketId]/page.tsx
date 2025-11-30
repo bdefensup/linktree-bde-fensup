@@ -177,15 +177,11 @@ export default function TicketDetailPage({ params }: { params: Promise<{ ticketI
     );
   }
 
-  // Use variables to avoid unused var error, or just use ticket.guestName directly in JSX
-  // const guestParticipant = ticket.participants.find((p) => p.user.role === "GUEST");
-  // const _guestEmail = guestParticipant?.user.email;
-
   return (
     <TooltipProvider>
-      <div className="flex flex-col h-full bg-background/95 supports-backdrop-filter:bg-background/60">
+      <div className="flex flex-col h-[calc(95vh-4rem)] bg-background border rounded-lg overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b h-16 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="flex items-center justify-between p-4 mt-2 border-b h-16 bg-background">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
               <ArrowLeft className="h-5 w-5" />
@@ -329,7 +325,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ ticketI
             </form>
           </div>
         ) : (
-          <div className="p-4 border-t bg-muted/50 text-center text-muted-foreground text-sm">
+          <div className="p-4  border-t bg-muted/50 text-center text-muted-foreground text-sm">
             Ce ticket est fermé. Rouvrez-le pour répondre.
           </div>
         )}

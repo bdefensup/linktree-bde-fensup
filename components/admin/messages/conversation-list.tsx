@@ -8,12 +8,13 @@ import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSession } from "@/lib/auth-client";
 import { supabase } from "@/lib/supabase";
 import { NewConversationDialog } from "./new-conversation-dialog";
 
-import { Pin } from "lucide-react";
+import { Pin, Crown, Landmark, PenLine } from "lucide-react";
 import { togglePinConversation } from "@/app/messaging";
 
 interface Conversation {
@@ -147,7 +148,7 @@ export function ConversationList() {
   }
 
   return (
-    <div className="w-80 border-r bg-muted/10 flex flex-col h-full">
+    <div className="w-80 max-w-full border-r bg-muted/10 flex flex-col h-full min-h-0">
       <div className="p-4 border-b h-16 flex items-center justify-between">
         <h2 className="font-semibold">Messages</h2>
       </div>
@@ -167,22 +168,32 @@ export function ConversationList() {
               .sort((a, b) => {
                 const otherA = a.participants.find((p) => p.user.id !== session?.user?.id)?.user;
                 const myA = a.participants.find((p) => p.user.id === session?.user?.id);
-                const isMandatoryA = ["President", "Tresorier", "Secretaire"].includes(
-                  otherA?.position || ""
-                );
                 const isPinnedA = myA?.isPinned;
 
                 const otherB = b.participants.find((p) => p.user.id !== session?.user?.id)?.user;
                 const myB = b.participants.find((p) => p.user.id === session?.user?.id);
-                const isMandatoryB = ["President", "Tresorier", "Secretaire"].includes(
-                  otherB?.position || ""
-                );
                 const isPinnedB = myB?.isPinned;
 
-                if (isMandatoryA && !isMandatoryB) return -1;
-                if (!isMandatoryA && isMandatoryB) return 1;
+                // Strict priority map
+                const rolePriority: Record<string, number> = {
+                  President: 1,
+                  Tresorier: 2,
+                  Secretaire: 3,
+                };
+
+                const priorityA = rolePriority[otherA?.position || ""] || 999;
+                const priorityB = rolePriority[otherB?.position || ""] || 999;
+
+                // 1. Strict Role Priority (President > Tresorier > Secretaire)
+                if (priorityA !== priorityB) {
+                  return priorityA - priorityB;
+                }
+
+                // 2. Pinned conversations (for non-mandatory roles)
                 if (isPinnedA && !isPinnedB) return -1;
                 if (!isPinnedA && isPinnedB) return 1;
+
+                // 3. Last message date
                 return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime();
               })
               .map((conversation) => {
@@ -195,20 +206,52 @@ export function ConversationList() {
                 );
 
                 const isPinned = myParticipant?.isPinned;
+                const position = otherParticipant?.position;
                 const isMandatory = ["President", "Tresorier", "Secretaire"].includes(
-                  otherParticipant?.position || ""
+                  position || ""
                 );
+
+                const positionConfig: Record<
+                  string,
+                  { icon: React.ReactNode; className: string; label: string }
+                > = {
+                  President: {
+                    icon: <Crown className="w-3 h-3" />,
+                    className:
+                      "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+                    label: "Président",
+                  },
+                  Tresorier: {
+                    icon: <Landmark className="w-3 h-3" />,
+                    className:
+                      "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800",
+                    label: "Trésorier",
+                  },
+                  Secretaire: {
+                    icon: <PenLine className="w-3 h-3" />,
+                    className:
+                      "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+                    label: "Secrétaire",
+                  },
+                };
 
                 const lastMessage = conversation.messages[0];
                 const isActive = currentChatId === conversation.id;
+
+                // Truncate name logic
+                const displayName =
+                  otherParticipant?.name || otherParticipant?.email || "Utilisateur";
+                const truncatedName =
+                  displayName.length > 20 ? displayName.substring(0, 20) + "..." : displayName;
 
                 return (
                   <Link
                     key={conversation.id}
                     href={`/admin/messages?chatId=${conversation.id}`}
                     className={cn(
-                      "group flex items-start gap-3 p-3 rounded-lg transition-colors hover:bg-accent/50",
-                      isActive && "bg-accent"
+                      "group flex items-start gap-3 p-3 rounded-lg transition-all duration-200",
+                      "hover:bg-primary/5 border border-transparent hover:border-primary/10",
+                      isActive ? "bg-primary/10 border-primary/20" : ""
                     )}
                   >
                     <Avatar className="h-10 w-10 border border-border/50">
@@ -218,30 +261,24 @@ export function ConversationList() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0 overflow-hidden">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-sm truncate">
-                          {otherParticipant?.name || otherParticipant?.email || "Utilisateur"}
-                        </span>
-                        {lastMessage && (
-                          <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-2">
-                            {formatDistanceToNow(new Date(lastMessage.createdAt), {
-                              addSuffix: true,
-                              locale: fr,
-                            })}
+                      <div className="flex items-center justify-between mb-0.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-medium text-sm truncate" title={displayName}>
+                            {truncatedName}
                           </span>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground truncate flex-1">
-                          {lastMessage ? (
-                            <>
-                              {lastMessage.senderId === session?.user?.id && "Vous: "}
-                              {lastMessage.content}
-                            </>
-                          ) : (
-                            "Nouvelle conversation"
+                          {isMandatory && position && positionConfig[position] && (
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "p-0 h-5 w-5 flex items-center justify-center",
+                                positionConfig[position].className
+                              )}
+                              title={positionConfig[position].label}
+                            >
+                              {positionConfig[position].icon}
+                            </Badge>
                           )}
-                        </p>
+                        </div>
                         {/* Pin Button */}
                         {(isPinned || isMandatory) && (
                           <button
@@ -263,6 +300,28 @@ export function ConversationList() {
                             />
                           </button>
                         )}
+                      </div>
+
+                      {lastMessage && (
+                        <div className="text-[10px] text-muted-foreground mb-1">
+                          {formatDistanceToNow(new Date(lastMessage.createdAt), {
+                            addSuffix: true,
+                            locale: fr,
+                          })}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground truncate flex-1">
+                          {lastMessage ? (
+                            <>
+                              {lastMessage.senderId === session?.user?.id && "Vous: "}
+                              {lastMessage.content}
+                            </>
+                          ) : (
+                            "Nouvelle conversation"
+                          )}
+                        </p>
                       </div>
                     </div>
                   </Link>

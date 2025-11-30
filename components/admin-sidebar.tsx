@@ -13,7 +13,11 @@ import {
   Loader2,
   Pin,
   MessageSquare,
+  Crown,
+  Landmark,
+  PenLine,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -193,9 +197,57 @@ export function AdminSidebar() {
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        const { getPinnedConversations } = await import("@/app/messaging");
-        const data = await getPinnedConversations();
-        setConversations(data as unknown as Conversation[]);
+        const { getPinnedConversations, getMandatoryUsers } = await import("@/app/messaging");
+        const [existingConversations, mandatoryUsers] = await Promise.all([
+          getPinnedConversations(),
+          getMandatoryUsers(),
+        ]);
+
+        const conversations = existingConversations as unknown as Conversation[];
+
+        // Merge mandatory users who don't have a conversation yet
+        const mergedConversations = [...conversations];
+
+        mandatoryUsers.forEach((user) => {
+          const hasConversation = conversations.some((c) =>
+            c.participants.some((p) => p.userId === user.id)
+          );
+
+          if (!hasConversation) {
+            // Create a virtual conversation object
+            mergedConversations.push({
+              id: `virtual-${user.id}`,
+              lastMessageAt: new Date(0), // Old date to put at bottom if not prioritized (but strict sort handles this)
+              participants: [
+                {
+                  userId: session?.user?.id || "",
+                  isPinned: true, // Mandatory are pinned by default logic
+                  user: {
+                    id: session?.user?.id || "",
+                    name: session?.user?.name || "",
+                    image: session?.user?.image || "",
+                    email: session?.user?.email || "",
+                    position: null,
+                  },
+                },
+                {
+                  userId: user.id,
+                  isPinned: true,
+                  user: {
+                    id: user.id,
+                    name: user.name,
+                    image: user.image,
+                    email: user.email,
+                    position: user.position,
+                  },
+                },
+              ],
+              messages: [],
+            });
+          }
+        });
+
+        setConversations(mergedConversations);
       } catch (error) {
         console.error("Failed to fetch conversations:", error);
       }
@@ -377,24 +429,34 @@ export function AdminSidebar() {
                         (p) => p.userId !== session?.user?.id
                       )?.user;
                       const myA = a.participants.find((p) => p.userId === session?.user?.id);
-                      const isMandatoryA = ["President", "Tresorier", "Secretaire"].includes(
-                        otherA?.position || ""
-                      );
                       const isPinnedA = myA?.isPinned;
 
                       const otherB = b.participants.find(
                         (p) => p.userId !== session?.user?.id
                       )?.user;
                       const myB = b.participants.find((p) => p.userId === session?.user?.id);
-                      const isMandatoryB = ["President", "Tresorier", "Secretaire"].includes(
-                        otherB?.position || ""
-                      );
                       const isPinnedB = myB?.isPinned;
 
-                      if (isMandatoryA && !isMandatoryB) return -1;
-                      if (!isMandatoryA && isMandatoryB) return 1;
+                      // Strict priority map
+                      const rolePriority: Record<string, number> = {
+                        President: 1,
+                        Tresorier: 2,
+                        Secretaire: 3,
+                      };
+
+                      const priorityA = rolePriority[otherA?.position || ""] || 999;
+                      const priorityB = rolePriority[otherB?.position || ""] || 999;
+
+                      // 1. Strict Role Priority (President > Tresorier > Secretaire)
+                      if (priorityA !== priorityB) {
+                        return priorityA - priorityB;
+                      }
+
+                      // 2. Pinned conversations (for non-mandatory roles)
                       if (isPinnedA && !isPinnedB) return -1;
                       if (!isPinnedA && isPinnedB) return 1;
+
+                      // 3. Last message date
                       return (
                         new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
                       );
@@ -407,10 +469,43 @@ export function AdminSidebar() {
                         (p) => p.userId === session?.user?.id
                       );
                       const isPinned = myParticipant?.isPinned;
+                      const position = otherParticipant?.position;
                       const isMandatory = ["President", "Tresorier", "Secretaire"].includes(
-                        otherParticipant?.position || ""
+                        position || ""
                       );
                       const lastMessage = chat.messages[0];
+
+                      const positionConfig: Record<
+                        string,
+                        { icon: React.ReactNode; className: string; label: string }
+                      > = {
+                        President: {
+                          icon: <Crown className="w-3 h-3" />,
+                          className:
+                            "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+                          label: "Président",
+                        },
+                        Tresorier: {
+                          icon: <Landmark className="w-3 h-3" />,
+                          className:
+                            "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800",
+                          label: "Trésorier",
+                        },
+                        Secretaire: {
+                          icon: <PenLine className="w-3 h-3" />,
+                          className:
+                            "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+                          label: "Secrétaire",
+                        },
+                      };
+
+                      // Truncate name logic
+                      const displayName =
+                        otherParticipant?.name || otherParticipant?.email || "Utilisateur";
+                      const truncatedName =
+                        displayName.length > 20
+                          ? displayName.substring(0, 14) + "..."
+                          : displayName;
 
                       return (
                         <SidebarMenuItem key={chat.id}>
@@ -419,37 +514,68 @@ export function AdminSidebar() {
                             isActive={pathname === `/admin/messages`}
                             className="h-14"
                           >
-                            <Link
-                              href={`/admin/messages?chatId=${chat.id}`}
-                              className="flex items-center gap-3"
+                            <div
+                              onClick={(e) => {
+                                if (chat.id.startsWith("virtual-")) {
+                                  e.preventDefault();
+                                  const userId = chat.id.replace("virtual-", "");
+                                  handleStartConversation(userId);
+                                }
+                              }}
                             >
-                              <Avatar className="h-8 w-8 border border-border/50">
-                                <AvatarImage src={otherParticipant?.image || undefined} />
-                                <AvatarFallback>
-                                  {otherParticipant?.name?.slice(0, 2).toUpperCase() || "U"}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex flex-col overflow-hidden flex-1">
-                                <div className="flex items-center justify-between">
-                                  <span className="font-semibold text-sm truncate">
-                                    {otherParticipant?.name || "Utilisateur"}
-                                  </span>
-                                  {(isPinned || isMandatory) && (
-                                    <Pin
-                                      className={cn(
-                                        "h-3 w-3 transform rotate-45 ml-1 shrink-0",
-                                        isMandatory
-                                          ? "text-red-500 fill-red-500"
-                                          : "text-primary fill-primary"
+                              <Link
+                                href={
+                                  chat.id.startsWith("virtual-")
+                                    ? "#"
+                                    : `/admin/messages?chatId=${chat.id}`
+                                }
+                                className="flex items-center gap-3 w-full"
+                              >
+                                <Avatar className="h-8 w-8 border border-border/50">
+                                  <AvatarImage src={otherParticipant?.image || undefined} />
+                                  <AvatarFallback>
+                                    {otherParticipant?.name?.slice(0, 2).toUpperCase() || "U"}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col overflow-hidden flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 min-w-0">
+                                      <span
+                                        className="font-semibold text-sm truncate"
+                                        title={displayName}
+                                      >
+                                        {truncatedName}
+                                      </span>
+                                      {isMandatory && position && positionConfig[position] && (
+                                        <Badge
+                                          variant="outline"
+                                          className={cn(
+                                            "p-0 h-4 w-4 flex items-center justify-center shrink-0",
+                                            positionConfig[position].className
+                                          )}
+                                          title={positionConfig[position].label}
+                                        >
+                                          {positionConfig[position].icon}
+                                        </Badge>
                                       )}
-                                    />
-                                  )}
+                                    </div>
+                                    {(isPinned || isMandatory) && (
+                                      <Pin
+                                        className={cn(
+                                          "h-3 w-3 transform rotate-45 ml-1 shrink-0",
+                                          isMandatory
+                                            ? "text-red-500 fill-red-500"
+                                            : "text-primary fill-primary"
+                                        )}
+                                      />
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-muted-foreground truncate">
+                                    {lastMessage?.content || "Nouvelle conversation"}
+                                  </span>
                                 </div>
-                                <span className="text-xs text-muted-foreground truncate">
-                                  {lastMessage?.content || "Nouvelle conversation"}
-                                </span>
-                              </div>
-                            </Link>
+                              </Link>
+                            </div>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       );

@@ -362,6 +362,36 @@ export async function searchUsers(query: string) {
   return users;
 }
 
+export async function getMandatoryUsers() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const users = await prisma.user.findMany({
+    where: {
+      position: {
+        in: ["President", "Tresorier", "Secretaire"],
+      },
+      id: {
+        not: session.user.id, // Exclude self if I am one of them
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      position: true,
+    },
+  });
+
+  return users;
+}
+
 export async function createConversation(targetUserId: string) {
   const session = await auth.api.getSession({
     headers: await headers(),

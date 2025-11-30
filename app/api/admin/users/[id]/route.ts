@@ -39,6 +39,30 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
           { status: 400 }
         );
       }
+
+      // 3. Check if position is already taken
+      if (position) {
+        const existingHolder = await prisma.user.findFirst({
+          where: {
+            position: position,
+            id: { not: id },
+          },
+          select: { name: true, email: true },
+        });
+
+        if (existingHolder) {
+          return NextResponse.json(
+            {
+              error: `Cette position est déjà occupée par ${
+                existingHolder.name || existingHolder.email
+              }.`,
+              code: "POSITION_TAKEN",
+              holderName: existingHolder.name || existingHolder.email,
+            },
+            { status: 409 }
+          );
+        }
+      }
     }
 
     const updatedUser = await prisma.user.update({

@@ -1,36 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Ticket as TicketIcon, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { getAdminTickets } from "@/app/messaging";
 
-interface Ticket {
-  id: string;
-  ticketId: string;
-  subject: string | null;
-  guestName: string | null;
-  ticketStatus: string;
-  createdAt: Date;
-  lastMessageAt: Date;
-  messages: { content: string }[];
-}
+import { columns, Ticket } from "./columns";
+import { DataTable } from "./data-table";
 
 export function TicketList() {
-  const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -61,67 +38,8 @@ export function TicketList() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TicketIcon className="h-5 w-5" />
-          Tickets de Support
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {tickets.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">Aucun ticket en cours.</div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Statut</TableHead>
-                <TableHead>Sujet</TableHead>
-                <TableHead>Invité</TableHead>
-                <TableHead>Dernier message</TableHead>
-                <TableHead>Date de création</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tickets.map((ticket) => (
-                <TableRow key={ticket.id}>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={
-                        ticket.ticketStatus === "OPEN"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-200 hover:border-green-300 dark:hover:bg-green-900/50 transition-colors duration-200"
-                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200 dark:border-red-800 hover:bg-red-200 hover:border-red-300 dark:hover:bg-red-900/50 transition-colors duration-200"
-                      }
-                    >
-                      {ticket.ticketStatus === "OPEN" ? "Ouvert" : "Résolu"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-medium">{ticket.subject || "Sans sujet"}</TableCell>
-                  <TableCell>{ticket.guestName || "Anonyme"}</TableCell>
-                  <TableCell className="max-w-[200px] truncate text-muted-foreground">
-                    {ticket.messages[0]?.content || "-"}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(ticket.createdAt), "dd MMM yyyy HH:mm", { locale: fr })}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => router.push(`/admin/tickets/${ticket.id}`)}
-                    >
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Voir
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <DataTable columns={columns} data={tickets} />
+    </div>
   );
 }
