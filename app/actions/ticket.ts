@@ -6,38 +6,59 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { ConversationParticipant } from "@prisma/client";
 
-export async function createTicket(subject: string, name: string) {
-  if (!subject || !name) {
-    throw new Error("Subject and name are required");
+import { Resend } from "resend";
+import TicketConfirmationEmail from "@/components/emails/ticket-confirmation";
+
+export async function createTicket(subject: string, name: string, email: string) {
+  if (!subject || !name || !email) {
+    throw new Error("Subject, name, and email are required");
   }
 
-  // Create a Guest User
-  // We use a random email for the guest user since it's required by the schema
-  // In a real app, we might want to ask for an email or make it optional in schema
-  const guestEmail = `guest-${Date.now()}-${Math.random().toString(36).substring(7)}@ticket.local`;
-
-  const guestUser = await prisma.user.create({
-    data: {
-      email: guestEmail,
-      name: name,
-      role: "GUEST",
-      emailVerified: true, // Auto-verify guest
-    },
+  // 1. Check if user exists or create Guest User
+  let user = await prisma.user.findUnique({
+    where: { email },
   });
 
-  // 2. Create conversation
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: email,
+        name: name,
+        role: "GUEST",
+        emailVerified: false, // Email provided by user, not verified yet
+      },
+    });
+  }
+
+  // 2. Generate Ticket Reference
+  // Format: TICKET-{RANDOM}-{DATE_TIME}
+  const random = Math.floor(1000 + Math.random() * 9000); // 4 digit random
+  const dateStr = new Date()
+    .toISOString()
+    .replace(/[-:T.]/g, "")
+    .slice(0, 12); // YYYYMMDDHHMM
+  const reference = `TICKET-${random}-${dateStr}`;
+
+  // 3. Create conversation and ticket
   const conversation = await prisma.conversation.create({
     data: {
       participants: {
         create: {
-          userId: guestUser.id,
+          userId: user.id,
         },
       },
       ticket: {
         create: {
           subject,
           guestName: name,
+          guestEmail: email, // We might need to add this field to schema if we want to store it explicitly on ticket, but we have it on user.
+          // Wait, previous step added guestEmail to Ticket type in columns but not schema?
+          // Ah, schema has guestEmail field! I saw it in the file view earlier.
+          // Let me double check schema view from step 3169.
+          // Line 165: guestEmail String?
+          // Yes, it exists.
           status: "OPEN",
+          reference: reference,
         },
       },
     },
@@ -46,11 +67,36 @@ export async function createTicket(subject: string, name: string) {
     },
   });
 
+  // 4. Send Confirmation Email
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  if (process.env.RESEND_API_KEY) {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.bdefenelon.org";
+    const ticketLink = `${baseUrl}/?conversationId=${conversation.id}&guestId=${user.id}`;
+
+    try {
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+        to: email,
+        subject: `Confirmation de votre ticket ${reference}`,
+        react: TicketConfirmationEmail({
+          name: name,
+          subject: subject,
+          reference: reference,
+          ticketLink: ticketLink,
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to send ticket confirmation email:", error);
+      // Don't fail the request if email fails
+    }
+  }
+
   return {
     success: true,
     ticketId: conversation.ticket?.id,
     conversationId: conversation.id,
-    guestId: guestUser.id,
+    guestId: user.id,
+    reference: reference,
   };
 }
 

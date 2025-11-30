@@ -450,6 +450,11 @@ export async function getAdminTickets() {
 
   const tickets = await prisma.ticket.findMany({
     include: {
+      user: {
+        select: {
+          email: true,
+        },
+      },
       conversation: {
         include: {
           messages: {
@@ -468,6 +473,11 @@ export async function getAdminTickets() {
 
   type TicketWithConversation = Prisma.TicketGetPayload<{
     include: {
+      user: {
+        select: {
+          email: true;
+        };
+      };
       conversation: {
         include: {
           messages: true;
@@ -481,6 +491,8 @@ export async function getAdminTickets() {
     ticketId: t.id,
     subject: t.subject,
     guestName: t.guestName,
+    guestEmail: t.guestEmail,
+    userEmail: t.user?.email,
     ticketStatus: t.status,
     createdAt: t.createdAt,
     lastMessageAt: t.conversation.lastMessageAt,

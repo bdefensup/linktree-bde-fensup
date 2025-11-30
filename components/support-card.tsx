@@ -35,9 +35,14 @@ interface MessageWithSender {
   };
 }
 
+import { useSearchParams, useRouter } from "next/navigation";
+
+// ... imports
+
 export function SupportCard() {
   const [view, setView] = useState<ViewState>("IDLE");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -47,19 +52,42 @@ export function SupportCard() {
   const [ticketStatus, setTicketStatus] = useState<string | null>("OPEN");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Restore session from localStorage
-  useEffect(() => {
-    const savedConversationId = localStorage.getItem("bde_support_conversationId");
-    const savedGuestId = localStorage.getItem("bde_support_guestId");
-    const savedSubject = localStorage.getItem("bde_support_subject");
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-    if (savedConversationId && savedGuestId) {
-      setConversationId(savedConversationId);
-      setGuestId(savedGuestId);
-      if (savedSubject) setSubject(savedSubject);
+  // Restore session from localStorage or URL
+  useEffect(() => {
+    const urlConversationId = searchParams.get("conversationId");
+    const urlGuestId = searchParams.get("guestId");
+
+    if (urlConversationId && urlGuestId) {
+      // Restore from URL (Magic Link)
+      setConversationId(urlConversationId);
+      setGuestId(urlGuestId);
       setView("CHAT");
+
+      // Persist to localStorage
+      localStorage.setItem("bde_support_conversationId", urlConversationId);
+      localStorage.setItem("bde_support_guestId", urlGuestId);
+
+      // Clean URL
+      router.replace("/", { scroll: false });
+    } else {
+      // Restore from localStorage
+      const savedConversationId = localStorage.getItem("bde_support_conversationId");
+      const savedGuestId = localStorage.getItem("bde_support_guestId");
+      const savedSubject = localStorage.getItem("bde_support_subject");
+      const savedEmail = localStorage.getItem("bde_support_email");
+
+      if (savedConversationId && savedGuestId) {
+        setConversationId(savedConversationId);
+        setGuestId(savedGuestId);
+        if (savedSubject) setSubject(savedSubject);
+        if (savedEmail) setEmail(savedEmail);
+        setView("CHAT");
+      }
     }
-  }, []);
+  }, [searchParams, router]);
 
   // Polling for messages
   useEffect(() => {
@@ -95,11 +123,11 @@ export function SupportCard() {
 
   const handleStartChat = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !subject) return;
+    if (!name || !subject || !email) return;
 
     setLoading(true);
     try {
-      const result = await createTicket(subject, name);
+      const result = await createTicket(subject, name, email);
       if (result.success && result.conversationId && result.guestId) {
         setConversationId(result.conversationId);
         setGuestId(result.guestId);
@@ -108,6 +136,7 @@ export function SupportCard() {
         localStorage.setItem("bde_support_conversationId", result.conversationId);
         localStorage.setItem("bde_support_guestId", result.guestId);
         localStorage.setItem("bde_support_subject", subject);
+        localStorage.setItem("bde_support_email", email);
 
         setView("CHAT");
       } else {
@@ -256,6 +285,21 @@ export function SupportCard() {
                   placeholder="Jean Dupont"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
+                  className="h-8 text-base md:text-sm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-xs">
+                  Votre email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="jean.dupont@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="h-8 text-base md:text-sm"
                 />

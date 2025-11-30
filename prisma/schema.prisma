@@ -157,6 +157,7 @@ model Conversation {
 
 model Ticket {
   id             String       @id @default(cuid())
+  reference      String?      @unique
   subject        String
   status         TicketStatus @default(OPEN)
   priority       String       @default("NORMAL") // LOW, NORMAL, HIGH, URGENT

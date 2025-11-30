@@ -73,6 +73,11 @@ const items = [
     icon: Users,
   },
   {
+    title: "Adhérents",
+    url: "/admin/members",
+    icon: User,
+  },
+  {
     title: "Événements",
     url: "/admin/events",
     icon: Calendar,

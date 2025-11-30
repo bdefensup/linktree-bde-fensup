@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "BDE FENELON SUP PARIS",
-  description: "BDE FENELON - L'association des étudiants de l'FENELON SUP PARIS",
+  description: "BDE FENELON SUP PARIS",
 };
 
 export const viewport: Viewport = {

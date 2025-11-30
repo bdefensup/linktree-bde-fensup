@@ -58,8 +58,7 @@ export const columns: ColumnDef<Booking>[] = [
     header: ({ table }) => (
       <Checkbox
         checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
@@ -138,10 +137,7 @@ export const columns: ColumnDef<Booking>[] = [
       if (!phone) return <span className="text-muted-foreground">-</span>;
 
       return (
-        <a
-          href={`tel:${phone}`}
-          className="hover:underline hover:text-primary transition-colors"
-        >
+        <a href={`tel:${phone}`} className="hover:underline hover:text-primary transition-colors">
           {phone}
         </a>
       );
@@ -177,34 +173,26 @@ export const columns: ColumnDef<Booking>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0" suppressHydrationWarning={true}>
               <span className="sr-only">Ouvrir menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(booking.email)}
-            >
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(booking.email)}>
               Copier l&apos;email
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => updateStatus(booking.id, "CONFIRMED")}
-            >
+            <DropdownMenuItem onClick={() => updateStatus(booking.id, "CONFIRMED")}>
               <Check className="mr-2 h-4 w-4 text-green-500" />
               Valider
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => updateStatus(booking.id, "PENDING")}
-            >
+            <DropdownMenuItem onClick={() => updateStatus(booking.id, "PENDING")}>
               <Clock className="mr-2 h-4 w-4 text-orange-500" />
               Mettre en attente
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => updateStatus(booking.id, "CANCELLED")}
-            >
+            <DropdownMenuItem onClick={() => updateStatus(booking.id, "CANCELLED")}>
               <X className="mr-2 h-4 w-4 text-red-500" />
               Annuler / Refuser
             </DropdownMenuItem>

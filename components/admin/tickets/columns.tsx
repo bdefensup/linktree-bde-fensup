@@ -15,6 +15,8 @@ export type Ticket = {
   ticketId: string;
   subject: string | null;
   guestName: string | null;
+  guestEmail?: string | null;
+  userEmail?: string | null;
   ticketStatus: string;
   createdAt: Date;
   lastMessageAt: Date;
@@ -76,6 +78,14 @@ export const columns: ColumnDef<Ticket>[] = [
     cell: ({ row }) => {
       const name = row.getValue("guestName") as string;
       return <div>{name || "Anonyme"}</div>;
+    },
+  },
+  {
+    id: "email",
+    header: "Email",
+    cell: ({ row }) => {
+      const email = row.original.guestEmail || row.original.userEmail;
+      return <div className="text-muted-foreground">{email || "-"}</div>;
     },
   },
   {

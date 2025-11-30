@@ -1,13 +1,16 @@
 import { prisma } from "@/lib/prisma";
-import { StaffTableWrapper } from "./staff-table-wrapper";
+import { MembersTableWrapper } from "./members-table-wrapper";
 
 export const dynamic = "force-dynamic";
 
 async function getUsers() {
   const users = await prisma.user.findMany({
     where: {
-      role: {
-        in: ["admin", "staff"],
+      role: "adherent",
+      NOT: {
+        email: {
+          endsWith: "@ticket.local",
+        },
       },
     },
     orderBy: {
@@ -26,7 +29,7 @@ async function getUsers() {
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-export default async function AdminStaffPage() {
+export default async function AdminMembersPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -38,14 +41,18 @@ export default async function AdminStaffPage() {
     <div className="container mx-auto py-10 space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestion du Staff</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Gestion des Adhérents</h1>
           <p className="text-muted-foreground mt-2">
-            Gérez les membres, leurs rôles et les accès à la plateforme.
+            Consultez la liste des adhérents de l'association.
           </p>
         </div>
       </div>
 
-      <StaffTableWrapper data={users} userRole={userRole} currentUserEmail={session?.user?.email} />
+      <MembersTableWrapper
+        data={users}
+        userRole={userRole}
+        currentUserEmail={session?.user?.email}
+      />
     </div>
   );
 }
