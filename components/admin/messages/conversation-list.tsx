@@ -164,14 +164,19 @@ export function ConversationList() {
               Aucune conversation épinglée
             </div>
           ) : (
+            session?.user &&
             conversations
+              .filter((conversation) => {
+                const other = conversation.participants.find((p) => p.user.id !== session.user.id);
+                return !!other;
+              })
               .sort((a, b) => {
-                const otherA = a.participants.find((p) => p.user.id !== session?.user?.id)?.user;
-                const myA = a.participants.find((p) => p.user.id === session?.user?.id);
+                const otherA = a.participants.find((p) => p.user.id !== session.user.id)?.user;
+                const myA = a.participants.find((p) => p.user.id === session.user.id);
                 const isPinnedA = myA?.isPinned;
 
-                const otherB = b.participants.find((p) => p.user.id !== session?.user?.id)?.user;
-                const myB = b.participants.find((p) => p.user.id === session?.user?.id);
+                const otherB = b.participants.find((p) => p.user.id !== session.user.id)?.user;
+                const myB = b.participants.find((p) => p.user.id === session.user.id);
                 const isPinnedB = myB?.isPinned;
 
                 // Strict priority map
@@ -198,11 +203,11 @@ export function ConversationList() {
               })
               .map((conversation) => {
                 const otherParticipant = conversation.participants.find(
-                  (p) => p.user.id !== session?.user?.id
+                  (p) => p.user.id !== session.user.id
                 )?.user;
 
                 const myParticipant = conversation.participants.find(
-                  (p) => p.user.id === session?.user?.id
+                  (p) => p.user.id === session.user.id
                 );
 
                 const isPinned = myParticipant?.isPinned;
@@ -315,7 +320,7 @@ export function ConversationList() {
                         <p className="text-xs text-muted-foreground truncate flex-1">
                           {lastMessage ? (
                             <>
-                              {lastMessage.senderId === session?.user?.id && "Vous: "}
+                              {lastMessage.senderId === session.user.id && "Vous: "}
                               {lastMessage.content}
                             </>
                           ) : (

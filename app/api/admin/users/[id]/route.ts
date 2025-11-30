@@ -121,7 +121,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     // Fetch target user to check their role
     const targetUser = await prisma.user.findUnique({
       where: { id },
-      select: { role: true },
+      select: { role: true, email: true },
     });
 
     if (!targetUser) {
@@ -138,6 +138,35 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
       );
     }
 
+    // 1. Delete all Tickets and associated Conversations owned by the user
+    const userTickets = await prisma.ticket.findMany({
+      where: { userId: id },
+      select: { conversationId: true },
+    });
+
+    const conversationIds = userTickets.map((t) => t.conversationId);
+
+    if (conversationIds.length > 0) {
+      // Deleting the conversation will cascade delete the Ticket (via Ticket.conversationId relation)
+      // and all Messages/Participants in that conversation.
+      await prisma.conversation.deleteMany({
+        where: { id: { in: conversationIds } },
+      });
+    }
+
+    // 2. Delete all Bookings associated with the user's email
+    if (targetUser.email) {
+      await prisma.booking.deleteMany({
+        where: { email: targetUser.email },
+      });
+    }
+
+    // 3. Delete the User
+    // This will cascade delete:
+    // - Messages sent by user (in other conversations)
+    // - ConversationParticipant records (removing them from other conversations)
+    // - Sessions
+    // - Accounts
     await prisma.user.delete({
       where: { id },
     });
