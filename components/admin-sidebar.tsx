@@ -16,6 +16,8 @@ import {
   Crown,
   Landmark,
   PenLine,
+  Mail,
+  MessageCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { usePathname, useRouter } from "next/navigation";
@@ -425,6 +427,24 @@ export function AdminSidebar() {
               </SidebarGroupAction>
             </SidebarGroupLabel>
             <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === "/admin/campaigns"}>
+                    <Link href="/admin/campaigns">
+                      <Mail className="h-4 w-4" />
+                      <span>Campagnes</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname === "/admin/messages"}>
+                    <Link href="/admin/messages">
+                      <MessageCircle className="h-4 w-4" />
+                      <span>Messagerie</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
               <ScrollArea className="h-[280px]">
                 <SidebarMenu>
                   {/* Conversations List */}
