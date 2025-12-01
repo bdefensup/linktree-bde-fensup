@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { updateTemplate } from "@/app/admin/campaigns/actions";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface EmailTemplate {
   id: string;
   name: string;
   subject: string;
-  content: any; // JSON
+  content: unknown; // JSON
   updatedAt: Date;
 }
 
@@ -74,21 +75,31 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between bg-background/95 backdrop-blur">
+      <div className="p-6 border-b flex items-center justify-between bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full">
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h2 className="text-lg font-semibold">Éditeur de template</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-xl font-bold tracking-tight">Éditeur de template</h2>
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <span
+                className={cn(
+                  "h-2 w-2 rounded-full",
+                  hasChanges ? "bg-yellow-500" : "bg-green-500"
+                )}
+              />
               {hasChanges ? "Modifications non enregistrées" : "À jour"}
             </p>
           </div>
         </div>
-        <Button onClick={handleSave} disabled={isSaving || !hasChanges}>
+        <Button
+          onClick={handleSave}
+          disabled={isSaving || !hasChanges}
+          className="min-w-[140px] shadow-sm"
+        >
           {isSaving ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -103,12 +114,14 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
         </Button>
       </div>
 
-      {/* Editor Form */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="grid gap-4">
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-5xl mx-auto p-8 space-y-8">
+          <div className="grid gap-6 p-6 border rounded-xl bg-card shadow-sm">
             <div className="grid gap-2">
-              <Label htmlFor="name">Nom du template</Label>
+              <Label htmlFor="name" className="text-base font-semibold">
+                Nom du template
+              </Label>
               <Input
                 id="name"
                 value={name}
@@ -117,10 +130,17 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
                   setHasChanges(true);
                 }}
                 placeholder="Ex: Newsletter Mensuelle"
+                className="h-11 text-lg"
               />
+              <p className="text-sm text-muted-foreground">
+                Le nom interne de votre template, visible uniquement par vous.
+              </p>
             </div>
+
             <div className="grid gap-2">
-              <Label htmlFor="subject">Objet de l'e-mail</Label>
+              <Label htmlFor="subject" className="text-base font-semibold">
+                Objet de l'email
+              </Label>
               <Input
                 id="subject"
                 value={subject}
@@ -128,21 +148,28 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
                   setSubject(e.target.value);
                   setHasChanges(true);
                 }}
-                placeholder="Ex: Les dernières nouvelles du BDE"
+                placeholder="Ex: Découvrez nos nouveautés !"
+                className="h-11 text-lg"
               />
+              <p className="text-sm text-muted-foreground">
+                L'objet qui s'affichera dans la boîte de réception de vos destinataires.
+              </p>
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label>Contenu</Label>
-            <RichTextEditor
-              value={content as string}
-              onChange={(val) => {
-                setContent(val);
-                setHasChanges(true);
-              }}
-              className="min-h-[400px]"
-            />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <Label className="text-base font-semibold">Contenu de l'email</Label>
+            </div>
+            <div className="border rounded-xl overflow-hidden shadow-sm bg-card min-h-[500px]">
+              <RichTextEditor
+                value={content}
+                onChange={(newContent) => {
+                  setContent(newContent);
+                  setHasChanges(true);
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -1,7 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Folder, Plus, MoreVertical, Pencil, Trash2, FolderOpen, Star } from "lucide-react";
+import {
+  Folder,
+  Plus,
+  MoreVertical,
+  Pencil,
+  Trash2,
+  FolderOpen,
+  Calendar,
+  Users,
+  ChevronRight,
+  Download,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -130,106 +141,186 @@ export function CampaignsSidebar({ selectedFolderId, onSelectFolder }: Campaigns
   };
 
   return (
-    <div className="w-64 border-r bg-muted/10 flex flex-col h-full">
-      <div className="p-4 border-b">
-        <Button className="w-full justify-start gap-2" onClick={() => setIsCreateOpen(true)}>
+    <div className="w-64 border-r bg-[#1C1C1E] text-sidebar-foreground flex flex-col h-full font-sans text-sm">
+      {/* Top Section */}
+      <div className="p-3 space-y-1">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+          onClick={() => setIsCreateOpen(true)}
+        >
           <Plus className="h-4 w-4" />
           Nouveau dossier
         </Button>
+        <Button
+          variant={selectedFolderId === null ? "secondary" : "ghost"}
+          className={cn(
+            "w-full justify-start gap-2",
+            selectedFolderId === null
+              ? "bg-white/10 text-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+          )}
+          onClick={() => onSelectFolder(null)}
+        >
+          <FolderOpen className="h-4 w-4" />
+          Tous les templates
+        </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4">
-        <div className="px-3 mb-2">
-          <h3 className="text-xs font-medium text-muted-foreground px-2 mb-2">Favoris</h3>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-6">
+        {/* Calendrier */}
+        <div>
           <Button
             variant="ghost"
-            className={cn(
-              "w-full justify-start gap-2 mb-1",
-              selectedFolderId === null && "bg-accent text-accent-foreground"
-            )}
-            onClick={() => onSelectFolder(null)}
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-white/5"
           >
-            <FolderOpen className="h-4 w-4" />
-            Tous les templates
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-2 mb-1 opacity-50 cursor-not-allowed"
-            disabled
-          >
-            <Star className="h-4 w-4" />
-            Favoris (Bientôt)
+            <Calendar className="h-4 w-4" />
+            Calendrier
           </Button>
         </div>
 
-        <div className="px-3 mt-6">
-          <h3 className="text-xs font-medium text-muted-foreground px-2 mb-2">Dossiers</h3>
-          {folders.map((folder) => (
-            <div
-              key={folder.id}
-              className={cn(
-                "group flex items-center justify-between rounded-md px-2 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors mb-1",
-                selectedFolderId === folder.id && "bg-accent text-accent-foreground"
-              )}
+        {/* Partagé avec moi */}
+        <div>
+          <h3 className="px-2 mb-1 text-xs font-medium text-muted-foreground/70 flex items-center gap-2">
+            <Users className="h-3 w-3" />
+            Partagé avec moi
+          </h3>
+        </div>
+
+        {/* Favoris */}
+        <div>
+          <h3 className="px-2 mb-1 text-xs font-medium text-muted-foreground/70">Favoris</h3>
+          <p className="px-2 text-xs text-muted-foreground/50 italic">
+            Star Docs pour les garder près de vous
+          </p>
+        </div>
+
+        {/* Dossiers */}
+        <div>
+          <div className="flex items-center justify-between px-2 mb-1 group">
+            <h3 className="text-xs font-medium text-muted-foreground/70">Dossiers</h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => setIsCreateOpen(true)}
             >
-              <button
-                className="flex items-center gap-2 flex-1 text-left truncate"
+              <Plus className="h-3 w-3" />
+            </Button>
+          </div>
+          <div className="space-y-0.5">
+            {folders.map((folder) => (
+              <div
+                key={folder.id}
+                className={cn(
+                  "group flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors cursor-pointer",
+                  selectedFolderId === folder.id
+                    ? "bg-white/10 text-foreground"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                )}
                 onClick={() => onSelectFolder(folder.id)}
               >
-                <Folder className="h-4 w-4 shrink-0" />
-                <span className="truncate">{folder.name}</span>
+                <div className="flex items-center gap-2 flex-1 overflow-hidden">
+                  <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />
+                  <Folder className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{folder.name}</span>
+                </div>
                 {folder._count.templates > 0 && (
-                  <span className="ml-auto text-xs text-muted-foreground">
+                  <span className="text-[10px] text-muted-foreground/50 ml-2">
                     {folder._count.templates}
                   </span>
                 )}
-              </button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:bg-white/10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreVertical className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-40 bg-[#1C1C1E] border-white/10 text-muted-foreground"
                   >
-                    <MoreVertical className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => openRenameDialog(folder)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Renommer
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => openDeleteDialog(folder)}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Supprimer
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ))}
+                    <DropdownMenuItem
+                      onClick={() => openRenameDialog(folder)}
+                      className="hover:bg-white/10 hover:text-foreground focus:bg-white/10 focus:text-foreground"
+                    >
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Renommer
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => openDeleteDialog(folder)}
+                      className="text-red-500 focus:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Supprimer
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Tags */}
+        <div>
+          <h3 className="px-2 mb-1 text-xs font-medium text-muted-foreground/70">Tags</h3>
+        </div>
+      </div>
+
+      {/* Bottom Actions */}
+      <div className="p-3 border-t border-white/5 flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/5"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/5"
+        >
+          <Download className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Create Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] bg-[#1C1C1E] border-white/10 text-foreground">
           <DialogHeader>
             <DialogTitle>Nouveau dossier</DialogTitle>
-            <DialogDescription>Créez un dossier pour organiser vos templates.</DialogDescription>
+            <DialogDescription className="text-muted-foreground">
+              Créez un dossier pour organiser vos templates.
+            </DialogDescription>
           </DialogHeader>
-          <Input
-            placeholder="Nom du dossier"
-            value={folderName}
-            onChange={(e) => setFolderName(e.target.value)}
-          />
+          <div className="grid gap-4 py-4">
+            <Input
+              placeholder="Nom du dossier"
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+              className="col-span-3 bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-white/20"
+            />
+          </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateOpen(false)}
+              className="bg-transparent border-white/10 text-foreground hover:bg-white/5 hover:text-foreground"
+            >
               Annuler
             </Button>
-            <Button onClick={handleCreateFolder} disabled={isLoading}>
+            <Button
+              onClick={handleCreateFolder}
+              disabled={isLoading}
+              className="bg-white text-black hover:bg-white/90"
+            >
               {isLoading ? "Création..." : "Créer"}
             </Button>
           </DialogFooter>
@@ -238,20 +329,31 @@ export function CampaignsSidebar({ selectedFolderId, onSelectFolder }: Campaigns
 
       {/* Rename Dialog */}
       <Dialog open={isRenameOpen} onOpenChange={setIsRenameOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] bg-[#1C1C1E] border-white/10 text-foreground">
           <DialogHeader>
             <DialogTitle>Renommer le dossier</DialogTitle>
           </DialogHeader>
-          <Input
-            placeholder="Nom du dossier"
-            value={folderName}
-            onChange={(e) => setFolderName(e.target.value)}
-          />
+          <div className="grid gap-4 py-4">
+            <Input
+              placeholder="Nom du dossier"
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+              className="col-span-3 bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-white/20"
+            />
+          </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRenameOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsRenameOpen(false)}
+              className="bg-transparent border-white/10 text-foreground hover:bg-white/5 hover:text-foreground"
+            >
               Annuler
             </Button>
-            <Button onClick={handleRenameFolder} disabled={isLoading}>
+            <Button
+              onClick={handleRenameFolder}
+              disabled={isLoading}
+              className="bg-white text-black hover:bg-white/90"
+            >
               {isLoading ? "Enregistrement..." : "Enregistrer"}
             </Button>
           </DialogFooter>
@@ -260,16 +362,20 @@ export function CampaignsSidebar({ selectedFolderId, onSelectFolder }: Campaigns
 
       {/* Delete Dialog */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] bg-[#1C1C1E] border-white/10 text-foreground">
           <DialogHeader>
             <DialogTitle>Supprimer le dossier</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-muted-foreground">
               Êtes-vous sûr de vouloir supprimer ce dossier ? Les templates à l'intérieur ne seront
               pas supprimés mais déplacés vers "Tous les templates".
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteOpen(false)}
+              className="bg-transparent border-white/10 text-foreground hover:bg-white/5 hover:text-foreground"
+            >
               Annuler
             </Button>
             <Button variant="destructive" onClick={handleDeleteFolder} disabled={isLoading}>
