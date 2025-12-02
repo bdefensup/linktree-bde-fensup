@@ -24,15 +24,16 @@ import {
   AlignRight,
   AlignJustify,
   Underline as UnderlineIcon,
-  Pen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button/blockquote-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button/code-block-button";
 import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover/color-text-popover";
+import { CopyAnchorLinkButton } from "@/components/tiptap-ui/copy-anchor-link-button/copy-anchor-link-button";
 import Highlight from "@tiptap/extension-highlight";
 import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
+import { GiPencilBrush } from "react-icons/gi";
 
 interface RichTextEditorProps {
   value: string;
@@ -128,8 +129,9 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
       <BlockquoteButton editor={editor} />
       <div className="w-px h-6 bg-border mx-1" />
       <ColorTextPopover editor={editor} className="w-8 h-8 p-0">
-        <Pen className="h-4 w-4" />
+        <GiPencilBrush className="h-4 w-4" />
       </ColorTextPopover>
+      <CopyAnchorLinkButton editor={editor} />
 
       <div className="w-px h-6 bg-border mx-1" />
 

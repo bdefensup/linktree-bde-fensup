@@ -1,135 +1,20 @@
-@import '../styles/_variables.scss';
-@import '../styles/_keyframe-animations.scss';
-
 @import "tailwindcss";
-@import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* --- 1. Plugins (Chargés directement ici en v4) --- */
+@plugin "@tailwindcss/typography";
+@plugin "tailwindcss-animate";
 
-:root {
-  /* --- Brand Palette --- */
-  --color-brand-orange: #f47231;
-  --color-brand-blue: #292758;
-  --color-brand-green: #2a9d8f;
-  --color-brand-yellow: #e9c46a;
-
-  /* --- Light Mode --- */
-  --background: #ffffff;
-  --foreground: #292758; /* Deep Blue text for high contrast */
-
-  /* Primary: Main Call-to-Action (Orange) */
-  --primary: #f47231;
-  --primary-foreground: #ffffff;
-
-  /* Secondary: Alternative actions (Deep Blue) */
-  --secondary: #292758;
-  --secondary-foreground: #ffffff;
-
-  /* Accent: Highlights & Interactive elements (Persian Green) */
-  --accent: #2a9d8f;
-  --accent-foreground: #ffffff;
-
-  /* Neutral: Warm accents (Sandy Brown) */
-  --neutral: #e9c46a;
-  --neutral-foreground: #292758;
-
-  /* UI Elements */
-  --muted: #f1f5f9; /* Slate 100 - Cool gray to complement blue */
-  --muted-foreground: #64748b; /* Slate 500 */
-
-  --card: #ffffff;
-  --card-foreground: #292758;
-
-  --popover: #ffffff;
-  --popover-foreground: #292758;
-
-  --border: #e2e8f0; /* Slate 200 */
-  --input: #e2e8f0;
-
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-
-  --ring: #f47231; /* Focus ring matches primary */
-  --radius: 0.625rem;
-
-  /* Charts */
-  --chart-1: #f47231; /* Orange */
-  --chart-2: #2a9d8f; /* Green */
-  --chart-3: #292758; /* Blue */
-  --chart-4: #e9c46a; /* Yellow */
-  --chart-5: #e76e50; /* Burnt Orange */
-
-  /* Sidebar */
-  --sidebar: #f8fafc;
-  --sidebar-foreground: #292758;
-  --sidebar-primary: #f47231;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e2e8f0;
-  --sidebar-accent-foreground: #292758;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #f47231;
-}
-
-.dark {
-  /* --- Dark Mode --- */
-  --background: #0f172a; /* Dark Slate */
-  --foreground: #f8fafc; /* Off-white text */
-
-  /* Primary: Orange pops well on dark */
-  --primary: #f47231;
-  --primary-foreground: #ffffff;
-
-  /* Secondary: Lighter Blue for visibility */
-  --secondary: #818cf8;
-  --secondary-foreground: #0f172a;
-
-  /* Accent: Brighter Green */
-  --accent: #2dd4bf;
-  --accent-foreground: #0f172a;
-
-  /* Neutral: Brighter Yellow/Orange */
-  --neutral: #fbbf24;
-  --neutral-foreground: #0f172a;
-
-  /* UI Elements */
-  --muted: #1e293b; /* Slate 800 */
-  --muted-foreground: #94a3b8; /* Slate 400 */
-
-  --card: #1e293b; /* Slightly lighter than bg */
-  --card-foreground: #f8fafc;
-
-  --popover: #0f172a;
-  --popover-foreground: #f8fafc;
-
-  --border: #334155; /* Slate 700 */
-  --input: #334155;
-
-  --destructive: #f87171;
-  --destructive-foreground: #0f172a;
-
-  --ring: #f47231;
-
-  /* Charts */
-  --chart-1: #f47231;
-  --chart-2: #2dd4bf;
-  --chart-3: #818cf8;
-  --chart-4: #fbbf24;
-  --chart-5: #e76e50;
-
-  /* Sidebar */
-  --sidebar: #020617;
-  --sidebar-foreground: #f8fafc;
-  --sidebar-primary: #f47231;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1e293b;
-  --sidebar-accent-foreground: #f8fafc;
-  --sidebar-border: #1e293b;
-  --sidebar-ring: #f47231;
-}
-
-@theme inline {
+/* --- 2. Configuration du Thème (Remplace tailwind.config.ts) --- */
+@theme {
+  /* On mappe les classes Tailwind (ex: bg-primary) vers nos variables CSS */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -137,20 +22,11 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
 
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-
-  --color-neutral: var(--neutral);
-  --color-neutral-foreground: var(--neutral-foreground);
-
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
 
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -174,19 +50,141 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Animation (hérité de tailwindcss-animate) */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
 }
 
-body {
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+/* --- 3. Définition du Mode Sombre (Standard v4) --- */
+@custom-variant dark (&:is(.dark *));
+
+/* --- 4. Vos Variables (La Palette Brand) --- */
+:root {
+  /* Brand Palette (Pour référence ou usage direct) */
+  --color-brand-orange: #f47231;
+  --color-brand-blue: #292758;
+  --color-brand-green: #2a9d8f;
+  --color-brand-yellow: #e9c46a;
+
+  /* LIGHT MODE */
+  --background: #ffffff;
+  --foreground: #292758; /* Deep Blue text */
+
+  --card: #ffffff;
+  --card-foreground: #292758;
+
+  --popover: #ffffff;
+  --popover-foreground: #292758;
+
+  --primary: #f47231; /* Orange */
+  --primary-foreground: #ffffff;
+
+  --secondary: #292758; /* Deep Blue */
+  --secondary-foreground: #ffffff;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  --accent: #2a9d8f; /* Persian Green */
+  --accent-foreground: #ffffff;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #f47231;
+
+  --radius: 0.625rem;
+
+  /* Charts */
+  --chart-1: #f47231;
+  --chart-2: #2a9d8f;
+  --chart-3: #292758;
+  --chart-4: #e9c46a;
+  --chart-5: #e76e50;
+
+  /* Sidebar */
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #292758;
+  --sidebar-primary: #f47231;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2e8f0;
+  --sidebar-accent-foreground: #292758;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #f47231;
 }
 
+.dark {
+  /* DARK MODE */
+  --background: #0f172a; /* Dark Slate */
+  --foreground: #f8fafc;
+
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+
+  --primary: #f47231; /* Orange pops well on dark */
+  --primary-foreground: #ffffff;
+
+  --secondary: #818cf8; /* Lighter Blue */
+  --secondary-foreground: #0f172a;
+
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+
+  --accent: #2dd4bf; /* Brighter Green */
+  --accent-foreground: #0f172a;
+
+  --destructive: #f87171;
+  --destructive-foreground: #0f172a;
+
+  --border: #334155;
+  --input: #334155;
+  --ring: #f47231;
+
+  /* Charts */
+  --chart-1: #f47231;
+  --chart-2: #2dd4bf;
+  --chart-3: #818cf8;
+  --chart-4: #fbbf24;
+  --chart-5: #e76e50;
+
+  /* Sidebar */
+  --sidebar: #020617;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #f47231;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #f47231;
+}
+
+/* --- 5. Base Styles --- */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -194,4 +192,50 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* --- 6. TIPTAP EDITOR SPECIFICS --- */
+
+/* Enlever la bordure bleue au clic */
+.ProseMirror {
+  outline: none;
+  min-height: 150px;
+}
+
+/* Placeholder (Text gris "Tapez ici...") */
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--muted-foreground);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Gestion correcte des images */
+.ProseMirror img {
+  border-radius: var(--radius);
+  max-width: 100%;
+  height: auto;
+}
+.ProseMirror-selectednode {
+  @apply ring-primary ring-2 ring-offset-2;
+}
+
+/* Listes de tâches (Checklists) - Crucial pour Tiptap */
+ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+ul[data-type="taskList"] li > label {
+  margin-right: 0.2rem;
+  user-select: none;
+}
+ul[data-type="taskList"] li > div {
+  flex: 1;
 }

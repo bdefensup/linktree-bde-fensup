@@ -126,12 +126,14 @@ interface SearchResult {
   email: string;
   image: string | null;
   role: string;
+  position: string | null;
 }
 
 export function AdminSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
+  const [isMounted, setIsMounted] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
@@ -215,7 +217,7 @@ export function AdminSidebar() {
         // Merge mandatory users who don't have a conversation yet
         const mergedConversations = [...conversations];
 
-        mandatoryUsers.forEach((user) => {
+        mandatoryUsers.forEach((user: SearchResult) => {
           const hasConversation = conversations.some((c) =>
             c.participants.some((p) => p.userId === user.id)
           );
@@ -268,7 +270,6 @@ export function AdminSidebar() {
     }, 3000);
 
     // Realtime subscription for pinned status changes
-    // Realtime subscription for pinned status changes
     const channel = supabase
       .channel("admin_sidebar_pins")
       .on(
@@ -277,7 +278,6 @@ export function AdminSidebar() {
           event: "*",
           schema: "public",
           table: "conversation_participant",
-          // filter: session?.user?.id ? `"userId"=eq.${session.user.id}` : undefined,
         },
         (_payload) => {
           fetchConversations();
@@ -311,6 +311,10 @@ export function AdminSidebar() {
     });
   };
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <>
       <Sidebar>
@@ -324,7 +328,7 @@ export function AdminSidebar() {
                     size="lg"
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16"
                   >
-                    {session?.user ? (
+                    {isMounted && session?.user ? (
                       <>
                         <Avatar className="h-12 w-12 rounded-lg">
                           <AvatarImage
