@@ -12,6 +12,8 @@ import {
   Users,
   ChevronRight,
   Download,
+  Settings,
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,9 +51,14 @@ interface TemplateFolder {
 interface CampaignsSidebarProps {
   selectedFolderId: string | null;
   onSelectFolder: (folderId: string | null) => void;
+  onCreateTemplate: () => void;
 }
 
-export function CampaignsSidebar({ selectedFolderId, onSelectFolder }: CampaignsSidebarProps) {
+export function CampaignsSidebar({
+  selectedFolderId,
+  onSelectFolder,
+  onCreateTemplate,
+}: CampaignsSidebarProps) {
   const [folders, setFolders] = useState<TemplateFolder[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
@@ -141,15 +148,23 @@ export function CampaignsSidebar({ selectedFolderId, onSelectFolder }: Campaigns
   };
 
   return (
-    <div className="w-64 border-r bg-[#1C1C1E] text-sidebar-foreground flex flex-col h-full font-sans text-sm">
+    <div className="w-64 shrink-0 m-4 rounded-2xl border bg-[#1B1B1B]/70 backdrop-blur-2xl supports-backdrop-filter:bg-[#1B1B1B]/50 text-sidebar-foreground flex flex-col h-[calc(100%-2rem)] font-sans text-sm shadow-2xl ring-1 ring-white/10 p-4">
       {/* Top Section */}
       <div className="p-3 space-y-1">
+        <Button
+          className="w-full justify-start gap-2 bg-white text-black hover:bg-white/90 mb-4 shadow-lg shadow-white/5"
+          onClick={onCreateTemplate}
+        >
+          <Plus className="h-4 w-4" />
+          Nouveau template
+        </Button>
+
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
           onClick={() => setIsCreateOpen(true)}
         >
-          <Plus className="h-4 w-4" />
+          <Folder className="h-4 w-4" />
           Nouveau dossier
         </Button>
         <Button
@@ -274,20 +289,77 @@ export function CampaignsSidebar({ selectedFolderId, onSelectFolder }: Campaigns
       </div>
 
       {/* Bottom Actions */}
-      <div className="p-3 border-t border-white/5 flex items-center gap-1">
+      {/* Bottom Actions */}
+      <div className="p-3 border-t border-white/5 flex items-center gap-1 mt-auto">
+        <Button
+          variant={selectedFolderId === "trash" ? "secondary" : "ghost"}
+          size="icon"
+          className={cn(
+            "h-8 w-8",
+            selectedFolderId === "trash"
+              ? "bg-white/10 text-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+          )}
+          onClick={() => onSelectFolder("trash")}
+          title="Corbeille"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+        <div className="relative">
+          <input
+            type="file"
+            accept=".md"
+            className="hidden"
+            id="import-template"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              const text = await file.text();
+              const name = file.name.replace(".md", "");
+
+              try {
+                // We'll use a server action that we need to import
+                // For now, let's assume it's passed as a prop or imported
+                // But since this is a client component, we can import the server action directly
+                const { importTemplate } = await import("@/app/admin/campaigns/actions");
+                await importTemplate(
+                  name,
+                  text,
+                  selectedFolderId === "trash" ? null : selectedFolderId
+                );
+                // Reset input
+                e.target.value = "";
+              } catch (error) {
+                console.error("Failed to import template:", error);
+              }
+            }}
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/5"
+            onClick={() => document.getElementById("import-template")?.click()}
+            title="Importer un template (.md)"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        </div>
         <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/5"
+          title="Paramètres"
         >
-          <Trash2 className="h-4 w-4" />
+          <Settings className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/5"
+          title="Aide"
         >
-          <Download className="h-4 w-4" />
+          <HelpCircle className="h-4 w-4" />
         </Button>
       </div>
 

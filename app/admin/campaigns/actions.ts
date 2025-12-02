@@ -115,13 +115,39 @@ export async function getTemplates(folderId?: string | null) {
     throw new Error("Unauthorized");
   }
 
+  const where: Prisma.EmailTemplateWhereInput = {
+    userId: session.user.id,
+    deletedAt: null,
+  };
+
+  if (folderId) {
+    where.folderId = folderId;
+  }
+
+  return await prisma.emailTemplate.findMany({
+    where,
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+}
+
+export async function getDeletedTemplates() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
   return await prisma.emailTemplate.findMany({
     where: {
       userId: session.user.id,
-      folderId: folderId || null,
+      deletedAt: { not: null },
     },
     orderBy: {
-      updatedAt: "desc",
+      deletedAt: "desc",
     },
   });
 }
@@ -140,6 +166,29 @@ export async function createTemplate(name: string, folderId?: string | null) {
       name,
       subject: "Nouvel e-mail",
       content: {}, // Empty JSON content
+      userId: session.user.id,
+      folderId: folderId || null,
+    },
+  });
+
+  revalidatePath("/admin/campaigns");
+  return template;
+}
+
+export async function importTemplate(name: string, content: string, folderId?: string | null) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const template = await prisma.emailTemplate.create({
+    data: {
+      name,
+      subject: name,
+      content: content, // Store MD content directly or convert to JSON structure if needed
       userId: session.user.id,
       folderId: folderId || null,
     },
@@ -185,6 +234,58 @@ export async function updateTemplate(
 }
 
 export async function deleteTemplate(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify ownership
+  const existing = await prisma.emailTemplate.findUnique({
+    where: { id },
+  });
+
+  if (!existing || existing.userId !== session.user.id) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.emailTemplate.update({
+    where: { id },
+    data: { deletedAt: new Date() },
+  });
+
+  revalidatePath("/admin/campaigns");
+}
+
+export async function restoreTemplate(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify ownership
+  const existing = await prisma.emailTemplate.findUnique({
+    where: { id },
+  });
+
+  if (!existing || existing.userId !== session.user.id) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.emailTemplate.update({
+    where: { id },
+    data: { deletedAt: null },
+  });
+
+  revalidatePath("/admin/campaigns");
+}
+
+export async function permanentDeleteTemplate(id: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });

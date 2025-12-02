@@ -1,8 +1,6 @@
 
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -248,6 +246,7 @@ model EmailTemplate {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   @@map("email_template")
   @@index([userId])

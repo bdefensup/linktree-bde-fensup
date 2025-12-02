@@ -9,13 +9,34 @@ interface EmailTemplate {
   id: string;
   name: string;
   subject: string;
+
   content: unknown;
   updatedAt: Date;
 }
 
+import { createTemplate } from "@/app/admin/campaigns/actions";
+import { toast } from "sonner";
+
+// ...
+
 export default function CampaignsPage() {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
+
+  const handleCreateTemplate = async () => {
+    const name = "Nouveau template";
+    try {
+      const newTemplate = await createTemplate(
+        name,
+        selectedFolderId === "trash" ? null : selectedFolderId
+      );
+      setSelectedTemplate(newTemplate as EmailTemplate);
+      toast.success("Template créé");
+    } catch (error) {
+      console.error("Failed to create template:", error);
+      toast.error("Erreur lors de la création du template");
+    }
+  };
 
   if (selectedTemplate) {
     return (
@@ -28,8 +49,12 @@ export default function CampaignsPage() {
   }
 
   return (
-    <div className="flex h-full">
-      <CampaignsSidebar selectedFolderId={selectedFolderId} onSelectFolder={setSelectedFolderId} />
+    <div className="flex h-full bg-black">
+      <CampaignsSidebar
+        selectedFolderId={selectedFolderId}
+        onSelectFolder={setSelectedFolderId}
+        onCreateTemplate={handleCreateTemplate}
+      />
       <TemplateList
         selectedFolderId={selectedFolderId}
         onSelectTemplate={(template) => setSelectedTemplate(template as EmailTemplate)}

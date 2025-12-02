@@ -192,6 +192,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         types: ["heading", "paragraph"],
       }),
     ],
+    immediatelyRender: false,
     content: value,
     editorProps: {
       attributes: {

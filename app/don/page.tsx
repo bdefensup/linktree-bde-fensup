@@ -108,7 +108,7 @@ function DonationForm() {
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-3xl mx-auto px-4 py-12 relative z-10 w-full flex-grow">
+      <div className="max-w-3xl mx-auto px-4 py-12 relative z-10 w-full grow">
         {/* Back Button */}
         <div className="mb-8">
           <Button
@@ -132,7 +132,7 @@ function DonationForm() {
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-primary/10 mb-4 animate-pulse">
             <Heart className="w-8 h-8 text-primary fill-primary" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-primary via-accent to-secondary">
             Soutenir le BDE FEN'SUP
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
