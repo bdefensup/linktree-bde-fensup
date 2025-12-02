@@ -25,6 +25,19 @@ export async function getFolders() {
       createdAt: "desc",
     },
     include: {
+      templates: {
+        where: {
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          name: true,
+          updatedAt: true,
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+      },
       _count: {
         select: { templates: true },
       },
@@ -308,4 +321,31 @@ export async function permanentDeleteTemplate(id: string) {
   });
 
   revalidatePath("/admin/campaigns");
+}
+
+export async function moveTemplate(templateId: string, folderId: string | null) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Verify ownership
+  const existing = await prisma.emailTemplate.findUnique({
+    where: { id: templateId },
+  });
+
+  if (!existing || existing.userId !== session.user.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const template = await prisma.emailTemplate.update({
+    where: { id: templateId },
+    data: { folderId },
+  });
+
+  revalidatePath("/admin/campaigns");
+  return template;
 }

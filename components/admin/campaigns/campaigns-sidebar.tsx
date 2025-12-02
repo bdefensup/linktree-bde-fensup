@@ -31,6 +31,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import {
   createFolder,
@@ -39,10 +45,16 @@ import {
   updateFolder,
 } from "@/app/admin/campaigns/actions";
 import { toast } from "sonner";
+import { useDroppable } from "@dnd-kit/core";
 
 interface TemplateFolder {
   id: string;
   name: string;
+  templates: {
+    id: string;
+    name: string;
+    updatedAt: Date;
+  }[];
   _count: {
     templates: number;
   };
@@ -51,15 +63,41 @@ interface TemplateFolder {
 interface CampaignsSidebarProps {
   selectedFolderId: string | null;
   onSelectFolder: (folderId: string | null) => void;
+  onSelectTemplate?: (template: any) => void;
   onCreateTemplate: () => void;
+}
+
+function DroppableFolder({
+  id,
+  children,
+  className,
+}: {
+  id: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(className, isOver && "bg-white/10 ring-1 ring-white/20 rounded-md")}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function CampaignsSidebar({
   selectedFolderId,
   onSelectFolder,
+  onSelectTemplate,
   onCreateTemplate,
 }: CampaignsSidebarProps) {
   const [folders, setFolders] = useState<TemplateFolder[]>([]);
+  const [unsortedTemplates, setUnsortedTemplates] = useState<{ id: string; name: string }[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -69,6 +107,7 @@ export function CampaignsSidebar({
 
   useEffect(() => {
     loadFolders();
+    loadUnsortedTemplates();
   }, []);
 
   const loadFolders = async () => {
@@ -78,6 +117,16 @@ export function CampaignsSidebar({
     } catch (error) {
       console.error("Failed to load folders:", error);
       toast.error("Erreur lors du chargement des dossiers");
+    }
+  };
+
+  const loadUnsortedTemplates = async () => {
+    try {
+      const { getTemplates } = await import("@/app/admin/campaigns/actions");
+      const data = await getTemplates(null);
+      setUnsortedTemplates(data);
+    } catch (error) {
+      console.error("Failed to load unsorted templates:", error);
     }
   };
 
@@ -212,75 +261,135 @@ export function CampaignsSidebar({
         </div>
 
         {/* Dossiers */}
-        <div>
-          <div className="flex items-center justify-between px-2 mb-1 group">
-            <h3 className="text-xs font-medium text-muted-foreground/70">Dossiers</h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => setIsCreateOpen(true)}
-            >
-              <Plus className="h-3 w-3" />
-            </Button>
-          </div>
-          <div className="space-y-0.5">
-            {folders.map((folder) => (
-              <div
-                key={folder.id}
-                className={cn(
-                  "group flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors cursor-pointer",
-                  selectedFolderId === folder.id
-                    ? "bg-white/10 text-foreground"
-                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-                )}
-                onClick={() => onSelectFolder(folder.id)}
+        <Accordion type="multiple" defaultValue={["dossiers"]} className="w-full">
+          <AccordionItem value="dossiers" className="border-none">
+            <div className="flex items-center justify-between px-2 mb-1 group">
+              <AccordionTrigger className="py-1 hover:no-underline text-xs font-medium text-muted-foreground/70 [&>svg]:hidden">
+                Dossiers
+                <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+              </AccordionTrigger>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsCreateOpen(true);
+                }}
               >
-                <div className="flex items-center gap-2 flex-1 overflow-hidden">
-                  <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />
-                  <Folder className="h-4 w-4 shrink-0" />
-                  <span className="truncate">{folder.name}</span>
-                </div>
-                {folder._count.templates > 0 && (
-                  <span className="text-[10px] text-muted-foreground/50 ml-2">
-                    {folder._count.templates}
-                  </span>
-                )}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:bg-white/10"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <MoreVertical className="h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="w-40 bg-[#1C1C1E] border-white/10 text-muted-foreground"
-                  >
-                    <DropdownMenuItem
-                      onClick={() => openRenameDialog(folder)}
-                      className="hover:bg-white/10 hover:text-foreground focus:bg-white/10 focus:text-foreground"
-                    >
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Renommer
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => openDeleteDialog(folder)}
-                      className="text-red-500 focus:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Supprimer
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
+            <AccordionContent className="pb-0">
+              <div className="space-y-0.5">
+                {/* Non trié */}
+                <Accordion type="single" collapsible className="w-full">
+                  <DroppableFolder id="unsorted" className="w-full">
+                    <AccordionItem value="unsorted" className="border-none">
+                      <AccordionTrigger className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors cursor-pointer hover:bg-white/5 hover:text-foreground hover:no-underline [&>svg]:hidden">
+                        <div className="flex items-center gap-2 flex-1 overflow-hidden">
+                          <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                          <FolderOpen className="h-4 w-4 shrink-0" />
+                          <span className="truncate">Non trié</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pl-6 pt-1 pb-1">
+                        {unsortedTemplates.map((template) => (
+                          <div
+                            key={template.id}
+                            className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-white/5 cursor-pointer text-muted-foreground hover:text-foreground"
+                            onClick={() => onSelectTemplate?.(template)}
+                          >
+                            <span className="truncate text-xs">{template.name}</span>
+                          </div>
+                        ))}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </DroppableFolder>
+                </Accordion>
+
+                {/* Folders */}
+                {folders.map((folder) => (
+                  <Accordion type="single" collapsible key={folder.id} className="w-full">
+                    <DroppableFolder id={folder.id} className="w-full">
+                      <AccordionItem value={folder.id} className="border-none">
+                        <div
+                          className={cn(
+                            "group flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors cursor-pointer",
+                            selectedFolderId === folder.id
+                              ? "bg-white/10 text-foreground"
+                              : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                          )}
+                        >
+                          <AccordionTrigger className="flex-1 hover:no-underline py-0 [&>svg]:hidden">
+                            <div
+                              className="flex items-center gap-2 flex-1 overflow-hidden"
+                              onClick={() => {
+                                // e.stopPropagation(); // Let accordion trigger
+                                onSelectFolder(folder.id);
+                              }}
+                            >
+                              <ChevronRight className="h-3 w-3 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                              <Folder className="h-4 w-4 shrink-0" />
+                              <span className="truncate">{folder.name}</span>
+                            </div>
+                          </AccordionTrigger>
+                          {folder.templates.length > 0 && (
+                            <span className="text-[10px] text-muted-foreground/50 ml-2">
+                              {folder.templates.length}
+                            </span>
+                          )}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity ml-1 hover:bg-white/10"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreVertical className="h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="w-40 bg-[#1C1C1E] border-white/10 text-muted-foreground"
+                            >
+                              <DropdownMenuItem
+                                onClick={() => openRenameDialog(folder)}
+                                className="hover:bg-white/10 hover:text-foreground focus:bg-white/10 focus:text-foreground"
+                              >
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Renommer
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => openDeleteDialog(folder)}
+                                className="text-red-500 focus:text-red-500 hover:bg-red-500/10 focus:bg-red-500/10"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <AccordionContent className="pl-6 pt-1 pb-1">
+                          {folder.templates.map((template) => (
+                            <div
+                              key={template.id}
+                              className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-white/5 cursor-pointer text-muted-foreground hover:text-foreground"
+                              onClick={() => onSelectTemplate?.(template)}
+                            >
+                              <span className="truncate text-xs">{template.name}</span>
+                            </div>
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </DroppableFolder>
+                  </Accordion>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/* Tags */}
         <div>
@@ -288,7 +397,6 @@ export function CampaignsSidebar({
         </div>
       </div>
 
-      {/* Bottom Actions */}
       {/* Bottom Actions */}
       <div className="p-3 border-t border-white/5 flex items-center gap-1 mt-auto">
         <Button
@@ -319,16 +427,12 @@ export function CampaignsSidebar({
               const name = file.name.replace(".md", "");
 
               try {
-                // We'll use a server action that we need to import
-                // For now, let's assume it's passed as a prop or imported
-                // But since this is a client component, we can import the server action directly
                 const { importTemplate } = await import("@/app/admin/campaigns/actions");
                 await importTemplate(
                   name,
                   text,
                   selectedFolderId === "trash" ? null : selectedFolderId
                 );
-                // Reset input
                 e.target.value = "";
               } catch (error) {
                 console.error("Failed to import template:", error);

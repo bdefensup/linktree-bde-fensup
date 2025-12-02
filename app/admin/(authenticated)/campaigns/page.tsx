@@ -14,7 +14,14 @@ interface EmailTemplate {
   updatedAt: Date;
 }
 
-import { createTemplate } from "@/app/admin/campaigns/actions";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { createTemplate, moveTemplate } from "@/app/admin/campaigns/actions";
 import { toast } from "sonner";
 
 // ...
@@ -22,6 +29,14 @@ import { toast } from "sonner";
 export default function CampaignsPage() {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   const handleCreateTemplate = async () => {
     const name = "Nouveau template";
@@ -38,6 +53,25 @@ export default function CampaignsPage() {
     }
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const templateId = active.id as string;
+    const folderId = over.id as string; // "unsorted" or folder ID
+
+    if (folderId === "dossiers") return; // Can't drop on the header
+
+    try {
+      await moveTemplate(templateId, folderId === "unsorted" ? null : folderId);
+      toast.success("Template déplacé");
+    } catch (error) {
+      console.error("Failed to move template:", error);
+      toast.error("Erreur lors du déplacement du template");
+    }
+  };
+
   if (selectedTemplate) {
     return (
       <TemplateEditor
@@ -49,16 +83,19 @@ export default function CampaignsPage() {
   }
 
   return (
-    <div className="flex h-full bg-black">
-      <CampaignsSidebar
-        selectedFolderId={selectedFolderId}
-        onSelectFolder={setSelectedFolderId}
-        onCreateTemplate={handleCreateTemplate}
-      />
-      <TemplateList
-        selectedFolderId={selectedFolderId}
-        onSelectTemplate={(template) => setSelectedTemplate(template as EmailTemplate)}
-      />
-    </div>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="flex h-full bg-black">
+        <CampaignsSidebar
+          selectedFolderId={selectedFolderId}
+          onSelectFolder={setSelectedFolderId}
+          onSelectTemplate={setSelectedTemplate}
+          onCreateTemplate={handleCreateTemplate}
+        />
+        <TemplateList
+          selectedFolderId={selectedFolderId}
+          onSelectTemplate={(template) => setSelectedTemplate(template as EmailTemplate)}
+        />
+      </div>
+    </DndContext>
   );
 }

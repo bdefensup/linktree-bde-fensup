@@ -14,7 +14,6 @@ import {
   Code,
   List,
   ListOrdered,
-  Quote,
   Heading1,
   Heading2,
   Heading3,
@@ -25,8 +24,15 @@ import {
   AlignRight,
   AlignJustify,
   Underline as UnderlineIcon,
+  Pen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button/blockquote-button";
+import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button/code-block-button";
+import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover/color-text-popover";
+import Highlight from "@tiptap/extension-highlight";
+import { Color } from "@tiptap/extension-color";
+import { TextStyle } from "@tiptap/extension-text-style";
 
 interface RichTextEditorProps {
   value: string;
@@ -77,6 +83,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
       >
         <Code className="h-4 w-4" />
       </Toggle>
+      <CodeBlockButton editor={editor} />
 
       <div className="w-px h-6 bg-border mx-1" />
 
@@ -118,13 +125,11 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
       >
         <ListOrdered className="h-4 w-4" />
       </Toggle>
-      <Toggle
-        size="sm"
-        pressed={editor.isActive("blockquote")}
-        onPressedChange={() => editor.chain().focus().toggleBlockquote().run()}
-      >
-        <Quote className="h-4 w-4" />
-      </Toggle>
+      <BlockquoteButton editor={editor} />
+      <div className="w-px h-6 bg-border mx-1" />
+      <ColorTextPopover editor={editor} className="w-8 h-8 p-0">
+        <Pen className="h-4 w-4" />
+      </ColorTextPopover>
 
       <div className="w-px h-6 bg-border mx-1" />
 
@@ -185,6 +190,9 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         placeholder: placeholder || "Commencez à écrire...",
       }),
       Underline,
+      Highlight.configure({ multicolor: true }),
+      Color,
+      TextStyle,
       Link.configure({
         openOnClick: false,
       }),
