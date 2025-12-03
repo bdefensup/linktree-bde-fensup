@@ -1,0 +1,185 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { updateCampaign } from "@/app/admin/(authenticated)/campaigns/actions";
+import { toast } from "sonner";
+import { ArrowLeft, ArrowRight, Save, FileText, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
+
+interface CampaignContentEditorProps {
+  campaign: any;
+  templates: any[];
+}
+
+export function CampaignContentEditor({ campaign, templates }: CampaignContentEditorProps) {
+  const [subject, setSubject] = useState(campaign.subject || "");
+  const [content, setContent] = useState(
+    typeof campaign.content === "string" ? campaign.content : JSON.stringify(campaign.content || {})
+  );
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSave = async (redirectUrl?: string) => {
+    setIsSaving(true);
+    try {
+      await updateCampaign(campaign.id, {
+        subject,
+        content: content, // Pass as string or JSON depending on what updateCampaign expects. Prisma Json type handles stringified JSON or object.
+        // If content is string from Tiptap (HTML), we might want to store it as string or JSON structure.
+        // The RichTextEditor usually returns HTML string.
+        // The Prisma model has `content Json?`.
+        // If we pass a string, Prisma might treat it as a JSON string or just a string value.
+        // Let's ensure we pass it in a way compatible with how we read it.
+      });
+      toast.success("Sauvegardé");
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Failed to save campaign:", error);
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleLoadTemplate = (template: any) => {
+    if (!confirm("Le contenu actuel sera remplacé. Continuer ?")) return;
+
+    const templateContent =
+      typeof template.content === "string" ? template.content : JSON.stringify(template.content);
+
+    setContent(templateContent);
+    setIsTemplateDialogOpen(false);
+    toast.success("Template chargé");
+  };
+
+  return (
+    <div className="flex h-screen flex-col bg-black p-4">
+      <div className="supports-backdrop-filter:bg-[#1B1B1B]/50 flex flex-1 flex-col overflow-hidden rounded-2xl border bg-[#1B1B1B]/70 shadow-2xl ring-1 ring-white/10 backdrop-blur-2xl">
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-[#1B1B1B]/50 p-6 backdrop-blur-md">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push("/admin/campaigns")}
+              className="rounded-full hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight">{campaign.name}</h1>
+              <p className="text-muted-foreground text-sm">Étape 2 : Contenu</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => handleSave()}
+              disabled={isSaving}
+              className="text-foreground border-white/10 bg-transparent hover:bg-white/5"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Sauvegarder
+            </Button>
+            <Button
+              onClick={() => handleSave(`/admin/campaigns/${campaign.id}/audience`)}
+              disabled={isSaving}
+              className="bg-white text-black hover:bg-white/90"
+            >
+              Suivant
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-8">
+          <div className="mx-auto max-w-4xl space-y-6">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Objet de l'e-mail</label>
+              <Input
+                placeholder="Ex: Découvrez nos nouveautés !"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="border-white/10 bg-white/5"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Contenu</label>
+                <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 border-white/10 bg-white/5 hover:bg-white/10"
+                    >
+                      <FileText className="mr-2 h-3 w-3" />
+                      Charger un template
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="text-foreground max-w-2xl border-white/10 bg-[#1C1C1E]">
+                    <DialogHeader>
+                      <DialogTitle>Choisir un template</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="mt-4 h-[400px]">
+                      <div className="grid grid-cols-2 gap-4 p-1">
+                        {templates.map((t) => (
+                          <Card
+                            key={t.id}
+                            className="cursor-pointer border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10"
+                            onClick={() => handleLoadTemplate(t)}
+                          >
+                            <h3 className="truncate font-semibold">{t.name}</h3>
+                            <p className="text-muted-foreground mt-1 text-xs">
+                              {t.subject || "Sans objet"}
+                            </p>
+                          </Card>
+                        ))}
+                        {templates.length === 0 && (
+                          <div className="text-muted-foreground col-span-2 py-8 text-center">
+                            Aucun template disponible.
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <div className="min-h-[500px] overflow-hidden rounded-xl border border-white/10">
+                <RichTextEditor
+                  value={content}
+                  onChange={setContent}
+                  className="min-h-[500px] rounded-none border-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

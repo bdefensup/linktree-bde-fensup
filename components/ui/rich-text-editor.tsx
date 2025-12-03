@@ -10,30 +10,24 @@ import { Toggle } from "@/components/ui/toggle";
 import {
   Bold,
   Italic,
+  Underline as UnderlineIcon,
   Strikethrough,
   Code,
-  List,
-  ListOrdered,
   Heading1,
   Heading2,
   Heading3,
-  Undo,
-  Redo,
+  List,
+  ListOrdered,
   AlignLeft,
   AlignCenter,
   AlignRight,
   AlignJustify,
-  Underline as UnderlineIcon,
+  Undo,
+  Redo,
+  Link as LinkIcon,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button/blockquote-button";
-import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button/code-block-button";
-import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover/color-text-popover";
-import { CopyAnchorLinkButton } from "@/components/tiptap-ui/copy-anchor-link-button/copy-anchor-link-button";
-import Highlight from "@tiptap/extension-highlight";
-import { Color } from "@tiptap/extension-color";
-import { TextStyle } from "@tiptap/extension-text-style";
-import { GiPencilBrush } from "react-icons/gi";
 
 interface RichTextEditorProps {
   value: string;
@@ -48,11 +42,13 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
   }
 
   return (
-    <div className="border-b p-2 flex flex-wrap gap-1 items-center bg-muted/20">
+    <div className="flex flex-wrap items-center gap-1 border-b border-white/10 bg-[#1B1B1B]/50 p-2">
+      {/* Group 1: Formatting */}
       <Toggle
         size="sm"
         pressed={editor.isActive("bold")}
         onPressedChange={() => editor.chain().focus().toggleBold().run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <Bold className="h-4 w-4" />
       </Toggle>
@@ -60,6 +56,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive("italic")}
         onPressedChange={() => editor.chain().focus().toggleItalic().run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <Italic className="h-4 w-4" />
       </Toggle>
@@ -67,6 +64,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive("underline")}
         onPressedChange={() => editor.chain().focus().toggleUnderline().run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <UnderlineIcon className="h-4 w-4" />
       </Toggle>
@@ -74,6 +72,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive("strike")}
         onPressedChange={() => editor.chain().focus().toggleStrike().run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <Strikethrough className="h-4 w-4" />
       </Toggle>
@@ -81,17 +80,26 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive("code")}
         onPressedChange={() => editor.chain().focus().toggleCode().run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <Code className="h-4 w-4" />
       </Toggle>
-      <CodeBlockButton editor={editor} />
+      <Toggle
+        size="sm"
+        onPressedChange={() => editor.chain().focus().unsetAllMarks().run()}
+        className="text-muted-foreground hover:bg-white/5"
+      >
+        <X className="h-4 w-4" />
+      </Toggle>
 
-      <div className="w-px h-6 bg-border mx-1" />
+      <div className="mx-1 h-4 w-px bg-white/10" />
 
+      {/* Group 2: Headings */}
       <Toggle
         size="sm"
         pressed={editor.isActive("heading", { level: 1 })}
         onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <Heading1 className="h-4 w-4" />
       </Toggle>
@@ -99,6 +107,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive("heading", { level: 2 })}
         onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <Heading2 className="h-4 w-4" />
       </Toggle>
@@ -106,16 +115,19 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive("heading", { level: 3 })}
         onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <Heading3 className="h-4 w-4" />
       </Toggle>
 
-      <div className="w-px h-6 bg-border mx-1" />
+      <div className="mx-1 h-4 w-px bg-white/10" />
 
+      {/* Group 3: Lists */}
       <Toggle
         size="sm"
         pressed={editor.isActive("bulletList")}
         onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <List className="h-4 w-4" />
       </Toggle>
@@ -123,22 +135,42 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive("orderedList")}
         onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <ListOrdered className="h-4 w-4" />
       </Toggle>
-      <BlockquoteButton editor={editor} />
-      <div className="w-px h-6 bg-border mx-1" />
-      <ColorTextPopover editor={editor} className="w-8 h-8 p-0">
-        <GiPencilBrush className="h-4 w-4" />
-      </ColorTextPopover>
-      <CopyAnchorLinkButton editor={editor} />
 
-      <div className="w-px h-6 bg-border mx-1" />
+      <div className="mx-1 h-4 w-px bg-white/10" />
 
+      {/* Group 4: Links/Actions */}
+      <Toggle
+        size="sm"
+        pressed={editor.isActive("link")}
+        onPressedChange={() => {
+          const previousUrl = editor.getAttributes("link").href;
+          const url = window.prompt("URL", previousUrl);
+          if (url === null) {
+            return;
+          }
+          if (url === "") {
+            editor.chain().focus().extendMarkRange("link").unsetLink().run();
+            return;
+          }
+          editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+        }}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
+      >
+        <LinkIcon className="h-4 w-4" />
+      </Toggle>
+
+      <div className="mx-1 h-4 w-px bg-white/10" />
+
+      {/* Group 5: Alignment */}
       <Toggle
         size="sm"
         pressed={editor.isActive({ textAlign: "left" })}
         onPressedChange={() => editor.chain().focus().setTextAlign("left").run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <AlignLeft className="h-4 w-4" />
       </Toggle>
@@ -146,6 +178,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive({ textAlign: "center" })}
         onPressedChange={() => editor.chain().focus().setTextAlign("center").run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <AlignCenter className="h-4 w-4" />
       </Toggle>
@@ -153,6 +186,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive({ textAlign: "right" })}
         onPressedChange={() => editor.chain().focus().setTextAlign("right").run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <AlignRight className="h-4 w-4" />
       </Toggle>
@@ -160,16 +194,19 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         pressed={editor.isActive({ textAlign: "justify" })}
         onPressedChange={() => editor.chain().focus().setTextAlign("justify").run()}
+        className="text-muted-foreground hover:bg-white/5 data-[state=on]:bg-white/10 data-[state=on]:text-white"
       >
         <AlignJustify className="h-4 w-4" />
       </Toggle>
 
-      <div className="w-px h-6 bg-border mx-1" />
+      <div className="mx-1 h-4 w-px bg-white/10" />
 
+      {/* Group 6: History */}
       <Toggle
         size="sm"
         onPressedChange={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().undo()}
+        className="text-muted-foreground hover:bg-white/5 disabled:opacity-50"
       >
         <Undo className="h-4 w-4" />
       </Toggle>
@@ -177,6 +214,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         size="sm"
         onPressedChange={() => editor.chain().focus().redo().run()}
         disabled={!editor.can().redo()}
+        className="text-muted-foreground hover:bg-white/5 disabled:opacity-50"
       >
         <Redo className="h-4 w-4" />
       </Toggle>
@@ -187,16 +225,22 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
 export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
       Placeholder.configure({
         placeholder: placeholder || "Commencez à écrire...",
+        emptyEditorClass:
+          "is-editor-empty before:content-[attr(data-placeholder)] before:text-muted-foreground/50 before:float-left before:pointer-events-none",
       }),
       Underline,
-      Highlight.configure({ multicolor: true }),
-      Color,
-      TextStyle,
       Link.configure({
         openOnClick: false,
+        HTMLAttributes: {
+          class: "text-blue-500 hover:underline cursor-pointer",
+        },
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -206,7 +250,8 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     content: value,
     editorProps: {
       attributes: {
-        class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[150px] p-4",
+        class:
+          "prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4 text-white/90",
       },
     },
     onUpdate: ({ editor }) => {
@@ -215,7 +260,9 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   });
 
   return (
-    <div className={cn("border rounded-md overflow-hidden bg-background", className)}>
+    <div
+      className={cn("overflow-hidden rounded-xl border border-white/10 bg-[#1B1B1B]/50", className)}
+    >
       <Toolbar editor={editor} />
       <EditorContent editor={editor} />
     </div>

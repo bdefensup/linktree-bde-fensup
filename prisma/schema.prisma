@@ -28,6 +28,7 @@ model User {
   
   templateFolders TemplateFolder[]
   emailTemplates  EmailTemplate[]
+  campaigns       Campaign[]
 
   @@map("user")
 }
@@ -251,4 +252,31 @@ model EmailTemplate {
   @@map("email_template")
   @@index([userId])
   @@index([folderId])
+}
+
+model Campaign {
+  id        String   @id @default(cuid())
+  name      String
+  subject   String?
+  content   Json?    // Content from template or custom
+  
+  status    String   @default("DRAFT") // DRAFT, SCHEDULED, SENT, ARCHIVED
+  
+  // Audience
+  recipients String[] // Array of emails or tags/segments IDs
+  
+  // Stats
+  sentCount Int      @default(0)
+  openCount Int      @default(0)
+  clickCount Int     @default(0)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sentAt    DateTime?
+
+  @@map("campaign")
+  @@index([userId])
 }

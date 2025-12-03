@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { updateTemplate } from "@/app/admin/campaigns/actions";
+import { updateTemplate } from "@/app/admin/(authenticated)/campaigns/actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
