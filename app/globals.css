@@ -180,6 +180,12 @@
   --tt-color-highlight-pink-contrast: #e2e8f0;
   --tt-color-highlight-red: #fee2e2;
   --tt-color-highlight-red-contrast: #e2e8f0;
+
+  /* --- Tiptap UI Variables --- */
+  --tt-brand-color-600: #f47231;
+  --tt-brand-color-500: #f47231;
+  --tt-brand-color-400: #f47231;
+  --tt-radius-xs: calc(var(--radius) - 6px);
 }
 
 .dark {
@@ -271,6 +277,11 @@
   --tt-color-highlight-pink-contrast: #1e293b;
   --tt-color-highlight-red: #450a0a;
   --tt-color-highlight-red-contrast: #1e293b;
+
+  /* --- Tiptap UI Variables (Dark) --- */
+  --tt-brand-color-600: #f47231;
+  --tt-brand-color-500: #f47231;
+  --tt-brand-color-400: #f47231;
 }
 
 /* --- 5. Base Styles --- */

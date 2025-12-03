@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
-import Image from "@tiptap/extension-image";
+import { Image } from "@/components/tiptap-node/image-node/image-node-extension";
 import { TableKit } from "@/components/tiptap-node/table-node/extensions/table-node-extension";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
@@ -27,6 +27,7 @@ import DetailsSummary from "@tiptap/extension-details-summary";
 import DetailsContent from "@tiptap/extension-details-content";
 import FileHandler from "@tiptap/extension-file-handler";
 import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
+import { uploadImage } from "@/lib/upload-image";
 
 import { cn } from "@/lib/utils";
 
@@ -39,6 +40,7 @@ import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button";
 import { LinkPopover } from "@/components/tiptap-ui/link-popover";
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
+import { ImageAlignButton } from "@/components/tiptap-ui/image-align-button";
 import { TableTriggerButton } from "@/components/tiptap-node/table-node/ui/table-trigger-button";
 import { EmojiTriggerButton } from "@/components/tiptap-ui/emoji-trigger-button";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
@@ -102,14 +104,10 @@ const extensions = [
     lowlight,
   }),
   ImageUploadNode.configure({
+    maxSize: 1024 * 1024 * 1024 * 1.5, // 1.5GB
+    accept: "image/*",
     upload: (file: File) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      });
+      return uploadImage(file);
     },
   }),
   Youtube.configure({
@@ -126,50 +124,60 @@ const extensions = [
   DetailsSummary,
   DetailsContent,
   FileHandler.configure({
-    allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp"],
+    allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml", "image/bmp", "image/tiff", "image/x-icon", "image/heic", "image/avif"],
     onDrop: (currentEditor, files, pos) => {
-      files.forEach((file) => {
-        const fileReader = new FileReader();
+      files.forEach(async (file) => {
+        if (file.size > 1024 * 1024 * 1024 * 1.5) {
+          window.alert("Fichier trop volumineux. La taille maximum est de 1.5GB.");
+          return;
+        }
 
-        fileReader.readAsDataURL(file);
-        fileReader.onload = () => {
+        try {
+          const url = await uploadImage(file);
           currentEditor
             .chain()
             .insertContentAt(pos, {
               type: "image",
               attrs: {
-                src: fileReader.result,
+                src: url,
               },
             })
             .focus()
             .run();
-        };
+        } catch (error) {
+          console.error("Upload failed:", error);
+          window.alert("Échec de l'upload de l'image.");
+        }
       });
     },
     onPaste: (currentEditor, files, htmlContent) => {
-      files.forEach((file) => {
+      files.forEach(async (file) => {
         if (htmlContent) {
-          // if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
-          // you could extract the pasted file from this url string and upload it to a server for example
-          console.log(htmlContent); // eslint-disable-line no-console
+          console.log(htmlContent);
           return;
         }
 
-        const fileReader = new FileReader();
+        if (file.size > 1024 * 1024 * 1024 * 1.5) {
+          window.alert("Fichier trop volumineux. La taille maximum est de 1.5GB.");
+          return;
+        }
 
-        fileReader.readAsDataURL(file);
-        fileReader.onload = () => {
+        try {
+          const url = await uploadImage(file);
           currentEditor
             .chain()
             .insertContentAt(currentEditor.state.selection.anchor, {
               type: "image",
               attrs: {
-                src: fileReader.result,
+                src: url,
               },
             })
             .focus()
             .run();
-        };
+        } catch (error) {
+          console.error("Upload failed:", error);
+          window.alert("Échec de l'upload de l'image.");
+        }
       });
     },
   }),
@@ -285,6 +293,9 @@ export function AdvancedEditor({
 
         <ToolbarGroup>
           <ImageUploadButton editor={editor} text="Add" />
+          <ImageAlignButton editor={editor} align="left" />
+          <ImageAlignButton editor={editor} align="center" />
+          <ImageAlignButton editor={editor} align="right" />
         </ToolbarGroup>
 
         <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
