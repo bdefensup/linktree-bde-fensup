@@ -25,110 +25,38 @@ import Details from "@tiptap/extension-details";
 import DetailsSummary from "@tiptap/extension-details-summary";
 import DetailsContent from "@tiptap/extension-details-content";
 import FileHandler from "@tiptap/extension-file-handler";
+import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
 
-// ... imports ...
+import { cn } from "@/lib/utils";
 
-// ... inside FileHandler configuration ...
-    onPaste: (currentEditor, files, htmlContent) => {
-      files.forEach((file) => {
-        if (htmlContent) {
-          console.log(htmlContent); // eslint-disable-line no-console
-          return; // Changed from returning false to just return, or return false if the type expects it. Tiptap documentation says return boolean to handle/not handle.
-          // Actually, looking at the error "Not all code paths return a value", the arrow function inside forEach doesn't need to return anything, but the onPaste handler itself might.
-          // Wait, onPaste signature in FileHandler is `onPaste?: (editor: Editor, files: File[], htmlContent: string | undefined) => void`.
-          // So it should return void. The previous code had `return false` inside a forEach callback, which does nothing for the outer function.
-          // I will just remove the return false or make it return void.
-        }
+// Tiptap UI Components
+import { Toolbar, ToolbarGroup, ToolbarSeparator } from "@/components/tiptap-ui-primitive/toolbar";
+import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button";
+import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu";
+import { MarkButton } from "@/components/tiptap-ui/mark-button";
+import { ListButton } from "@/components/tiptap-ui/list-button";
+import { TextAlignButton } from "@/components/tiptap-ui/text-align-button";
+import { LinkPopover } from "@/components/tiptap-ui/link-popover";
+import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
+import { TableTriggerButton } from "@/components/tiptap-node/table-node/ui/table-trigger-button";
+import { EmojiTriggerButton } from "@/components/tiptap-ui/emoji-trigger-button";
+import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
+import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
 
-        const fileReader = new FileReader();
-
-        fileReader.readAsDataURL(file);
-        fileReader.onload = () => {
-          currentEditor
-            .chain()
-            .insertContentAt(currentEditor.state.selection.anchor, {
-              type: "image",
-              attrs: {
-                src: fileReader.result,
-              },
-            })
-            .focus()
-            .run();
-        };
-      });
-    },
-  }),
-];
-
-// ... inside toolbar ...
-            <DropdownMenuItem
-              onClick={() => editor.chain().focus().setDetails().run()}
-              className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              Détails
-            </DropdownMenuItem>
-            <DropdownMenuItem
-               onClick={() => {
-                 const input = window.prompt("Entrez votre équation LaTeX (ex: E = mc^2)");
-                 if (input) {
-                   // Mathematics extension usage might differ, usually it parses $...$ or uses a command.
-                   // Assuming standard usage or just inserting text that gets parsed.
-                   // Let's check if there is a specific command. If not, inserting text with $ delimiters.
-                   editor.chain().focus().insertContent(`$${input}$`).run();
-                 }
-               }}
-               className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <Sigma className="h-4 w-4" />
-              Mathématiques
-            </DropdownMenuItem>
-             <DropdownMenuItem
-               onClick={() => editor.chain().focus().setEmoji("😄").run()} // Basic example, usually opens a picker
-               className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <Smile className="h-4 w-4" />
-              Emoji
-            </DropdownMenuItem>
-
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+// Manual imports for extras
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import {
-  Bold,
-  Italic,
-  Strikethrough,
-  Code,
-  List,
-  ListOrdered,
-  Quote,
-  Undo,
-  Redo,
-  Image as ImageIcon,
-  Table as TableIcon,
-  Underline as UnderlineIcon,
-  Link as LinkIcon,
-  Superscript as SuperscriptIcon,
-  Subscript as SubscriptIcon,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
-  CheckSquare,
-  Heading as HeadingIcon,
-  ChevronDown,
   Plus,
   Youtube as YoutubeIcon,
   Sigma,
-  Smile,
   MoreHorizontal,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const lowlight = createLowlight(common);
 
@@ -167,6 +95,17 @@ const extensions = [
   }),
   CodeBlockLowlight.configure({
     lowlight,
+  }),
+  ImageUploadNode.configure({
+    upload: (file: File) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      });
+    },
   }),
   Youtube.configure({
     controls: false,
@@ -208,7 +147,7 @@ const extensions = [
           // if there is htmlContent, stop manual insertion & let other extensions handle insertion via inputRule
           // you could extract the pasted file from this url string and upload it to a server for example
           console.log(htmlContent); // eslint-disable-line no-console
-          return false;
+          return;
         }
 
         const fileReader = new FileReader();
@@ -274,37 +213,11 @@ export function AdvancedEditor({
     return null;
   }
 
-  const addImage = () => {
-    const url = window.prompt("URL de l'image");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
-  };
-
   const addYoutube = () => {
     const url = window.prompt("URL de la vidéo YouTube");
     if (url) {
       editor.chain().focus().setYoutubeVideo({ src: url }).run();
     }
-  };
-
-  const setLink = () => {
-    const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("URL", previousUrl);
-
-    // cancelled
-    if (url === null) {
-      return;
-    }
-
-    // empty
-    if (url === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
-      return;
-    }
-
-    // update
-    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
 
   return (
@@ -315,328 +228,14 @@ export function AdvancedEditor({
       )}
     >
       {/* Toolbar */}
-      <div
+      <Toolbar
         className={cn(
-          "sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b border-white/10 bg-[#0E0E11] p-2",
+          "sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b border-white/10 bg-[#0E0E11] p-2 justify-center",
           toolbarClassName
         )}
       >
-        {/* Undo / Redo */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().chain().focus().undo().run()}
-          className="text-white hover:bg-white/10 hover:text-white"
-        >
-          <Undo className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().chain().focus().redo().run()}
-          className="text-white hover:bg-white/10 hover:text-white"
-        >
-          <Redo className="h-4 w-4" />
-        </Button>
-
-        <Separator orientation="vertical" className="mx-1 h-6 bg-white/10" />
-
-        {/* Headings */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1 text-white hover:bg-white/10 hover:text-white"
-            >
-              <HeadingIcon className="h-4 w-4" />
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[#0E0E11] text-white border-white/10">
-            <DropdownMenuItem
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={cn(
-                "hover:bg-white/10 cursor-pointer",
-                editor.isActive("heading", { level: 1 }) && "bg-white/10"
-              )}
-            >
-              H1 Titre 1
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={cn(
-                "hover:bg-white/10 cursor-pointer",
-                editor.isActive("heading", { level: 2 }) && "bg-white/10"
-              )}
-            >
-              H2 Titre 2
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-              className={cn(
-                "hover:bg-white/10 cursor-pointer",
-                editor.isActive("heading", { level: 3 }) && "bg-white/10"
-              )}
-            >
-              H3 Titre 3
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => editor.chain().focus().setParagraph().run()}
-              className={cn(
-                "hover:bg-white/10 cursor-pointer",
-                editor.isActive("paragraph") && "bg-white/10"
-              )}
-            >
-              Paragraphe
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Separator orientation="vertical" className="mx-1 h-6 bg-white/10" />
-
-        {/* Lists */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("bulletList") && "bg-white/10"
-          )}
-        >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("orderedList") && "bg-white/10"
-          )}
-        >
-          <ListOrdered className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleTaskList().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("taskList") && "bg-white/10"
-          )}
-        >
-          <CheckSquare className="h-4 w-4" />
-        </Button>
-
-        <Separator orientation="vertical" className="mx-1 h-6 bg-white/10" />
-
-        {/* Formatting */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          disabled={!editor.can().chain().focus().toggleBold().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("bold") && "bg-white/10"
-          )}
-        >
-          <Bold className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          disabled={!editor.can().chain().focus().toggleItalic().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("italic") && "bg-white/10"
-          )}
-        >
-          <Italic className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          disabled={!editor.can().chain().focus().toggleStrike().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("strike") && "bg-white/10"
-          )}
-        >
-          <Strikethrough className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleCode().run()}
-          disabled={!editor.can().chain().focus().toggleCode().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("code") && "bg-white/10"
-          )}
-        >
-          <Code className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("underline") && "bg-white/10"
-          )}
-        >
-          <UnderlineIcon className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={setLink}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("link") && "bg-white/10"
-          )}
-        >
-          <LinkIcon className="h-4 w-4" />
-        </Button>
-
-        {/* Sub/Superscript */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleSuperscript().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("superscript") && "bg-white/10"
-          )}
-        >
-          <SuperscriptIcon className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().toggleSubscript().run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive("subscript") && "bg-white/10"
-          )}
-        >
-          <SubscriptIcon className="h-4 w-4" />
-        </Button>
-
-        <Separator orientation="vertical" className="mx-1 h-6 bg-white/10" />
-
-        {/* Alignment */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().setTextAlign("left").run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive({ textAlign: "left" }) && "bg-white/10"
-          )}
-        >
-          <AlignLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().setTextAlign("center").run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive({ textAlign: "center" }) && "bg-white/10"
-          )}
-        >
-          <AlignCenter className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().setTextAlign("right").run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive({ textAlign: "right" }) && "bg-white/10"
-          )}
-        >
-          <AlignRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-          className={cn(
-            "text-white hover:bg-white/10 hover:text-white",
-            editor.isActive({ textAlign: "justify" }) && "bg-white/10"
-          )}
-        >
-          <AlignJustify className="h-4 w-4" />
-        </Button>
-
-        <Separator orientation="vertical" className="mx-1 h-6 bg-white/10" />
-
-        {/* Add Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1 text-white hover:bg-white/10 hover:text-white"
-            >
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[#0E0E11] text-white border-white/10">
-            <DropdownMenuItem
-              onClick={addImage}
-              className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <ImageIcon className="h-4 w-4" />
-              Image
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={addYoutube}
-              className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <YoutubeIcon className="h-4 w-4" />
-              YouTube
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                  .run()
-              }
-              className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <TableIcon className="h-4 w-4" />
-              Tableau
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <Quote className="h-4 w-4" />
-              Citation
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => editor.chain().focus().setDetails().run()}
-              className="hover:bg-white/10 cursor-pointer gap-2"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              Détails
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+        
+      </Toolbar>
 
       {/* Editor Content */}
       <div className="min-h-[400px] p-4">
