@@ -20,6 +20,8 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { Emoji } from "@tiptap/extension-emoji";
 import Details from "@tiptap/extension-details";
+import DetailsSummary from "@tiptap/extension-details-summary";
+import DetailsContent from "@tiptap/extension-details-content";
 import FileHandler from "@tiptap/extension-file-handler";
 import InvisibleCharacters from "@tiptap/extension-invisible-characters";
 import TableOfContents from "@tiptap/extension-table-of-contents";
@@ -42,7 +44,7 @@ import { TextAlignButton } from "@/components/tiptap-ui/text-align-button/text-a
 import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button/undo-redo-button";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button/blockquote-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button/code-block-button";
-import { ColorHighlightPopover } from "@/components/tiptap-ui/color-highlight-popover/color-highlight-popover";
+import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover/color-text-popover";
 import { ResetAllFormattingButton } from "@/components/tiptap-ui/reset-all-formatting-button/reset-all-formatting-button";
 import { MentionDropdownMenu } from "@/components/tiptap-ui/mention-dropdown-menu/mention-dropdown-menu";
 import { EmojiDropdownMenu } from "@/components/tiptap-ui/emoji-dropdown-menu/emoji-dropdown-menu";
@@ -125,6 +127,8 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           class: "details",
         },
       }),
+      DetailsSummary,
+      DetailsContent,
       FileHandler.configure({
         allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp"],
         onDrop: (currentEditor, files, pos) => {
@@ -230,7 +234,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         <MarkButton editor={editor} type="strike" />
         <MarkButton editor={editor} type="code" />
         <MarkButton editor={editor} type="underline" />
-        <ColorHighlightPopover editor={editor} />
+        <ColorTextPopover editor={editor} />
         <ResetAllFormattingButton editor={editor} />
         <LinkPopover editor={editor} />
         <Separator orientation="vertical" className="mx-1 h-6" />

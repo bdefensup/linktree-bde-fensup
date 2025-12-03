@@ -135,6 +135,7 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
                       variant="outline"
                       size="sm"
                       className="h-8 border-white/10 bg-white/5 hover:bg-white/10"
+                      suppressHydrationWarning
                     >
                       <FileText className="mr-2 h-3 w-3" />
                       Charger un template

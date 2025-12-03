@@ -155,6 +155,12 @@ importers:
       '@tiptap/extension-details':
         specifier: ^3.12.0
         version: 3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))(@tiptap/extension-text-style@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0)))(@tiptap/pm@3.12.0)
+      '@tiptap/extension-details-content':
+        specifier: ^2.26.2
+        version: 2.26.2(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))(@tiptap/extension-text-style@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0)))
+      '@tiptap/extension-details-summary':
+        specifier: ^2.26.2
+        version: 2.26.2(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))(@tiptap/extension-text-style@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0)))
       '@tiptap/extension-document':
         specifier: ^3.12.0
         version: 3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))
@@ -2314,6 +2320,18 @@ packages:
     resolution: {integrity: sha512-QyxZCrd48SV/iB9ZjKmyEmII1IBm/SpDjXeQXmM8H5pORqMEgJ3MdF/I88SGeKRYWNjBA9hkt6ZWv/sVYvFz8Q==}
     peerDependencies:
       '@tiptap/extension-text-style': ^3.12.0
+
+  '@tiptap/extension-details-content@2.26.2':
+    resolution: {integrity: sha512-2Ia2KqwYucuv7dcTpA/PhytUuDhotzi8uZPXBHlGJLHVI9rAmJsSvID9cX/YWRTvCvAxyNqDp0sBH+Qx8QcloQ==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+      '@tiptap/extension-text-style': ^2.7.0
+
+  '@tiptap/extension-details-summary@2.26.2':
+    resolution: {integrity: sha512-rbRq6f56HKvzIuSpPHt513Ubglq728pz8Jx7WBRVqjpYF5/sTpYu9hZpbrIfLfjb2UakXI/LVU8vS50VwTwCnw==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+      '@tiptap/extension-text-style': ^2.7.0
 
   '@tiptap/extension-details@3.12.0':
     resolution: {integrity: sha512-thKbV3N31ILDtLmKUyL/Ot4aXd84YK9YqCyf4MKzk+ldAYqQ7+LMtv4JX3FEexNmjXx10dxH6f26jCnEQ401Fw==}
@@ -6947,6 +6965,16 @@ snapshots:
 
   '@tiptap/extension-color@3.12.0(@tiptap/extension-text-style@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0)))':
     dependencies:
+      '@tiptap/extension-text-style': 3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))
+
+  '@tiptap/extension-details-content@2.26.2(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))(@tiptap/extension-text-style@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0)))':
+    dependencies:
+      '@tiptap/core': 3.12.0(@tiptap/pm@3.12.0)
+      '@tiptap/extension-text-style': 3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))
+
+  '@tiptap/extension-details-summary@2.26.2(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))(@tiptap/extension-text-style@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0)))':
+    dependencies:
+      '@tiptap/core': 3.12.0(@tiptap/pm@3.12.0)
       '@tiptap/extension-text-style': 3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))
 
   '@tiptap/extension-details@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0))(@tiptap/extension-text-style@3.12.0(@tiptap/core@3.12.0(@tiptap/pm@3.12.0)))(@tiptap/pm@3.12.0)':
