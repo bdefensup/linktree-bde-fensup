@@ -5,8 +5,7 @@ import { AdvancedEditor } from "@/components/editor/advanced-editor";
 export default function TestPage() {
   return (
     <div className="bg-muted/20 flex min-h-screen flex-col items-center justify-center p-8">
-      <div className="w-full max-w-5xl space-y-4">
-        <h1 className="mb-8 text-3xl font-bold">Test de l'Éditeur Tiptap Avancé</h1>
+      <div className="w-full max-w-[1400px] space-y-4">
       <AdvancedEditor
         placeholder="Écrivez votre contenu ici..."
         initialContent={`

@@ -1,6 +1,7 @@
 "use client"
 
 import { forwardRef, useCallback, useMemo, useRef, useState } from "react"
+import { type Editor } from "@tiptap/react"
 
 // --- Hooks ---
 import { useMenuNavigation } from "@/hooks/use-menu-navigation"
@@ -52,6 +53,7 @@ import { chunkArray } from "@/lib/tiptap-advanced-utils"
 import "@/components/tiptap-ui/color-text-popover/color-text-popover.scss"
 
 export interface RenderColorButtonProps extends ButtonProps {
+  editor: Editor | null
   colorObj: RecentColor
   withLabel?: boolean
   onColorChanged?: ({
@@ -66,6 +68,7 @@ export interface RenderColorButtonProps extends ButtonProps {
 }
 
 export const RecentColorButton: React.FC<RenderColorButtonProps> = ({
+  editor,
   colorObj,
   withLabel = false,
   onColorChanged,
@@ -88,16 +91,18 @@ export const RecentColorButton: React.FC<RenderColorButtonProps> = ({
 
   return colorObj.type === "text" ? (
     <ColorTextButton
+      editor={editor}
       textColor={color.value}
       label={color.label}
       {...commonProps}
     />
   ) : (
-    <ColorHighlightButton highlightColor={color.value} {...commonProps} />
+    <ColorHighlightButton editor={editor} highlightColor={color.value} {...commonProps} />
   )
 }
 
 export interface ColorGroupProps {
+  editor: Editor | null
   type: ColorType
   colors: ColorItem[][]
   onColorSelected: ({
@@ -114,6 +119,7 @@ export interface ColorGroupProps {
 }
 
 export const ColorGroup: React.FC<ColorGroupProps> = ({
+  editor,
   type,
   colors,
   onColorSelected,
@@ -141,6 +147,7 @@ export const ColorGroup: React.FC<ColorGroupProps> = ({
 
         return type === "text" ? (
           <ColorTextButton
+            editor={editor}
             key={`${type}-${color.value}-${colorIndex}`}
             textColor={color.value}
             label={color.label}
@@ -148,6 +155,7 @@ export const ColorGroup: React.FC<ColorGroupProps> = ({
           />
         ) : (
           <ColorHighlightButton
+            editor={editor}
             key={`${type}-${color.value}-${colorIndex}`}
             highlightColor={color.value}
             {...commonProps}
@@ -159,6 +167,7 @@ export const ColorGroup: React.FC<ColorGroupProps> = ({
 }
 
 interface RecentColorsSectionProps {
+  editor: Editor | null
   recentColors: RecentColor[]
   onColorSelected: ({
     type,
@@ -173,6 +182,7 @@ interface RecentColorsSectionProps {
 }
 
 const RecentColorsSection: React.FC<RecentColorsSectionProps> = ({
+  editor,
   recentColors,
   onColorSelected,
   selectedIndex,
@@ -185,6 +195,7 @@ const RecentColorsSection: React.FC<RecentColorsSectionProps> = ({
       <ButtonGroup orientation="horizontal">
         {recentColors.map((colorObj, index) => (
           <RecentColorButton
+            editor={editor}
             key={`recent-${colorObj.type}-${colorObj.value}`}
             colorObj={colorObj}
             onColorChanged={onColorSelected}
@@ -198,6 +209,7 @@ const RecentColorsSection: React.FC<RecentColorsSectionProps> = ({
 }
 
 export interface TextStyleColorPanelProps {
+  editor: Editor | null
   maxColorsPerGroup?: number
   maxRecentColors?: number
   onColorChanged?: ({
@@ -212,6 +224,7 @@ export interface TextStyleColorPanelProps {
 }
 
 export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
+  editor,
   maxColorsPerGroup = 5,
   maxRecentColors = 3,
   onColorChanged,
@@ -330,6 +343,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
       <CardBody>
         {isInitialized && (
           <RecentColorsSection
+            editor={editor}
             recentColors={recentColors}
             onColorSelected={handleColorSelected}
             selectedIndex={selectedIndex}
@@ -339,6 +353,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
         <CardItemGroup>
           <CardGroupLabel>Text color</CardGroupLabel>
           <ColorGroup
+            editor={editor}
             type="text"
             colors={textColorGroups}
             onColorSelected={handleColorSelected}
@@ -350,6 +365,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
         <CardItemGroup>
           <CardGroupLabel>Highlight color</CardGroupLabel>
           <ColorGroup
+            editor={editor}
             type="highlight"
             colors={highlightColorGroups}
             onColorSelected={handleColorSelected}
@@ -461,7 +477,7 @@ export const ColorTextPopover = forwardRef<
           side="bottom"
           align="start"
         >
-          <TextStyleColorPanel onColorChanged={handleColorChanged} />
+          <TextStyleColorPanel editor={editor} onColorChanged={handleColorChanged} />
         </PopoverContent>
       </Popover>
     )

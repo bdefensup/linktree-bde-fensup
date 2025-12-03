@@ -17,6 +17,7 @@ import Typography from "@tiptap/extension-typography";
 import Placeholder from "@tiptap/extension-placeholder";
 import UniqueID from "@tiptap/extension-unique-id";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import Highlight from "@tiptap/extension-highlight";
 import { common, createLowlight } from "lowlight";
 import Youtube from "@tiptap/extension-youtube";
 import Mathematics from "@tiptap/extension-mathematics";
@@ -34,7 +35,7 @@ import { Toolbar, ToolbarGroup, ToolbarSeparator } from "@/components/tiptap-ui-
 import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button";
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu";
 import { MarkButton } from "@/components/tiptap-ui/mark-button";
-import { ListButton } from "@/components/tiptap-ui/list-button";
+import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button";
 import { LinkPopover } from "@/components/tiptap-ui/link-popover";
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
@@ -42,6 +43,7 @@ import { TableTriggerButton } from "@/components/tiptap-node/table-node/ui/table
 import { EmojiTriggerButton } from "@/components/tiptap-ui/emoji-trigger-button";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
+import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover";
 
 // Manual imports for extras
 import {
@@ -92,6 +94,9 @@ const extensions = [
   Typography,
   UniqueID.configure({
     types: ["heading", "paragraph"],
+  }),
+  Highlight.configure({
+    multicolor: true,
   }),
   CodeBlockLowlight.configure({
     lowlight,
@@ -223,7 +228,7 @@ export function AdvancedEditor({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-4xl rounded-lg border border-white/10 bg-[#0E0E11] text-white shadow-sm",
+        "mx-auto w-full max-w-full rounded-lg border border-white/10 bg-[#0E0E11] text-white shadow-sm",
         className
       )}
     >
@@ -234,12 +239,119 @@ export function AdvancedEditor({
           toolbarClassName
         )}
       >
-        
+        <ToolbarGroup>
+          <UndoRedoButton editor={editor} action="undo" />
+          <UndoRedoButton editor={editor} action="redo" />
+        </ToolbarGroup>
+
+        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+
+        <ToolbarGroup>
+          <HeadingDropdownMenu editor={editor} />
+          <ListDropdownMenu editor={editor} />
+          <BlockquoteButton editor={editor} />
+          <CodeBlockButton editor={editor} />
+        </ToolbarGroup>
+
+        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+
+        <ToolbarGroup>
+          <MarkButton editor={editor} type="bold" />
+          <MarkButton editor={editor} type="italic" />
+          <MarkButton editor={editor} type="strike" />
+          <MarkButton editor={editor} type="code" />
+          <MarkButton editor={editor} type="underline" />
+          <ColorTextPopover editor={editor} />
+          <LinkPopover editor={editor} />
+        </ToolbarGroup>
+
+        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+
+        <ToolbarGroup>
+          <MarkButton editor={editor} type="superscript" />
+          <MarkButton editor={editor} type="subscript" />
+        </ToolbarGroup>
+
+        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+
+        <ToolbarGroup>
+          <TextAlignButton editor={editor} align="left" />
+          <TextAlignButton editor={editor} align="center" />
+          <TextAlignButton editor={editor} align="right" />
+          <TextAlignButton editor={editor} align="justify" />
+        </ToolbarGroup>
+
+        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+
+        <ToolbarGroup>
+          <ImageUploadButton editor={editor} text="Add" />
+        </ToolbarGroup>
+
+        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+
+        {/* Extras Menu */}
+        <ToolbarGroup>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1 text-white hover:bg-white/10 hover:text-white"
+              >
+                <Plus className="h-4 w-4" />
+                Plus
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#0E0E11] text-white border-white/10">
+              <DropdownMenuItem
+                onClick={addYoutube}
+                className="hover:bg-white/10 cursor-pointer gap-2"
+              >
+                <YoutubeIcon className="h-4 w-4" />
+                YouTube
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => editor.chain().focus().setDetails().run()}
+                className="hover:bg-white/10 cursor-pointer gap-2"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                Détails
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const input = window.prompt(
+                    "Entrez votre équation LaTeX (ex: E = mc^2)"
+                  );
+                  if (input) {
+                    editor.chain().focus().insertContent(`$${input}$`).run();
+                  }
+                }}
+                className="hover:bg-white/10 cursor-pointer gap-2"
+              >
+                <Sigma className="h-4 w-4" />
+                Mathématiques
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+                className="hover:bg-white/10 cursor-pointer gap-2"
+              >
+                <TableTriggerButton editor={editor} />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                 onClick={() => editor.chain().focus().setEmoji("😄").run()}
+                 className="hover:bg-white/10 cursor-pointer gap-2"
+              >
+                <EmojiTriggerButton editor={editor} />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </ToolbarGroup>
       </Toolbar>
 
       {/* Editor Content */}
-      <div className="min-h-[400px] p-4">
-        <EditorContent editor={editor} />
+      {/* Editor Content */}
+      <div className="h-[900px] w-full overflow-y-auto rounded-b-lg border-t-0 p-4">
+        <EditorContent editor={editor} className="min-h-full" />
       </div>
     </div>
   );

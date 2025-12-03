@@ -137,6 +137,49 @@
   --sidebar-accent-foreground: #292758;
   --sidebar-border: #e2e8f0;
   --sidebar-ring: #f47231;
+
+  /* --- Tiptap Colors (Light Mode) --- */
+  --tt-color-text: #292758;
+  --tt-color-text-contrast: #e2e8f0;
+  --tt-color-text-gray: #64748b;
+  --tt-color-text-gray-contrast: #e2e8f0;
+  --tt-color-text-brown: #854d0e;
+  --tt-color-text-brown-contrast: #e2e8f0;
+  --tt-color-text-orange: #f47231;
+  --tt-color-text-orange-contrast: #e2e8f0;
+  --tt-color-text-yellow: #eab308;
+  --tt-color-text-yellow-contrast: #e2e8f0;
+  --tt-color-text-green: #2a9d8f;
+  --tt-color-text-green-contrast: #e2e8f0;
+  --tt-color-text-blue: #2563eb;
+  --tt-color-text-blue-contrast: #e2e8f0;
+  --tt-color-text-purple: #9333ea;
+  --tt-color-text-purple-contrast: #e2e8f0;
+  --tt-color-text-pink: #db2777;
+  --tt-color-text-pink-contrast: #e2e8f0;
+  --tt-color-text-red: #ef4444;
+  --tt-color-text-red-contrast: #e2e8f0;
+
+  --tt-bg-color: #ffffff;
+  --tt-bg-color-contrast: #e2e8f0;
+  --tt-color-highlight-gray: #f1f5f9;
+  --tt-color-highlight-gray-contrast: #e2e8f0;
+  --tt-color-highlight-brown: #fef3c7;
+  --tt-color-highlight-brown-contrast: #e2e8f0;
+  --tt-color-highlight-orange: #ffedd5;
+  --tt-color-highlight-orange-contrast: #e2e8f0;
+  --tt-color-highlight-yellow: #fef9c3;
+  --tt-color-highlight-yellow-contrast: #e2e8f0;
+  --tt-color-highlight-green: #dcfce7;
+  --tt-color-highlight-green-contrast: #e2e8f0;
+  --tt-color-highlight-blue: #dbeafe;
+  --tt-color-highlight-blue-contrast: #e2e8f0;
+  --tt-color-highlight-purple: #f3e8ff;
+  --tt-color-highlight-purple-contrast: #e2e8f0;
+  --tt-color-highlight-pink: #fce7f3;
+  --tt-color-highlight-pink-contrast: #e2e8f0;
+  --tt-color-highlight-red: #fee2e2;
+  --tt-color-highlight-red-contrast: #e2e8f0;
 }
 
 .dark {
@@ -185,6 +228,49 @@
   --sidebar-accent-foreground: #f8fafc;
   --sidebar-border: #1e293b;
   --sidebar-ring: #f47231;
+
+  /* --- Tiptap Colors (Dark Mode) --- */
+  --tt-color-text: #f8fafc;
+  --tt-color-text-contrast: #1e293b;
+  --tt-color-text-gray: #94a3b8;
+  --tt-color-text-gray-contrast: #1e293b;
+  --tt-color-text-brown: #d97706;
+  --tt-color-text-brown-contrast: #1e293b;
+  --tt-color-text-orange: #fb923c;
+  --tt-color-text-orange-contrast: #1e293b;
+  --tt-color-text-yellow: #facc15;
+  --tt-color-text-yellow-contrast: #1e293b;
+  --tt-color-text-green: #2dd4bf;
+  --tt-color-text-green-contrast: #1e293b;
+  --tt-color-text-blue: #60a5fa;
+  --tt-color-text-blue-contrast: #1e293b;
+  --tt-color-text-purple: #c084fc;
+  --tt-color-text-purple-contrast: #1e293b;
+  --tt-color-text-pink: #f472b6;
+  --tt-color-text-pink-contrast: #1e293b;
+  --tt-color-text-red: #f87171;
+  --tt-color-text-red-contrast: #1e293b;
+
+  --tt-bg-color: #0f172a;
+  --tt-bg-color-contrast: #1e293b;
+  --tt-color-highlight-gray: #334155;
+  --tt-color-highlight-gray-contrast: #1e293b;
+  --tt-color-highlight-brown: #451a03;
+  --tt-color-highlight-brown-contrast: #1e293b;
+  --tt-color-highlight-orange: #431407;
+  --tt-color-highlight-orange-contrast: #1e293b;
+  --tt-color-highlight-yellow: #422006;
+  --tt-color-highlight-yellow-contrast: #1e293b;
+  --tt-color-highlight-green: #064e3b;
+  --tt-color-highlight-green-contrast: #1e293b;
+  --tt-color-highlight-blue: #1e3a8a;
+  --tt-color-highlight-blue-contrast: #1e293b;
+  --tt-color-highlight-purple: #3b0764;
+  --tt-color-highlight-purple-contrast: #1e293b;
+  --tt-color-highlight-pink: #500724;
+  --tt-color-highlight-pink-contrast: #1e293b;
+  --tt-color-highlight-red: #450a0a;
+  --tt-color-highlight-red-contrast: #1e293b;
 }
 
 /* --- 5. Base Styles --- */
@@ -194,6 +280,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  ::selection {
+    @apply bg-primary/20;
   }
 }
 
@@ -231,7 +320,7 @@ ul[data-type="taskList"] {
 }
 ul[data-type="taskList"] li {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -241,4 +330,20 @@ ul[data-type="taskList"] li > label {
 }
 ul[data-type="taskList"] li > div {
   flex: 1;
+}
+
+/* Blockquotes */
+.ProseMirror blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+}
+
+/* Nested Blockquotes */
+.ProseMirror blockquote blockquote {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-left-color: var(--secondary);
 }
