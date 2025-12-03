@@ -1,3 +1,6 @@
+@import '../styles/_variables.scss';
+@import '../styles/_keyframe-animations.scss';
+
 @import "tailwindcss";
 
 /* --- 1. Plugins (Chargés directement ici en v4) --- */
