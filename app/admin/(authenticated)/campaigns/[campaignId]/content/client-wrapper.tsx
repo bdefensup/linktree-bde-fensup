@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { updateCampaign } from "@/app/admin/(authenticated)/campaigns/actions";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Save, FileText, Loader2 } from "lucide-react";
@@ -170,13 +169,7 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
                 </Dialog>
               </div>
 
-              <div className="min-h-[500px] overflow-hidden rounded-xl border border-white/10">
-                <RichTextEditor
-                  value={content}
-                  onChange={setContent}
-                  className="min-h-[500px] rounded-none border-none"
-                />
-              </div>
+              <div className="min-h-[500px] overflow-hidden rounded-xl border border-white/10"></div>
             </div>
           </div>
         </div>
