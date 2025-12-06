@@ -23,6 +23,35 @@ import {
 } from "@/components/tiptap-node/table-node/lib/tiptap-table-utils"
 
 export const TableNode = Table.extend<TableOptions>({
+  addAttributes() {
+    return {
+      align: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("align"),
+        renderHTML: (attributes) => {
+          if (!attributes.align) {
+            return {}
+          }
+          
+          const style = (() => {
+            switch (attributes.align) {
+              case "left":
+                return "float: left; margin-right: 1rem; margin-bottom: 1rem;"
+              case "right":
+                return "float: right; margin-left: 1rem; margin-bottom: 1rem;"
+              case "center":
+                return "margin-left: auto; margin-right: auto; display: table;"
+              default:
+                return null
+            }
+          })()
+
+          return style ? { style, align: attributes.align } : { align: attributes.align }
+        },
+      },
+    }
+  },
+
   addProseMirrorPlugins() {
     const isResizable = this.options.resizable && this.editor.isEditable
 

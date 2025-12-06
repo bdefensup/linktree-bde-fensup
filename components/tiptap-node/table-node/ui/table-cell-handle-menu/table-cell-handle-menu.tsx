@@ -13,6 +13,7 @@ import { cn, SR_ONLY } from "@/lib/tiptap-utils"
 import { ColorMenu } from "@/components/tiptap-ui/color-menu"
 import { TableAlignMenu } from "@/components/tiptap-node/table-node/ui/table-alignment-menu"
 import { TableFormatMenu } from "@/components/tiptap-node/table-node/ui/table-format-menu"
+import { TableNodeAlignMenu } from "@/components/tiptap-node/table-node/ui/table-node-align-menu"
 import { useTableClearRowColumnContent } from "@/components/tiptap-node/table-node/ui/table-clear-row-column-content-button"
 import { useTableMergeSplitCell } from "@/components/tiptap-node/table-node/ui/table-merge-split-cell-button"
 
@@ -164,6 +165,7 @@ const TableActionMenu = ({
           <TableFormatMenu editor={editor} />
           <ColorMenu />
           <TableAlignMenu />
+          <TableNodeAlignMenu editor={editor} />
         </MenuGroup>
 
         {clearAction.isAvailable && (

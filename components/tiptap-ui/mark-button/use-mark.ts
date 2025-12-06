@@ -93,6 +93,9 @@ export function canToggleMark(editor: Editor | null, type: Mark): boolean {
 /**
  * Checks if a mark is currently active
  */
+/**
+ * Checks if a mark is currently active
+ */
 export function isMarkActive(editor: Editor | null, type: Mark): boolean {
   if (!editor || !editor.isEditable) return false
 
@@ -102,22 +105,27 @@ export function isMarkActive(editor: Editor | null, type: Mark): boolean {
   }
 
   if (isCellSelection(editor.state.selection)) {
-    let hasMark = false
     const { selection } = editor.state
-    
-    // Check if any cell has the mark (or maybe all? usually Tiptap checks if active in current context)
-    // For buttons, we usually want to show active if the selection *has* the mark.
-    // Let's check if *every* cell has the mark to show it as active, or maybe just the first?
-    // Tiptap standard behavior for mixed selection is usually inactive.
-    // Let's stick to Tiptap's isActive behavior which might work for CellSelection if we pass the attributes?
-    // Actually, let's just rely on editor.isActive(type) first, if it fails we can improve.
-    // But for CellSelection, editor.isActive might only check the anchor/head.
-    
-    // Let's use a simple heuristic: if the first cell has it, we consider it active (or mixed).
-    // Better: check if all selected content has it.
-    // For now, let's trust editor.isActive(type) as a baseline, but if it doesn't work for CellSelection we might need to iterate.
-    // Given the complexity, let's stick to editor.isActive(type) for now and only fix toggleMark.
-    return editor.isActive(type)
+    const markType = editor.schema.marks[type]
+    if (!markType) return false
+
+    let hasContent = false
+    let allHaveMark = true
+
+    // @ts-ignore
+    selection.forEachCell((node, pos) => {
+      if (node.textContent.length > 0) {
+        hasContent = true
+        const from = pos + 1
+        const to = pos + node.nodeSize - 1
+        // If any cell with content doesn't have the mark, we consider it inactive
+        if (!editor.state.doc.rangeHasMark(from, to, markType)) {
+          allHaveMark = false
+        }
+      }
+    })
+
+    return hasContent && allHaveMark
   }
 
   return editor.isActive(type)
@@ -141,10 +149,8 @@ export function toggleMark(editor: Editor | null, type: Mark): boolean {
     const markType = editor.schema.marks[type]
     if (!markType) return false
 
-    // Determine if we should add or remove.
-    // If currently active (fully or partially), we usually remove? Or if mixed, we add?
-    // Standard Tiptap toggle: if active, remove. If inactive, add.
-    const isActive = editor.isActive(type)
+    // Determine if we should add or remove based on our custom logic
+    const isActive = isMarkActive(editor, type)
     
     // Manual iteration
     // @ts-ignore
