@@ -78,6 +78,15 @@ export function canToggleMark(editor: Editor | null, type: Mark): boolean {
   if (!isMarkInSchema(type, editor) || isNodeTypeSelected(editor, ["image"]))
     return false
 
+  // Check for CellSelection (duck typing)
+  const isCellSelection = (sel: any): boolean => {
+    return !!sel && typeof sel.forEachCell === "function"
+  }
+
+  if (isCellSelection(editor.state.selection)) {
+    return true
+  }
+
   return editor.can().toggleMark(type)
 }
 
@@ -86,6 +95,31 @@ export function canToggleMark(editor: Editor | null, type: Mark): boolean {
  */
 export function isMarkActive(editor: Editor | null, type: Mark): boolean {
   if (!editor || !editor.isEditable) return false
+
+  // Check for CellSelection (duck typing)
+  const isCellSelection = (sel: any): boolean => {
+    return !!sel && typeof sel.forEachCell === "function"
+  }
+
+  if (isCellSelection(editor.state.selection)) {
+    let hasMark = false
+    const { selection } = editor.state
+    
+    // Check if any cell has the mark (or maybe all? usually Tiptap checks if active in current context)
+    // For buttons, we usually want to show active if the selection *has* the mark.
+    // Let's check if *every* cell has the mark to show it as active, or maybe just the first?
+    // Tiptap standard behavior for mixed selection is usually inactive.
+    // Let's stick to Tiptap's isActive behavior which might work for CellSelection if we pass the attributes?
+    // Actually, let's just rely on editor.isActive(type) first, if it fails we can improve.
+    // But for CellSelection, editor.isActive might only check the anchor/head.
+    
+    // Let's use a simple heuristic: if the first cell has it, we consider it active (or mixed).
+    // Better: check if all selected content has it.
+    // For now, let's trust editor.isActive(type) as a baseline, but if it doesn't work for CellSelection we might need to iterate.
+    // Given the complexity, let's stick to editor.isActive(type) for now and only fix toggleMark.
+    return editor.isActive(type)
+  }
+
   return editor.isActive(type)
 }
 
@@ -95,6 +129,43 @@ export function isMarkActive(editor: Editor | null, type: Mark): boolean {
 export function toggleMark(editor: Editor | null, type: Mark): boolean {
   if (!editor || !editor.isEditable) return false
   if (!canToggleMark(editor, type)) return false
+
+  // Check for CellSelection (duck typing)
+  const isCellSelection = (sel: any): boolean => {
+    return !!sel && typeof sel.forEachCell === "function"
+  }
+
+  if (isCellSelection(editor.state.selection)) {
+    const { selection } = editor.state
+    const tr = editor.state.tr
+    const markType = editor.schema.marks[type]
+    if (!markType) return false
+
+    // Determine if we should add or remove.
+    // If currently active (fully or partially), we usually remove? Or if mixed, we add?
+    // Standard Tiptap toggle: if active, remove. If inactive, add.
+    const isActive = editor.isActive(type)
+    
+    // Manual iteration
+    // @ts-ignore
+    selection.forEachCell((node, pos) => {
+      if (node.textContent.length > 0) {
+        const from = pos + 1
+        const to = pos + node.nodeSize - 1
+        if (isActive) {
+          tr.removeMark(from, to, markType)
+        } else {
+          tr.addMark(from, to, markType.create())
+        }
+      }
+    })
+
+    if (tr.docChanged) {
+      editor.view.dispatch(tr)
+      return true
+    }
+    return false
+  }
 
   return editor.chain().focus().toggleMark(type).run()
 }

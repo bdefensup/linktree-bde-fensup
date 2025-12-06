@@ -12,6 +12,7 @@ import { cn, SR_ONLY } from "@/lib/tiptap-utils"
 // --- UI ---
 import { ColorMenu } from "@/components/tiptap-ui/color-menu"
 import { TableAlignMenu } from "@/components/tiptap-node/table-node/ui/table-alignment-menu"
+import { TableFormatMenu } from "@/components/tiptap-node/table-node/ui/table-format-menu"
 import { useTableClearRowColumnContent } from "@/components/tiptap-node/table-node/ui/table-clear-row-column-content-button"
 import { useTableMergeSplitCell } from "@/components/tiptap-node/table-node/ui/table-merge-split-cell-button"
 
@@ -130,7 +131,13 @@ const TableActionItem = ({ action }: { action: TableAction }) => {
   )
 }
 
-const TableActionMenu = ({ onClose }: { onClose: () => void }) => {
+const TableActionMenu = ({
+  onClose,
+  editor,
+}: {
+  onClose: () => void
+  editor: Editor | null
+}) => {
   const { mergeAction, splitAction, clearAction } = useTableActions()
 
   const hasMergeOrSplit = mergeAction.isAvailable || splitAction.isAvailable
@@ -140,22 +147,33 @@ const TableActionMenu = ({ onClose }: { onClose: () => void }) => {
       <Combobox style={SR_ONLY} />
       <ComboboxList style={{ minWidth: "15rem" }}>
         {hasMergeOrSplit && (
-          <MenuGroup>
-            {mergeAction.isAvailable && (
-              <TableActionItem action={mergeAction} />
-            )}
-            {splitAction.isAvailable && (
-              <TableActionItem action={splitAction} />
-            )}
+          <>
+            <MenuGroup>
+              {mergeAction.isAvailable && (
+                <TableActionItem action={mergeAction} />
+              )}
+              {splitAction.isAvailable && (
+                <TableActionItem action={splitAction} />
+              )}
+            </MenuGroup>
             <Separator orientation="horizontal" />
-          </MenuGroup>
+          </>
         )}
 
         <MenuGroup>
+          <TableFormatMenu editor={editor} />
           <ColorMenu />
           <TableAlignMenu />
-          {clearAction.isAvailable && <TableActionItem action={clearAction} />}
         </MenuGroup>
+
+        {clearAction.isAvailable && (
+          <>
+            <Separator orientation="horizontal" />
+            <MenuGroup>
+              <TableActionItem action={clearAction} />
+            </MenuGroup>
+          </>
+        )}
       </ComboboxList>
     </MenuContent>
   )
@@ -202,7 +220,7 @@ export const TableCellHandleMenu = forwardRef<
         </MenuButton>
       }
     >
-      <TableActionMenu onClose={closeMenu} />
+      <TableActionMenu onClose={closeMenu} editor={editor} />
     </Menu>
   )
 })
