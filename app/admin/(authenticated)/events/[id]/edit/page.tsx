@@ -31,6 +31,7 @@ export default async function EditEventPage(props: {
           image: event.image || undefined,
           capacity: event.maxSeats,
           time: format(event.date, "HH:mm"),
+          manualRemainingSeats: event.manualRemainingSeats ?? undefined,
         }}
       />
     </div>

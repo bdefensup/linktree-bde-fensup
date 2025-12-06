@@ -96,6 +96,7 @@ model Event {
   externalMemberPaymentLink String?
 
   maxSeats    Int
+  manualRemainingSeats Int?
   image       String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

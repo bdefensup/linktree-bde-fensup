@@ -284,7 +284,7 @@ export function useColorTextPopover(config?: UseColorTextPopoverConfig) {
     activeTextStyle,
     activeHighlight,
     handleColorChanged,
-    label: "Text color",
+    label: "Couleur du texte",
     Icon: TextColorSmallIcon,
   }
 }

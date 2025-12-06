@@ -54,8 +54,8 @@ export interface UseTableDuplicateRowColumnConfig {
 const REQUIRED_EXTENSIONS = ["tableHandleExtension"]
 
 export const tableDuplicateRowColumnLabels: Record<Orientation, string> = {
-  row: "Duplicate row",
-  column: "Duplicate column",
+  row: "Dupliquer la ligne",
+  column: "Dupliquer la colonne",
 }
 
 /**

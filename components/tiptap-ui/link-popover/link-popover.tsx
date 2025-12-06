@@ -86,8 +86,8 @@ export const LinkButton = forwardRef<HTMLButtonElement, ButtonProps>(
         data-style="ghost"
         role="button"
         tabIndex={-1}
-        aria-label="Link"
-        tooltip="Link"
+        aria-label="Lien"
+        tooltip="Lien"
         ref={ref}
         {...props}
       >
@@ -134,7 +134,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
           <InputGroup>
             <Input
               type="url"
-              placeholder="Paste a link..."
+              placeholder="Coller un lien..."
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -149,7 +149,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
             <Button
               type="button"
               onClick={setLink}
-              title="Apply link"
+              title="Appliquer le lien"
               disabled={!url && !isActive}
               data-style="ghost"
             >
@@ -163,7 +163,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
             <Button
               type="button"
               onClick={openLink}
-              title="Open in new window"
+              title="Ouvrir dans une nouvelle fenêtre"
               disabled={!url && !isActive}
               data-style="ghost"
             >
@@ -173,7 +173,7 @@ const LinkMain: React.FC<LinkMainProps> = ({
             <Button
               type="button"
               onClick={removeLink}
-              title="Remove link"
+              title="Supprimer le lien"
               disabled={!url && !isActive}
               data-style="ghost"
             >

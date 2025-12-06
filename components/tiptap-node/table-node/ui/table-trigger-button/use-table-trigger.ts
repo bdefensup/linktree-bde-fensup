@@ -48,6 +48,8 @@ export interface UseTableTriggerButtonConfig {
  */
 export function canInsertTable(editor: Editor | null): boolean {
   if (!editor || !editor.isEditable) return false
+  // Prevent nested tables
+  if (editor.isActive("table")) return false
   return isExtensionAvailable(editor, REQUIRED_EXTENSIONS)
 }
 
@@ -68,7 +70,7 @@ export function insertTable(
       .insertTable({
         rows,
         cols,
-        withHeaderRow: false,
+        withHeaderRow: true,
       })
       .run()
   } catch (error) {
@@ -173,7 +175,7 @@ export function useTableTriggerButton(config?: UseTableTriggerButtonConfig) {
     handleCellHover,
     handleCellClick,
     resetHoveredCell,
-    label: "Insert table",
+    label: "Insérer un tableau",
     Icon: TableIcon,
   }
 }

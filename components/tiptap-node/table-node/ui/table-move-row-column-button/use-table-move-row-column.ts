@@ -78,16 +78,16 @@ export const tableMoveRowColumnLabels: Record<
   Record<MoveDirection, string>
 > = {
   row: {
-    up: "Move row up",
-    down: "Move row down",
-    left: "Move row left",
-    right: "Move row right",
+    up: "Déplacer la ligne vers le haut",
+    down: "Déplacer la ligne vers le bas",
+    left: "Déplacer la ligne vers la gauche",
+    right: "Déplacer la ligne vers la droite",
   },
   column: {
-    up: "Move column up",
-    down: "Move column down",
-    left: "Move column left",
-    right: "Move column right",
+    up: "Déplacer la colonne vers le haut",
+    down: "Déplacer la colonne vers le bas",
+    left: "Déplacer la colonne vers la gauche",
+    right: "Déplacer la colonne vers la droite",
   },
 }
 

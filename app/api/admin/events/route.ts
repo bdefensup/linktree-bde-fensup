@@ -15,6 +15,7 @@ export async function POST(request: Request) {
       externalPrice,
       capacity,
       isFeatured,
+      manualRemainingSeats,
     } = body;
 
     // Basic validation
@@ -50,7 +51,8 @@ export async function POST(request: Request) {
         image,
         maxSeats: parseInt(capacity),
         isFeatured: isFeatured || false,
-      },
+        manualRemainingSeats: manualRemainingSeats ? parseInt(manualRemainingSeats) : null,
+      } as any,
     });
 
     return NextResponse.json(event);

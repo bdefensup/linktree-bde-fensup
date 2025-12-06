@@ -60,8 +60,8 @@ export interface UseTableHeaderRowColumnConfig {
 const REQUIRED_EXTENSIONS = ["table"]
 
 export const tableHeaderRowColumnLabels: Record<Orientation, string> = {
-  row: "Header row",
-  column: "Header column",
+  row: "Ligne d'en-tête",
+  column: "Colonne d'en-tête",
 }
 
 export const tableHeaderRowColumnIcons = {

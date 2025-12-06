@@ -1,15 +1,15 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Image } from "@/components/tiptap-node/image-node/image-node-extension";
 import { TableKit } from "@/components/tiptap-node/table-node/extensions/table-node-extension";
+import { TableHandleExtension } from "@/components/tiptap-node/table-node/extensions/table-handle";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
-import Superscript from "@tiptap/extension-superscript";
-import Subscript from "@tiptap/extension-subscript";
+
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import TextAlign from "@tiptap/extension-text-align";
@@ -20,16 +20,14 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Highlight from "@tiptap/extension-highlight";
 import { common, createLowlight } from "lowlight";
 import Youtube from "@tiptap/extension-youtube";
-import Mathematics from "@tiptap/extension-mathematics";
-import Emoji from "@tiptap/extension-emoji";
-import Details from "@tiptap/extension-details";
-import DetailsSummary from "@tiptap/extension-details-summary";
-import DetailsContent from "@tiptap/extension-details-content";
+import { Mathematics } from "@tiptap/extension-mathematics";
+
 import FileHandler from "@tiptap/extension-file-handler";
 import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { uploadImage } from "@/lib/upload-image";
 
 import { cn } from "@/lib/utils";
+import "@/components/tiptap-node/table-node/styles/table-node.scss";
 
 // Tiptap UI Components
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from "@/components/tiptap-ui-primitive/toolbar";
@@ -42,25 +40,21 @@ import { LinkPopover } from "@/components/tiptap-ui/link-popover";
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
 import { ImageAlignButton } from "@/components/tiptap-ui/image-align-button";
 import { TableTriggerButton } from "@/components/tiptap-node/table-node/ui/table-trigger-button";
-import { EmojiTriggerButton } from "@/components/tiptap-ui/emoji-trigger-button";
+
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
 import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover";
+import { MathBubbleMenu } from "@/components/tiptap-ui/math-bubble-menu";
+import { YoutubePopover } from "@/components/tiptap-ui/youtube-popover";
+import { MathPopover } from "@/components/tiptap-ui/math-popover";
+import { TableBubbleMenu } from "@/components/tiptap-ui/table-bubble-menu";
+import katex from "katex";
 
-// Manual imports for extras
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import {
-  Plus,
-  Youtube as YoutubeIcon,
-  Sigma,
-  MoreHorizontal,
-} from "lucide-react";
+// Table Node UI Components
+import { TableHandle } from "@/components/tiptap-node/table-node/ui/table-handle/table-handle";
+import { TableSelectionOverlay } from "@/components/tiptap-node/table-node/ui/table-selection-overlay";
+import { TableCellHandleMenu } from "@/components/tiptap-node/table-node/ui/table-cell-handle-menu";
+import { TableExtendRowColumnButtons } from "@/components/tiptap-node/table-node/ui/table-extend-row-column-button";
 
 const lowlight = createLowlight(common);
 
@@ -79,13 +73,18 @@ const extensions = [
   TextStyle,
   Color,
   Image,
-  TableKit,
+  TableKit.configure({
+    table: {
+      resizable: true,
+      allowTableNodeSelection: true,
+    },
+  }),
+  TableHandleExtension,
   Underline,
   Link.configure({
     openOnClick: false,
   }),
-  Superscript,
-  Subscript,
+
   TaskList,
   TaskItem.configure({
     nested: true,
@@ -113,16 +112,12 @@ const extensions = [
   Youtube.configure({
     controls: false,
   }),
-  Mathematics,
-  Emoji,
-  Details.configure({
-    persist: true,
-    HTMLAttributes: {
-      class: "details",
+  Mathematics.configure({
+    katexOptions: {
+      throwOnError: false,
     },
   }),
-  DetailsSummary,
-  DetailsContent,
+
   FileHandler.configure({
     allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml", "image/bmp", "image/tiff", "image/x-icon", "image/heic", "image/avif"],
     onDrop: (currentEditor, files, pos) => {
@@ -222,148 +217,139 @@ export function AdvancedEditor({
     immediatelyRender: false,
   });
 
+  // Ensure katex is available globally for the extension
+  if (typeof window !== "undefined") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).katex = katex;
+  }
+
   if (!editor) {
     return null;
   }
 
-  const addYoutube = () => {
-    const url = window.prompt("URL de la vidéo YouTube");
-    if (url) {
-      editor.chain().focus().setYoutubeVideo({ src: url }).run();
-    }
-  };
-
   return (
-    <div
-      className={cn(
-        "mx-auto w-full max-w-full rounded-lg border border-white/10 bg-[#0E0E11] text-white shadow-sm",
-        className
-      )}
-    >
-      {/* Toolbar */}
-      <Toolbar
+    <EditorContext.Provider value={{ editor }}>
+      <div
         className={cn(
-          "sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b border-white/10 bg-[#0E0E11] p-2 justify-center",
-          toolbarClassName
+          "mx-auto w-full max-w-full rounded-lg border border-white/10 bg-[#19191A] text-white shadow-sm",
+          className
         )}
       >
-        <ToolbarGroup>
-          <UndoRedoButton editor={editor} action="undo" />
-          <UndoRedoButton editor={editor} action="redo" />
-        </ToolbarGroup>
+        <style jsx global>{`
+          .prose ul > li, .prose ol > li {
+            margin-top: 0.1em !important;
+            margin-bottom: 0.1em !important;
+          }
+          .prose ul, .prose ol {
+            margin-top: 0.5em !important;
+            margin-bottom: 0.5em !important;
+          }
+          .prose li p {
+            margin-top: 0.1em !important;
+            margin-bottom: 0.1em !important;
+          }
+          /* Bullet point styles */
+          .prose ul {
+            list-style-type: disc !important;
+          }
+          .prose ul ul {
+            list-style-type: circle !important;
+          }
+          .prose ul ul ul {
+            list-style-type: square !important;
+          }
+          /* Link styles */
+          .prose a {
+            text-decoration: none !important;
+          }
+          /* Hide scrollbar */
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+        `}</style>
+        {/* Toolbar */}
+        <Toolbar
+          className={cn(
+            "sticky top-0 z-10 flex flex-wrap items-center gap-1 rounded-t-lg border-b border-white/10 bg-[#19191A] p-2 justify-center",
+            toolbarClassName
+          )}
+        >
+          <ToolbarGroup>
+            <UndoRedoButton editor={editor} action="undo" />
+            <UndoRedoButton editor={editor} action="redo" />
+          </ToolbarGroup>
 
-        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+          <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
 
-        <ToolbarGroup>
-          <HeadingDropdownMenu editor={editor} />
-          <ListDropdownMenu editor={editor} />
-          <BlockquoteButton editor={editor} />
-          <CodeBlockButton editor={editor} />
-        </ToolbarGroup>
+          <ToolbarGroup>
+            <HeadingDropdownMenu editor={editor} />
+            <ListDropdownMenu editor={editor} />
+            <BlockquoteButton editor={editor} />
+            <CodeBlockButton editor={editor} />
+          </ToolbarGroup>
 
-        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+          <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
 
-        <ToolbarGroup>
-          <MarkButton editor={editor} type="bold" />
-          <MarkButton editor={editor} type="italic" />
-          <MarkButton editor={editor} type="strike" />
-          <MarkButton editor={editor} type="code" />
-          <MarkButton editor={editor} type="underline" />
-          <ColorTextPopover editor={editor} />
-          <LinkPopover editor={editor} />
-        </ToolbarGroup>
+          <ToolbarGroup>
+            <MarkButton editor={editor} type="bold" />
+            <MarkButton editor={editor} type="italic" />
+            <MarkButton editor={editor} type="strike" />
+            <MarkButton editor={editor} type="code" />
+            <MarkButton editor={editor} type="underline" />
+            <ColorTextPopover editor={editor} />
+            <LinkPopover editor={editor} />
+          </ToolbarGroup>
 
-        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+          <ToolbarGroup>
+            <TextAlignButton editor={editor} align="left" />
+            <TextAlignButton editor={editor} align="center" />
+            <TextAlignButton editor={editor} align="right" />
+            <TextAlignButton editor={editor} align="justify" />
+          </ToolbarGroup>
 
-        <ToolbarGroup>
-          <MarkButton editor={editor} type="superscript" />
-          <MarkButton editor={editor} type="subscript" />
-        </ToolbarGroup>
+          <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
 
-        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+          <ToolbarGroup>
+            <ImageUploadButton editor={editor} text="Add" />
+            <ImageAlignButton editor={editor} align="left" />
+            <ImageAlignButton editor={editor} align="center" />
+            <ImageAlignButton editor={editor} align="right" />
+          </ToolbarGroup>
 
-        <ToolbarGroup>
-          <TextAlignButton editor={editor} align="left" />
-          <TextAlignButton editor={editor} align="center" />
-          <TextAlignButton editor={editor} align="right" />
-          <TextAlignButton editor={editor} align="justify" />
-        </ToolbarGroup>
+          <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
 
-        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+          {/* Extras Menu */}
+          <ToolbarGroup>
+            <YoutubePopover editor={editor} />
+            <MathPopover editor={editor} />
+            <TableTriggerButton editor={editor} />
+          </ToolbarGroup>
+        </Toolbar>
 
-        <ToolbarGroup>
-          <ImageUploadButton editor={editor} text="Add" />
-          <ImageAlignButton editor={editor} align="left" />
-          <ImageAlignButton editor={editor} align="center" />
-          <ImageAlignButton editor={editor} align="right" />
-        </ToolbarGroup>
+        {/* Editor Content */}
+        <div className="no-scrollbar h-[900px] w-full overflow-y-auto rounded-b-lg border-t-0 p-4">
+          <EditorContent editor={editor} className="min-h-full" />
+          <MathBubbleMenu editor={editor} />
+          <TableBubbleMenu editor={editor} />
+        </div>
 
-        <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
-
-        {/* Extras Menu */}
-        <ToolbarGroup>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1 text-white hover:bg-white/10 hover:text-white"
-              >
-                <Plus className="h-4 w-4" />
-                Plus
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#0E0E11] text-white border-white/10">
-              <DropdownMenuItem
-                onClick={addYoutube}
-                className="hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <YoutubeIcon className="h-4 w-4" />
-                YouTube
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().setDetails().run()}
-                className="hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-                Détails
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  const input = window.prompt(
-                    "Entrez votre équation LaTeX (ex: E = mc^2)"
-                  );
-                  if (input) {
-                    editor.chain().focus().insertContent(`$${input}$`).run();
-                  }
-                }}
-                className="hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <Sigma className="h-4 w-4" />
-                Mathématiques
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-                className="hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <TableTriggerButton editor={editor} />
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                 onClick={() => editor.chain().focus().setEmoji("😄").run()}
-                 className="hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <EmojiTriggerButton editor={editor} />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </ToolbarGroup>
-      </Toolbar>
-
-      {/* Editor Content */}
-      {/* Editor Content */}
-      <div className="h-[900px] w-full overflow-y-auto rounded-b-lg border-t-0 p-4">
-        <EditorContent editor={editor} className="min-h-full" />
+        {/* Table Components */}
+        <TableHandle />
+        <TableSelectionOverlay
+          showResizeHandles={true}
+          cellMenu={(props) => (
+            <TableCellHandleMenu
+              editor={props.editor}
+              onMouseDown={(e) => props.onResizeStart?.('br')(e)}
+            />
+          )}
+        />
+        <TableExtendRowColumnButtons />
       </div>
-    </div>
+    </EditorContext.Provider>
   );
 }

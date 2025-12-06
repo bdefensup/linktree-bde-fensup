@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { type Editor } from "@tiptap/react"
+import { CellSelection } from "@tiptap/pm/tables"
 import { useHotkeys } from "react-hotkeys-hook"
 
 // --- Hooks ---
@@ -21,52 +22,52 @@ import { TextColorSmallIcon } from "@/components/tiptap-icons/text-color-small-i
 export const COLOR_TEXT_SHORTCUT_KEY = "mod+shift+t"
 export const TEXT_COLORS = [
   {
-    label: "Default text",
+    label: "Texte par défaut",
     value: "var(--tt-color-text)",
     border: "var(--tt-color-text-contrast)",
   },
   {
-    label: "Gray text",
+    label: "Texte gris",
     value: "var(--tt-color-text-gray)",
     border: "var(--tt-color-text-gray-contrast)",
   },
   {
-    label: "Brown text",
+    label: "Texte marron",
     value: "var(--tt-color-text-brown)",
     border: "var(--tt-color-text-brown-contrast)",
   },
   {
-    label: "Orange text",
+    label: "Texte orange",
     value: "var(--tt-color-text-orange)",
     border: "var(--tt-color-text-orange-contrast)",
   },
   {
-    label: "Yellow text",
+    label: "Texte jaune",
     value: "var(--tt-color-text-yellow)",
     border: "var(--tt-color-text-yellow-contrast)",
   },
   {
-    label: "Green text",
+    label: "Texte vert",
     value: "var(--tt-color-text-green)",
     border: "var(--tt-color-text-green-contrast)",
   },
   {
-    label: "Blue text",
+    label: "Texte bleu",
     value: "var(--tt-color-text-blue)",
     border: "var(--tt-color-text-blue-contrast)",
   },
   {
-    label: "Purple text",
+    label: "Texte violet",
     value: "var(--tt-color-text-purple)",
     border: "var(--tt-color-text-purple-contrast)",
   },
   {
-    label: "Pink text",
+    label: "Texte rose",
     value: "var(--tt-color-text-pink)",
     border: "var(--tt-color-text-pink-contrast)",
   },
   {
-    label: "Red text",
+    label: "Texte rouge",
     value: "var(--tt-color-text-red)",
     border: "var(--tt-color-text-red-contrast)",
   },
@@ -228,7 +229,19 @@ export function useColorText(config: UseColorTextConfig) {
   }, [editor, hideWhenUnavailable])
 
   const handleColorText = useCallback(() => {
-    if (!editor || !canColorTextState) return false
+    if (!editor || !canColorTextState) return
+
+    // Check for CellSelection (duck typing to avoid instance mismatch)
+    const isCellSelection = (sel: any): sel is CellSelection => {
+      return !!sel && typeof sel.forEachCell === "function"
+    }
+
+    if (isCellSelection(editor.state.selection)) {
+      console.log("Applying color to CellSelection via setMark", textColor)
+      editor.chain().focus().setMark("textStyle", { color: textColor }).run()
+      onApplied?.({ color: textColor, label })
+      return
+    }
 
     if (editor.state.storedMarks) {
       const textStyleMarkType = editor.schema.marks.textStyle
@@ -250,7 +263,6 @@ export function useColorText(config: UseColorTextConfig) {
       if (success) {
         onApplied?.({ color: textColor, label })
       }
-      return success
     }, 0)
   }, [editor, canColorTextState, textColor, onApplied, label])
 

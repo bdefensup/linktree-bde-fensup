@@ -40,8 +40,8 @@ export interface UseTableMergeSplitCellConfig {
 const REQUIRED_EXTENSIONS = ["table"]
 
 export const tableMergeSplitCellLabels: Record<MergeSplitAction, string> = {
-  merge: "Merge cells",
-  split: "Split cell",
+  merge: "Fusionner les cellules",
+  split: "Diviser la cellule",
 }
 
 export const tableMergeSplitCellIcons = {

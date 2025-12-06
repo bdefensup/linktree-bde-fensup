@@ -142,7 +142,7 @@ export const ColorGroup: React.FC<ColorGroupProps> = ({
             onColorSelected({ type, label: color.label, value: color.value }),
           tabIndex: isHighlighted ? 0 : -1,
           "data-highlighted": isHighlighted,
-          "aria-label": `${color.label} ${type === "text" ? "text" : "highlight"} color`,
+          "aria-label": `${color.label} ${type === "text" ? "texte" : "surlignage"}`,
         }
 
         return type === "text" ? (
@@ -191,7 +191,7 @@ const RecentColorsSection: React.FC<RecentColorsSectionProps> = ({
 
   return (
     <CardItemGroup>
-      <CardGroupLabel>Recently used</CardGroupLabel>
+      <CardGroupLabel>Récemment utilisé</CardGroupLabel>
       <ButtonGroup orientation="horizontal">
         {recentColors.map((colorObj, index) => (
           <RecentColorButton
@@ -269,7 +269,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
         ...recentColors.map((color) => ({
           type: color.type,
           value: color.value,
-          label: `Recent ${color.type === "text" ? "text" : "highlight"} color`,
+          label: `Couleur ${color.type === "text" ? "de texte" : "de surlignage"} récente`,
           group: "recent",
         }))
       )
@@ -306,7 +306,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
       label: string
       value: string
     }) => {
-      if (!containerRef.current) return false
+      if (!containerRef.current) return
 
       const highlightedElement = containerRef.current.querySelector(
         '[data-highlighted="true"]'
@@ -351,7 +351,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
         )}
 
         <CardItemGroup>
-          <CardGroupLabel>Text color</CardGroupLabel>
+          <CardGroupLabel>Couleur du texte</CardGroupLabel>
           <ColorGroup
             editor={editor}
             type="text"
@@ -363,7 +363,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
         </CardItemGroup>
 
         <CardItemGroup>
-          <CardGroupLabel>Highlight color</CardGroupLabel>
+          <CardGroupLabel>Couleur de surlignage</CardGroupLabel>
           <ColorGroup
             editor={editor}
             type="highlight"
@@ -473,7 +473,7 @@ export const ColorTextPopover = forwardRef<
         </PopoverTrigger>
 
         <PopoverContent
-          aria-label="Text color options"
+          aria-label="Options de couleur de texte"
           side="bottom"
           align="start"
         >

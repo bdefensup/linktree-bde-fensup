@@ -65,9 +65,9 @@ export const imageAlignIcons = {
 }
 
 export const imageAlignLabels: Record<ImageAlign, string> = {
-  left: "Image align left",
-  center: "Image align center",
-  right: "Image align right",
+  left: "Aligner l'image à gauche",
+  center: "Centrer l'image",
+  right: "Aligner l'image à droite",
 }
 
 /**

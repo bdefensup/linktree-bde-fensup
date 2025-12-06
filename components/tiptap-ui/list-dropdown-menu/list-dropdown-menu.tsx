@@ -8,6 +8,7 @@ import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
 
 // --- Icons ---
 import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon"
+import { Indent, Outdent } from "lucide-react"
 
 // --- Tiptap UI ---
 import { ListButton, type ListType } from "@/components/tiptap-ui/list-button"
@@ -114,6 +115,47 @@ export function ListDropdownMenu({
                   />
                 </DropdownMenuItem>
               ))}
+            </ButtonGroup>
+            
+            <div className="my-1 h-px bg-border/50" />
+
+            <ButtonGroup>
+              <DropdownMenuItem asChild>
+                <Button
+                  type="button"
+                  data-style="ghost"
+                  onClick={() => {
+                    if (editor?.can().sinkListItem('listItem')) {
+                      editor.chain().focus().sinkListItem('listItem').run()
+                    } else if (editor?.can().sinkListItem('taskItem')) {
+                      editor.chain().focus().sinkListItem('taskItem').run()
+                    }
+                  }}
+                  disabled={!editor?.can().sinkListItem('listItem') && !editor?.can().sinkListItem('taskItem')}
+                  className="w-full justify-start"
+                >
+                  <Indent className="tiptap-button-icon mr-2" />
+                  <span className="tiptap-button-text">Augmenter le retrait</span>
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  type="button"
+                  data-style="ghost"
+                  onClick={() => {
+                    if (editor?.can().liftListItem('listItem')) {
+                      editor.chain().focus().liftListItem('listItem').run()
+                    } else if (editor?.can().liftListItem('taskItem')) {
+                      editor.chain().focus().liftListItem('taskItem').run()
+                    }
+                  }}
+                  disabled={!editor?.can().liftListItem('listItem') && !editor?.can().liftListItem('taskItem')}
+                  className="w-full justify-start"
+                >
+                  <Outdent className="tiptap-button-icon mr-2" />
+                  <span className="tiptap-button-text">Diminuer le retrait</span>
+                </Button>
+              </DropdownMenuItem>
             </ButtonGroup>
           </CardBody>
         </Card>

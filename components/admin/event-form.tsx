@@ -37,6 +37,7 @@ const formSchema = z.object({
   capacity: z.coerce.number().min(1, "La capacité doit être d'au moins 1"),
   image: z.string().url("L'URL de l'image est invalide").optional().or(z.literal("")),
   externalPrice: z.coerce.number().min(0, "Le prix extérieur ne peut pas être négatif").optional(),
+  manualRemainingSeats: z.coerce.number().min(0, "Le nombre de places ne peut pas être négatif").optional(),
 });
 
 type EventFormValues = z.infer<typeof formSchema>;
@@ -56,6 +57,7 @@ export function EventForm({ initialData }: EventFormProps) {
         time: format(new Date(initialData.date), "HH:mm"),
         memberPrice: initialData.memberPrice || undefined,
         externalPrice: initialData.externalPrice || undefined,
+        manualRemainingSeats: initialData.manualRemainingSeats || undefined,
         image: initialData.image || "",
       }
     : {
@@ -69,6 +71,7 @@ export function EventForm({ initialData }: EventFormProps) {
         capacity: 100,
         image: "",
         externalPrice: 0,
+        manualRemainingSeats: undefined,
       };
 
   const form = useForm<EventFormValues>({
@@ -123,6 +126,23 @@ export function EventForm({ initialData }: EventFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control as unknown as Control<FieldValues>}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel suppressHydrationWarning>Image de l'événement</FormLabel>
+              <FormControl>
+                <ImageUpload value={field.value} onChange={field.onChange} disabled={loading} />
+              </FormControl>
+              <FormDescription>
+                Glissez une image ou cliquez pour télécharger (Max 5MB).
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="grid gap-4 md:grid-cols-2">
           <FormField
             control={form.control as unknown as Control<FieldValues>}
@@ -152,23 +172,7 @@ export function EventForm({ initialData }: EventFormProps) {
           />
         </div>
 
-        <FormField
-          control={form.control as unknown as Control<FieldValues>}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Description de l'événement..."
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
 
         <div className="grid gap-4 md:grid-cols-2">
           <FormField
@@ -225,28 +229,17 @@ export function EventForm({ initialData }: EventFormProps) {
           />
         </div>
 
+
+
         <div className="grid gap-4 md:grid-cols-3">
-          <FormField
-            control={form.control as unknown as Control<FieldValues>}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Prix Standard (€)</FormLabel>
-                <FormControl>
-                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control as unknown as Control<FieldValues>}
             name="memberPrice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prix Adhérent (€)</FormLabel>
+                <FormLabel suppressHydrationWarning>Prix Adhérent (€)</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
+                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} suppressHydrationWarning />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -254,28 +247,25 @@ export function EventForm({ initialData }: EventFormProps) {
           />
           <FormField
             control={form.control as unknown as Control<FieldValues>}
-            name="capacity"
+            name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Capacité</FormLabel>
+                <FormLabel suppressHydrationWarning>Prix Standard (€)</FormLabel>
                 <FormControl>
-                  <Input type="number" {...field} value={field.value ?? ""} />
+                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} suppressHydrationWarning />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
           <FormField
             control={form.control as unknown as Control<FieldValues>}
             name="externalPrice"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prix Extérieur (€) (Optionnel)</FormLabel>
+                <FormLabel suppressHydrationWarning>Prix Extérieur (€) (Optionnel)</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} />
+                  <Input type="number" step="0.01" {...field} value={field.value ?? ""} suppressHydrationWarning />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -283,18 +273,51 @@ export function EventForm({ initialData }: EventFormProps) {
           />
         </div>
 
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control as unknown as Control<FieldValues>}
+            name="capacity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel suppressHydrationWarning>Capacité</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} value={field.value ?? ""} suppressHydrationWarning />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control as unknown as Control<FieldValues>}
+            name="manualRemainingSeats"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel suppressHydrationWarning>Places restantes (affichage manuel)</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} value={field.value ?? ""} placeholder="Laisser vide pour auto" suppressHydrationWarning />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        
+
         <FormField
           control={form.control as unknown as Control<FieldValues>}
-          name="image"
+          name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image de l'événement</FormLabel>
+              <FormLabel suppressHydrationWarning>Description</FormLabel>
               <FormControl>
-                <ImageUpload value={field.value} onChange={field.onChange} disabled={loading} />
+                <Textarea
+                  placeholder="Description de l'événement..."
+                  className="resize-none"
+                  {...field}
+                  suppressHydrationWarning
+                />
               </FormControl>
-              <FormDescription>
-                Glissez une image ou cliquez pour télécharger (Max 5MB).
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

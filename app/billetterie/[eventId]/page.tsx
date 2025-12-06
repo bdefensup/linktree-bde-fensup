@@ -45,6 +45,7 @@ interface Event {
   memberPrice?: number;
   externalPrice?: number;
   maxSeats: number;
+  manualRemainingSeats?: number | null;
   image: string | null;
   _count?: {
     bookings: number;
@@ -165,7 +166,10 @@ export default function EventDetailPage() {
     );
   }
 
-  const availableSeats = event.maxSeats - (event._count?.bookings || 0);
+  const availableSeats =
+    event.manualRemainingSeats !== null && event.manualRemainingSeats !== undefined
+      ? event.manualRemainingSeats
+      : event.maxSeats - (event._count?.bookings || 0);
   const isSoldOut = availableSeats <= 0;
   const currentPrice = formData.isMember && event.memberPrice ? event.memberPrice : event.price;
   const eventDate = new Date(event.date);

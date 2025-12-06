@@ -173,6 +173,7 @@ export const AvatarFallback = forwardRef<HTMLSpanElement, AvatarFallbackProps>(
         const timerId = window.setTimeout(() => setCanRender(true), delayMs)
         return () => window.clearTimeout(timerId)
       }
+      return undefined
     }, [delayMs])
 
     if (!canRender || context.imageLoadingStatus === "loaded") return null

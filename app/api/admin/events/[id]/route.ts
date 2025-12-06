@@ -16,6 +16,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       externalPrice,
       capacity,
       isFeatured,
+      manualRemainingSeats,
     } = body;
 
     // If this event is featured, unfeature all others
@@ -38,6 +39,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     if (image !== undefined) updateData.image = image;
     if (capacity !== undefined) updateData.maxSeats = parseInt(capacity);
     if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
+    if (manualRemainingSeats !== undefined) updateData.manualRemainingSeats = manualRemainingSeats ? parseInt(manualRemainingSeats) : null;
 
     const event = await prisma.event.update({
       where: { id },

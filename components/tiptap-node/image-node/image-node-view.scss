@@ -14,18 +14,32 @@
   }
 
   .tiptap-image {
-    display: flex;
-    width: 100%;
-    margin: 1.5rem 0;
+    display: inline-block;
+    vertical-align: bottom;
+    margin: 0.5rem 0;
+    max-width: 100%;
+
+    &[data-align="left"] {
+      float: left;
+      margin-right: 1.5rem;
+      margin-bottom: 0.5rem;
+      clear: right; // Prevent stacking with other right floats if needed, but usually not
+    }
 
     &[data-align="right"] {
-      text-align: right;
-      justify-content: flex-end;
+      float: right;
+      margin-left: 1.5rem;
+      margin-bottom: 0.5rem;
+      clear: left;
     }
 
     &[data-align="center"] {
-      text-align: center;
+      display: flex;
+      width: 100%;
       justify-content: center;
+      margin: 1.5rem 0;
+      float: none;
+      clear: both;
     }
   }
 
