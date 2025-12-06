@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import type { ChainedCommands } from "@tiptap/react"
 import { type Editor } from "@tiptap/react"
+import { CellSelection } from "@tiptap/pm/tables"
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
@@ -204,6 +205,19 @@ export function useTextAlign(config: UseTextAlignConfig) {
 
   const handleTextAlign = useCallback(() => {
     if (!editor) return false
+
+    // Check for CellSelection (duck typing)
+    const isCellSelection = (sel: any): sel is CellSelection => {
+      return !!sel && typeof sel.forEachCell === "function"
+    }
+
+    if (isCellSelection(editor.state.selection)) {
+      const success = editor.chain().focus().setCellAttribute("textAlign", align).run()
+      if (success) {
+        onAligned?.()
+      }
+      return success
+    }
 
     const success = setTextAlign(editor, align)
     if (success) {

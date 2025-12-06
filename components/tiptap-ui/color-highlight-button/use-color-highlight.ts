@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { type Editor } from "@tiptap/react"
-import { CellSelection } from "@tiptap/pm/tables"
 import { useHotkeys } from "react-hotkeys-hook"
 
 // --- Hooks ---
@@ -22,52 +21,52 @@ import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
 export const COLOR_HIGHLIGHT_SHORTCUT_KEY = "mod+shift+h"
 export const HIGHLIGHT_COLORS = [
   {
-    label: "Fond par défaut",
+    label: "Default background",
     value: "var(--tt-bg-color)",
     border: "var(--tt-bg-color-contrast)",
   },
   {
-    label: "Fond gris",
+    label: "Gray background",
     value: "var(--tt-color-highlight-gray)",
     border: "var(--tt-color-highlight-gray-contrast)",
   },
   {
-    label: "Fond marron",
+    label: "Brown background",
     value: "var(--tt-color-highlight-brown)",
     border: "var(--tt-color-highlight-brown-contrast)",
   },
   {
-    label: "Fond orange",
+    label: "Orange background",
     value: "var(--tt-color-highlight-orange)",
     border: "var(--tt-color-highlight-orange-contrast)",
   },
   {
-    label: "Fond jaune",
+    label: "Yellow background",
     value: "var(--tt-color-highlight-yellow)",
     border: "var(--tt-color-highlight-yellow-contrast)",
   },
   {
-    label: "Fond vert",
+    label: "Green background",
     value: "var(--tt-color-highlight-green)",
     border: "var(--tt-color-highlight-green-contrast)",
   },
   {
-    label: "Fond bleu",
+    label: "Blue background",
     value: "var(--tt-color-highlight-blue)",
     border: "var(--tt-color-highlight-blue-contrast)",
   },
   {
-    label: "Fond violet",
+    label: "Purple background",
     value: "var(--tt-color-highlight-purple)",
     border: "var(--tt-color-highlight-purple-contrast)",
   },
   {
-    label: "Fond rose",
+    label: "Pink background",
     value: "var(--tt-color-highlight-pink)",
     border: "var(--tt-color-highlight-pink-contrast)",
   },
   {
-    label: "Fond rouge",
+    label: "Red background",
     value: "var(--tt-color-highlight-red)",
     border: "var(--tt-color-highlight-red-contrast)",
   },
@@ -201,16 +200,6 @@ export function removeHighlight(
   if (!canColorHighlight(editor, mode)) return false
 
   if (mode === "mark") {
-    // Check for CellSelection (duck typing)
-    const isCellSelection = (sel: any): sel is CellSelection => {
-      return !!sel && typeof sel.forEachCell === "function"
-    }
-
-    if (isCellSelection(editor.state.selection)) {
-      editor.chain().focus().unsetMark("highlight").run()
-      return true
-    }
-
     return editor.chain().focus().unsetMark("highlight").run()
   } else {
     return editor.chain().focus().unsetNodeBackgroundColor().run()
@@ -279,18 +268,6 @@ export function useColorHighlight(config: UseColorHighlightConfig) {
       return false
 
     if (mode === "mark") {
-      // Check for CellSelection (duck typing)
-      const isCellSelection = (sel: any): sel is CellSelection => {
-        return !!sel && typeof sel.forEachCell === "function"
-      }
-
-      if (isCellSelection(editor.state.selection)) {
-        console.log("Applying highlight to CellSelection via setMark", highlightColor)
-        editor.chain().focus().setMark("highlight", { color: highlightColor }).run()
-        onApplied?.({ color: highlightColor, label, mode })
-        return true
-      }
-
       if (editor.state.storedMarks) {
         const highlightMarkType = editor.schema.marks.highlight
         if (highlightMarkType) {

@@ -76,12 +76,12 @@ const REQUIRED_EXTENSIONS = ["table"]
 
 export const tableAddRowColumnLabels = {
   row: {
-    above: "Insérer une ligne au-dessus",
-    below: "Insérer une ligne en dessous",
+    above: "Insert row above",
+    below: "Insert row below",
   } as Record<RowSide, string>,
   column: {
-    left: "Insérer une colonne à gauche",
-    right: "Insérer une colonne à droite",
+    left: "Insert column left",
+    right: "Insert column right",
   } as Record<ColSide, string>,
 } as const
 
@@ -293,7 +293,7 @@ export function useTableAddRowColumn(config: UseTableAddRowColumnConfig) {
 
   const { editor } = useTiptapEditor(providedEditor)
 
-
+  const selectionType = getTableSelectionType(editor, index, orientation)
 
   const isVisible = shouldShowButton({
     editor,
@@ -325,12 +325,12 @@ export function useTableAddRowColumn(config: UseTableAddRowColumnConfig) {
   }, [editor, index, orientation, tablePos, side, onAdded])
 
   const label =
-    orientation === "row"
+    selectionType?.orientation === "row"
       ? tableAddRowColumnLabels.row[side as RowSide]
       : tableAddRowColumnLabels.column[side as ColSide]
 
   const Icon =
-    orientation === "row"
+    selectionType?.orientation === "row"
       ? side === "above"
         ? AddRowTopIcon
         : AddRowBottomIcon

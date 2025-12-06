@@ -66,12 +66,12 @@ export const tableSortRowColumnLabels: Record<
   Record<SortDirection, string>
 > = {
   row: {
-    asc: "Trier la ligne A-Z",
-    desc: "Trier la ligne Z-A",
+    asc: "Sort row A-Z",
+    desc: "Sort row Z-A",
   },
   column: {
-    asc: "Trier la colonne A-Z",
-    desc: "Trier la colonne Z-A",
+    asc: "Sort column A-Z",
+    desc: "Sort column Z-A",
   },
 }
 

@@ -85,8 +85,8 @@ const MENU_PLACEMENT_MAP: Record<
 }
 
 const ARIA_LABELS: Record<Orientation, string> = {
-  row: "Actions de ligne",
-  column: "Actions de colonne",
+  row: "Row actions",
+  column: "Column actions",
 }
 
 /* -------------------------------------------------------------------------------------------------

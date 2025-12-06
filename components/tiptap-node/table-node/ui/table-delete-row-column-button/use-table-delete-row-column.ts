@@ -52,8 +52,8 @@ export interface UseTableDeleteRowColumnConfig {
 const REQUIRED_EXTENSIONS = ["table"]
 
 export const tableDeleteRowColumnLabels: Record<Orientation, string> = {
-  row: "Supprimer la ligne",
-  column: "Supprimer la colonne",
+  row: "Delete row",
+  column: "Delete column",
 }
 
 /**

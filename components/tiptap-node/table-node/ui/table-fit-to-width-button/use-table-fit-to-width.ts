@@ -229,7 +229,7 @@ export function useTableFitToWidth(config: UseTableFitToWidthConfig = {}) {
     return success
   }, [editor, onWidthAdjusted])
 
-  const label = "Ajuster à la largeur"
+  const label = "Fit to width"
   const Icon = MoveHorizontalIcon
 
   return {

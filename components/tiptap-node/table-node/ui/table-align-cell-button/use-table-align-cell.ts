@@ -67,15 +67,15 @@ const REQUIRED_EXTENSIONS = ["table"]
 
 export const tableAlignCellLabels = {
   text: {
-    left: "Aligner à gauche",
-    center: "Centrer",
-    right: "Aligner à droite",
-    justify: "Justifier",
+    left: "Align left",
+    center: "Align center",
+    right: "Align right",
+    justify: "Justify",
   } as Record<TextAlignment, string>,
   vertical: {
-    top: "Aligner en haut",
-    middle: "Aligner au milieu",
-    bottom: "Aligner en bas",
+    top: "Align top",
+    middle: "Align middle",
+    bottom: "Align bottom",
   } as Record<VerticalAlignment, string>,
 }
 

@@ -64,8 +64,8 @@ export interface UseTableClearRowColumnContentConfig {
 const REQUIRED_EXTENSIONS = ["table"]
 
 export const tableClearRowColumnContentLabels: Record<Orientation, string> = {
-  row: "Effacer le contenu de la ligne",
-  column: "Effacer le contenu de la colonne",
+  row: "Clear row contents",
+  column: "Clear column contents",
 }
 
 /**
@@ -455,7 +455,7 @@ export function useTableClearRowColumnContent(
     if (selectionType) {
       return tableClearRowColumnContentLabels[selectionType.orientation]
     }
-    return "Effacer le contenu"
+    return "Clear contents"
   }, [selectionType])
 
   const Icon = SquareXIcon

@@ -5,6 +5,8 @@ import StarterKit from "@tiptap/starter-kit";
 import { Color } from "@tiptap/extension-color";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Image } from "@/components/tiptap-node/image-node/image-node-extension";
+import { NodeBackground } from "@/components/tiptap-extension/node-background-extension";
+import { NodeAlignment } from "@/components/tiptap-extension/node-alignment-extension";
 import { TableKit } from "@/components/tiptap-node/table-node/extensions/table-node-extension";
 import { TableHandleExtension } from "@/components/tiptap-node/table-node/extensions/table-handle";
 import Underline from "@tiptap/extension-underline";
@@ -27,6 +29,7 @@ import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/imag
 import { uploadImage } from "@/lib/upload-image";
 
 import { cn } from "@/lib/utils";
+import "@/components/tiptap-node/table-node/styles/prosemirror-table.scss";
 import "@/components/tiptap-node/table-node/styles/table-node.scss";
 
 // Tiptap UI Components
@@ -47,7 +50,6 @@ import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover";
 import { MathBubbleMenu } from "@/components/tiptap-ui/math-bubble-menu";
 import { YoutubePopover } from "@/components/tiptap-ui/youtube-popover";
 import { MathPopover } from "@/components/tiptap-ui/math-popover";
-import { TableBubbleMenu } from "@/components/tiptap-ui/table-bubble-menu";
 import katex from "katex";
 
 // Table Node UI Components
@@ -76,10 +78,11 @@ const extensions = [
   TableKit.configure({
     table: {
       resizable: true,
-      allowTableNodeSelection: true,
     },
   }),
   TableHandleExtension,
+  NodeBackground,
+  NodeAlignment,
   Underline,
   Link.configure({
     openOnClick: false,
@@ -334,7 +337,6 @@ export function AdvancedEditor({
         <div className="no-scrollbar h-[900px] w-full overflow-y-auto rounded-b-lg border-t-0 p-4">
           <EditorContent editor={editor} className="min-h-full" />
           <MathBubbleMenu editor={editor} />
-          <TableBubbleMenu editor={editor} />
         </div>
 
         {/* Table Components */}

@@ -255,27 +255,9 @@ export function useColorTextPopover(config?: UseColorTextPopoverConfig) {
       label: string
       value: string
     }) => {
-      if (!editor) return
-
-      console.log("ColorTextPopover: Applying color", { type, value })
-
-      if (type === "text") {
-        if (value === "var(--tt-color-text)") {
-          editor.chain().focus().unsetMark("textStyle").run()
-        } else {
-          editor.chain().focus().setMark("textStyle", { color: value }).run()
-        }
-      } else if (type === "highlight") {
-        if (value === "var(--tt-bg-color)") {
-          editor.chain().focus().unsetMark("highlight").run()
-        } else {
-          editor.chain().focus().setMark("highlight", { color: value }).run()
-        }
-      }
-      
       onColorChanged?.({ type, label, value })
     },
-    [editor, onColorChanged]
+    [onColorChanged]
   )
 
   return {
@@ -284,7 +266,7 @@ export function useColorTextPopover(config?: UseColorTextPopoverConfig) {
     activeTextStyle,
     activeHighlight,
     handleColorChanged,
-    label: "Couleur du texte",
+    label: "Text color",
     Icon: TextColorSmallIcon,
   }
 }
