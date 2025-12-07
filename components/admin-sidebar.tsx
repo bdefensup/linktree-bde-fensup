@@ -126,7 +126,7 @@ interface SearchResult {
   email: string;
   image: string | null;
   role: string;
-  position: string | null;
+  position?: string | null;
 }
 
 export function AdminSidebar() {
