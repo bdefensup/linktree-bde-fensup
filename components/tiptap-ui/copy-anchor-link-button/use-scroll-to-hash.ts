@@ -106,6 +106,7 @@ export function useScrollToHash(config: UseScrollToHashConfig = {}) {
       }
     } else {
       handleScroll(500)
+      return () => {}
     }
   }, [editor, handleScroll])
 
