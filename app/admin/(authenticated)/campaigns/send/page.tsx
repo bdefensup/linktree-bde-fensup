@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { AdvancedEditor } from "@/components/editor/advanced-editor";
 import { sendEmail, getTemplates } from "@/app/admin/(authenticated)/campaigns/actions";
 import { toast } from "sonner";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
@@ -167,8 +167,8 @@ export default function SendCampaignPage() {
               <div className="grid gap-2">
                 <label className="text-sm font-medium">Contenu</label>
                 <div className="min-h-[400px] overflow-hidden rounded-xl border border-white/10">
-                  <RichTextEditor
-                    value={content}
+                  <AdvancedEditor
+                    initialContent={content}
                     onChange={setContent}
                     className="min-h-[400px] rounded-none border-none"
                   />

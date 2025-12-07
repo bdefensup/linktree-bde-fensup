@@ -5,7 +5,7 @@ import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { AdvancedEditor } from "@/components/editor/advanced-editor";
 import { updateTemplate } from "@/app/admin/(authenticated)/campaigns/actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -151,9 +151,9 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
                 <h3 className="text-lg font-semibold text-muted-foreground">Contenu</h3>
               </div>
               <div className="border rounded-xl overflow-hidden shadow-sm bg-card min-h-[500px]">
-                <RichTextEditor
-                  value={content}
-                  onChange={(newContent) => {
+                <AdvancedEditor
+                  initialContent={content}
+                  onChange={(newContent: string) => {
                     setContent(newContent);
                     setHasChanges(true);
                   }}

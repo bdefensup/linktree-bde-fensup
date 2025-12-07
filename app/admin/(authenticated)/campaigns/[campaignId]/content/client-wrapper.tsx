@@ -130,7 +130,7 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
         {/* Content */}
         <div className="flex flex-1 flex-col overflow-hidden p-4">
           <div className="mx-auto flex h-full w-full max-w-full flex-col gap-4">
-            <div className="grid gap-2 flex-shrink-0">
+            <div className="grid gap-2 shrink-0">
               <label className="text-sm font-medium">Objet de l'e-mail</label>
               <Input
                 placeholder="Ex: Découvrez nos nouveautés !"
@@ -141,7 +141,7 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
             </div>
 
             <div className="flex flex-1 flex-col gap-2 min-h-0">
-              <div className="flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center justify-between shrink-0">
                 <label className="text-sm font-medium">Contenu</label>
                 <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
                   
