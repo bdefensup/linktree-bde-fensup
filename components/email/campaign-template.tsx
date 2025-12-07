@@ -12,7 +12,7 @@ import {
   Column,
   Row,
 } from "@react-email/components";
-import * as React from "react";
+
 
 interface CampaignEmailProps {
   content: string;
