@@ -31,6 +31,7 @@ import { uploadImage } from "@/lib/upload-image";
 import { cn } from "@/lib/utils";
 import "@/components/tiptap-node/table-node/styles/prosemirror-table.scss";
 import "@/components/tiptap-node/table-node/styles/table-node.scss";
+import "@/components/tiptap-node/table-node/styles/table-node.scss";
 
 // Tiptap UI Components
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from "@/components/tiptap-ui-primitive/toolbar";
@@ -209,7 +210,12 @@ export function AdvancedEditor({
     extensions: [
       ...extensions,
       Placeholder.configure({
-        placeholder: placeholder || "Commencez à écrire...",
+        includeChildren: true,
+        showOnlyCurrent: false,
+        emptyNodeClass: "is-empty",
+        placeholder: () => {
+          return placeholder || "Commencez à écrire...";
+        },
       }),
     ],
     content: initialContent,
@@ -302,6 +308,9 @@ export function AdvancedEditor({
             <ListDropdownMenu editor={editor} />
             <BlockquoteButton editor={editor} />
             <CodeBlockButton editor={editor} />
+            <BlockquoteButton editor={editor} />
+            <CodeBlockButton editor={editor} />
+            <MathPopover editor={editor} />
           </ToolbarGroup>
 
           <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
@@ -328,6 +337,7 @@ export function AdvancedEditor({
           <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
 
           <ToolbarGroup>
+            <YoutubePopover editor={editor} />
             <ImageUploadButton editor={editor} text="Add" />
             <ImageAlignButton editor={editor} align="left" />
             <ImageAlignButton editor={editor} align="center" />
@@ -346,12 +356,6 @@ export function AdvancedEditor({
           </ToolbarGroup>
 
           <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
-
-          {/* Extras Menu */}
-          <ToolbarGroup>
-            <YoutubePopover editor={editor} />
-            <MathPopover editor={editor} />
-          </ToolbarGroup>
         </Toolbar>
 
         {/* Editor Content */}
