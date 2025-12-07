@@ -247,7 +247,7 @@ export function AdvancedEditor({
     <EditorContext.Provider value={{ editor }}>
       <div
         className={cn(
-          "mx-auto w-full max-w-full rounded-lg border border-white/10 bg-[#19191A] text-white shadow-sm",
+          "mx-auto flex h-full w-full max-w-full flex-col rounded-lg border border-white/10 bg-[#19191A] text-white shadow-sm",
           className
         )}
       >
@@ -359,7 +359,7 @@ export function AdvancedEditor({
         </Toolbar>
 
         {/* Editor Content */}
-        <ScrollArea className="h-[900px] w-full rounded-b-lg border-t-0 p-4">
+        <ScrollArea className="flex-1 w-full rounded-b-lg border-t-0 p-4 overflow-hidden">
           <EditorContent editor={editor} className="min-h-full" />
           <MathBubbleMenu editor={editor} />
         </ScrollArea>

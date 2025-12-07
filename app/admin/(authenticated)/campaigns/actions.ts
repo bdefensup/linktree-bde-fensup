@@ -527,7 +527,7 @@ export async function sendCampaign(id: string) {
   const emailHtml = await render(
     React.createElement(CampaignEmail, {
       content: contentString,
-      subject: campaign.subject,
+      subject: campaign.subject || "Sans objet",
     })
   );
 
@@ -541,7 +541,7 @@ export async function sendCampaign(id: string) {
         resend.emails.send({
           from,
           to: email,
-          subject: campaign.subject,
+          subject: campaign.subject || "Sans objet",
           html: emailHtml,
         })
       )

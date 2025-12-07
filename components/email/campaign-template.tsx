@@ -2,7 +2,6 @@ import {
   Body,
   Container,
   Head,
-  Heading,
   Html,
   Img,
   Link,
@@ -19,8 +18,6 @@ interface CampaignEmailProps {
   content: string;
   subject: string;
 }
-
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.bdefenelon.org";
 
 export const CampaignEmail = ({ content, subject }: CampaignEmailProps) => {
   return (
@@ -123,11 +120,6 @@ const header = {
 const logo = {
   margin: "0 auto",
   marginBottom: "10px",
-};
-
-const bdeLogo = {
-  margin: "0 auto",
-  borderRadius: "50%",
 };
 
 const contentSection = {

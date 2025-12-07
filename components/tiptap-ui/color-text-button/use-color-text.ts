@@ -228,7 +228,7 @@ export function useColorText(config: UseColorTextConfig) {
   }, [editor, hideWhenUnavailable])
 
   const handleColorText = useCallback(() => {
-    if (!editor || !canColorTextState) return false
+    if (!editor || !canColorTextState) return
 
     if (editor.state.storedMarks) {
       const textStyleMarkType = editor.schema.marks.textStyle

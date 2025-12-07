@@ -26,7 +26,7 @@ interface CampaignContentEditorProps {
 export function CampaignContentEditor({ campaign, templates }: CampaignContentEditorProps) {
   const [subject, setSubject] = useState(campaign.subject || "");
   const [content, setContent] = useState(
-    typeof campaign.content === "string" ? campaign.content : JSON.stringify(campaign.content || {})
+    typeof campaign.content === "string" ? campaign.content : (campaign.content ? JSON.stringify(campaign.content) : "")
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
@@ -70,7 +70,7 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
   };
 
   return (
-    <div className="flex h-screen flex-col bg-black p-4">
+    <div className="flex h-full flex-col bg-black p-4">
       <div className="supports-backdrop-filter:bg-[#1B1B1B]/50 flex flex-1 flex-col overflow-hidden rounded-2xl border bg-[#1B1B1B]/70 shadow-2xl ring-1 ring-white/10 backdrop-blur-2xl">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-[#1B1B1B]/50 p-6 backdrop-blur-md">
@@ -89,7 +89,21 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
+          <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+
+            <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 border-white/10 bg-white/5 hover:bg-white/10"
+                      suppressHydrationWarning
+                    >
+                      <FileText className="mr-2 h-3 w-3" />
+                      Charger un template
+                    </Button>
+                  </DialogTrigger>
+                  </Dialog>
+                  <Button
               variant="outline"
               onClick={() => handleSave()}
               disabled={isSaving}
@@ -114,9 +128,9 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-8">
-          <div className="mx-auto max-w-4xl space-y-6">
-            <div className="grid gap-2">
+        <div className="flex flex-1 flex-col overflow-hidden p-4">
+          <div className="mx-auto flex h-full w-full max-w-full flex-col gap-4">
+            <div className="grid gap-2 flex-shrink-0">
               <label className="text-sm font-medium">Objet de l'e-mail</label>
               <Input
                 placeholder="Ex: Découvrez nos nouveautés !"
@@ -126,21 +140,11 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
               />
             </div>
 
-            <div className="grid gap-2">
-              <div className="flex items-center justify-between">
+            <div className="flex flex-1 flex-col gap-2 min-h-0">
+              <div className="flex items-center justify-between flex-shrink-0">
                 <label className="text-sm font-medium">Contenu</label>
                 <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 border-white/10 bg-white/5 hover:bg-white/10"
-                      suppressHydrationWarning
-                    >
-                      <FileText className="mr-2 h-3 w-3" />
-                      Charger un template
-                    </Button>
-                  </DialogTrigger>
+                  
                   <DialogContent className="text-foreground max-w-2xl border-white/10 bg-[#1C1C1E]">
                     <DialogHeader>
                       <DialogTitle>Choisir un template</DialogTitle>
@@ -170,11 +174,11 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
                 </Dialog>
               </div>
 
-              <div className="min-h-[500px] overflow-hidden rounded-xl border border-white/10">
+              <div className="h-full overflow-hidden rounded-xl border border-white/10">
                 <AdvancedEditor
                   initialContent={content}
                   onChange={setContent}
-                  className="border-0"
+                  className="border-0 h-full"
                 />
               </div>
             </div>
