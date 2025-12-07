@@ -195,7 +195,7 @@ const link = {
   textDecoration: "none",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ? process.env.NEXT_PUBLIC_APP_URL : "";
+
 
 const logo = {
   margin: "0 auto 20px",
