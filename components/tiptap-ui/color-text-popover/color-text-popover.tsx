@@ -293,7 +293,7 @@ export const TextStyleColorPanel: React.FC<TextStyleColorPanelProps> = ({
       label: string
       value: string
     }) => {
-      if (!containerRef.current) return false
+      if (!containerRef.current) return
 
       const highlightedElement = containerRef.current.querySelector(
         '[data-highlighted="true"]'
