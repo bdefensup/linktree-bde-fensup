@@ -13,9 +13,10 @@ import { cn, SR_ONLY } from "@/lib/tiptap-utils"
 import { ColorMenu } from "@/components/tiptap-ui/color-menu"
 import { TableAlignMenu } from "@/components/tiptap-node/table-node/ui/table-alignment-menu"
 import { TableFormatMenu } from "@/components/tiptap-node/table-node/ui/table-format-menu"
-import { TableNodeAlignMenu } from "@/components/tiptap-node/table-node/ui/table-node-align-menu"
 import { useTableClearRowColumnContent } from "@/components/tiptap-node/table-node/ui/table-clear-row-column-content-button"
 import { useTableMergeSplitCell } from "@/components/tiptap-node/table-node/ui/table-merge-split-cell-button"
+import { MathEditCard } from "@/components/tiptap-ui/math-popover/math-edit-card"
+
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -31,6 +32,7 @@ import { Separator } from "@/components/tiptap-ui-primitive/separator"
 
 // --- Icons ---
 import { Grip4Icon } from "@/components/tiptap-icons/grip-4-icon"
+import { Sigma } from "lucide-react"
 
 import "./table-cell-handle-menu.scss"
 
@@ -41,12 +43,13 @@ interface TableAction {
   isAvailable: boolean
   isActive?: boolean
   shortcutBadge?: React.ReactNode
+  preventClose?: boolean
 }
 
 /**
  * Hook to manage all table actions and their availability
  */
-function useTableActions() {
+function useTableActions({ onMathClick }: { onMathClick: () => void }) {
   const mergeCellAction = useTableMergeSplitCell({ action: "merge" })
   const splitCellAction = useTableMergeSplitCell({ action: "split" })
   const clearContentAction = useTableClearRowColumnContent({ resetAttrs: true })
@@ -72,10 +75,19 @@ function useTableActions() {
     isAvailable: clearContentAction.canClearRowColumnContent,
   }
 
+  const mathAction: TableAction = {
+    icon: Sigma,
+    label: "Equation",
+    onClick: onMathClick,
+    isAvailable: true,
+    preventClose: true,
+  }
+
   return {
     mergeAction,
     splitAction,
     clearAction,
+    mathAction,
   }
 }
 
@@ -113,7 +125,7 @@ function useTableCellHandleMenu({ editor }: { editor: Editor | null }) {
 }
 
 const TableActionItem = ({ action }: { action: TableAction }) => {
-  const { icon: Icon, label, onClick, isActive = false, shortcutBadge } = action
+  const { icon: Icon, label, onClick, isActive = false, shortcutBadge, isAvailable, preventClose } = action
 
   return (
     <MenuItem
@@ -121,9 +133,12 @@ const TableActionItem = ({ action }: { action: TableAction }) => {
         <Button
           data-style="ghost"
           data-active-state={isActive ? "on" : "off"}
+          disabled={!isAvailable} // Added disabled prop
         />
       }
       onClick={onClick}
+      disabled={!isAvailable} // Added disabled prop
+      preventClose={preventClose}
     >
       <Icon className="tiptap-button-icon" />
       <span className="tiptap-button-text">{label}</span>
@@ -139,9 +154,45 @@ const TableActionMenu = ({
   onClose: () => void
   editor: Editor | null
 }) => {
-  const { mergeAction, splitAction, clearAction } = useTableActions()
+  const [isMathOpen, setIsMathOpen] = useState(false)
+  const [formula, setFormula] = useState("")
+
+  const { mergeAction, splitAction, clearAction, mathAction } = useTableActions({
+    onMathClick: () => setIsMathOpen(true),
+  })
+
+  const handleMathApply = () => {
+    if (editor && formula) {
+      editor.chain().focus().insertInlineMath({ latex: formula }).run()
+    }
+    setFormula("")
+    setIsMathOpen(false)
+    onClose()
+  }
 
   const hasMergeOrSplit = mergeAction.isAvailable || splitAction.isAvailable
+
+  if (isMathOpen) {
+    return (
+      <MenuContent
+        autoFocusOnShow
+        modal
+        onClose={() => {
+          setIsMathOpen(false)
+          onClose()
+        }}
+      >
+        <div className="p-2">
+          <MathEditCard
+            formula={formula}
+            setFormula={setFormula}
+            onApply={handleMathApply}
+            onCancel={() => setIsMathOpen(false)}
+          />
+        </div>
+      </MenuContent>
+    )
+  }
 
   return (
     <MenuContent autoFocusOnShow modal onClose={onClose}>
@@ -165,17 +216,18 @@ const TableActionMenu = ({
           <TableFormatMenu editor={editor} />
           <ColorMenu />
           <TableAlignMenu />
-          <TableNodeAlignMenu editor={editor} />
+          <TableActionItem action={mathAction} />
         </MenuGroup>
 
-        {clearAction.isAvailable && (
-          <>
-            <Separator orientation="horizontal" />
-            <MenuGroup>
-              <TableActionItem action={clearAction} />
-            </MenuGroup>
-          </>
-        )}
+        <Separator orientation="horizontal" />
+        <MenuGroup>
+          <TableActionItem
+            action={{
+              ...clearAction,
+              isActive: false, // Ensure it's not active
+            }}
+          />
+        </MenuGroup>
       </ComboboxList>
     </MenuContent>
   )

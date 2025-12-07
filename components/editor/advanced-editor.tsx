@@ -3,7 +3,7 @@
 import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Color } from "@tiptap/extension-color";
-import { TextStyle } from "@tiptap/extension-text-style";
+import { TextStyleKit } from "@tiptap/extension-text-style";
 import { Image } from "@/components/tiptap-node/image-node/image-node-extension";
 import { NodeBackground } from "@/components/tiptap-extension/node-background-extension";
 import { NodeAlignment } from "@/components/tiptap-extension/node-alignment-extension";
@@ -43,6 +43,7 @@ import { LinkPopover } from "@/components/tiptap-ui/link-popover";
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
 import { ImageAlignButton } from "@/components/tiptap-ui/image-align-button";
 import { TableTriggerButton } from "@/components/tiptap-node/table-node/ui/table-trigger-button";
+import { TableNodeAlignButton } from "@/components/tiptap-node/table-node/ui/table-node-align-button";
 
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
@@ -50,7 +51,11 @@ import { ColorTextPopover } from "@/components/tiptap-ui/color-text-popover";
 import { MathBubbleMenu } from "@/components/tiptap-ui/math-bubble-menu";
 import { YoutubePopover } from "@/components/tiptap-ui/youtube-popover";
 import { MathPopover } from "@/components/tiptap-ui/math-popover";
+import { FontSizeDropdown } from "@/components/tiptap-ui/font-size-dropdown"
+import { FontFamilyDropdown } from "@/components/tiptap-ui/font-family-dropdown";
 import katex from "katex";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Table Node UI Components
 import { TableHandle } from "@/components/tiptap-node/table-node/ui/table-handle/table-handle";
@@ -72,7 +77,7 @@ const extensions = [
     },
     codeBlock: false, // Disable default codeBlock to use lowlight
   }),
-  TextStyle,
+  TextStyleKit,
   Color,
   Image,
   TableKit.configure({
@@ -188,6 +193,7 @@ interface AdvancedEditorProps {
   editorClassName?: string;
   toolbarClassName?: string;
   placeholder?: string;
+  portal?: boolean;
 }
 
 export function AdvancedEditor({
@@ -197,6 +203,7 @@ export function AdvancedEditor({
   editorClassName,
   toolbarClassName,
   placeholder,
+  portal = false,
 }: AdvancedEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -290,6 +297,8 @@ export function AdvancedEditor({
 
           <ToolbarGroup>
             <HeadingDropdownMenu editor={editor} />
+            <FontSizeDropdown editor={editor} portal={portal} />
+            <FontFamilyDropdown editor={editor} portal={portal} />
             <ListDropdownMenu editor={editor} />
             <BlockquoteButton editor={editor} />
             <CodeBlockButton editor={editor} />
@@ -306,6 +315,8 @@ export function AdvancedEditor({
             <ColorTextPopover editor={editor} />
             <LinkPopover editor={editor} />
           </ToolbarGroup>
+
+          <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
 
           <ToolbarGroup>
             <TextAlignButton editor={editor} align="left" />
@@ -325,19 +336,29 @@ export function AdvancedEditor({
 
           <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
 
+
+
+          <ToolbarGroup>
+            <TableTriggerButton editor={editor} text="Tableau" />
+            <TableNodeAlignButton editor={editor} align="left" />
+            <TableNodeAlignButton editor={editor} align="center" />
+            <TableNodeAlignButton editor={editor} align="right" />
+          </ToolbarGroup>
+
+          <ToolbarSeparator className="mx-1 h-6 bg-white/10" />
+
           {/* Extras Menu */}
           <ToolbarGroup>
             <YoutubePopover editor={editor} />
             <MathPopover editor={editor} />
-            <TableTriggerButton editor={editor} />
           </ToolbarGroup>
         </Toolbar>
 
         {/* Editor Content */}
-        <div className="no-scrollbar h-[900px] w-full overflow-y-auto rounded-b-lg border-t-0 p-4">
+        <ScrollArea className="h-[900px] w-full rounded-b-lg border-t-0 p-4">
           <EditorContent editor={editor} className="min-h-full" />
           <MathBubbleMenu editor={editor} />
-        </div>
+        </ScrollArea>
 
         {/* Table Components */}
         <TableHandle />

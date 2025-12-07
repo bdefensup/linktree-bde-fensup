@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
-import type { Editor } from "@tiptap/react"
 import {
   Menu,
   MenuButton,
@@ -16,19 +14,26 @@ import { ChevronRightIcon } from "@/components/tiptap-icons/chevron-right-icon"
 import { AlignLeftIcon } from "@/components/tiptap-icons/align-left-icon"
 import { AlignCenterIcon } from "@/components/tiptap-icons/align-center-icon"
 import { AlignRightIcon } from "@/components/tiptap-icons/align-right-icon"
-import { LayoutIcon } from "@/components/tiptap-icons/layout-icon"
+import { AlignmentIcon } from "@/components/tiptap-icons/alignment-icon"
+import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { Editor } from "@tiptap/react"
 
-export const TableNodeAlignMenu = ({ editor }: { editor: Editor | null }) => {
-  const setTableAlign = useCallback(
-    (align: "left" | "center" | "right" | null) => {
-      if (!editor) return
+interface TableNodeAlignMenuProps {
+  editor: Editor | null
+}
 
-      editor.chain().focus().updateAttributes("table", { align }).run()
-    },
-    [editor]
-  )
+export const TableNodeAlignMenu = ({ editor: providedEditor }: TableNodeAlignMenuProps) => {
+  const { editor } = useTiptapEditor(providedEditor)
 
-  const currentAlign = editor?.getAttributes("table")?.align || null
+  if (!editor) return null
+
+  const setAlignment = (align: string) => {
+    editor.chain().focus().setNodeTextAlign(align).run()
+  }
+
+  const isAligned = (align: string) => {
+    return editor.isActive({ nodeTextAlign: align })
+  }
 
   return (
     <Menu
@@ -39,7 +44,7 @@ export const TableNodeAlignMenu = ({ editor }: { editor: Editor | null }) => {
             <MenuItem
               render={
                 <Button data-style="ghost">
-                  <LayoutIcon className="tiptap-button-icon" />
+                  <AlignmentIcon className="tiptap-button-icon" />
                   <span className="tiptap-button-text">Position</span>
                   <MenuButtonArrow render={<ChevronRightIcon />} />
                 </Button>
@@ -56,37 +61,37 @@ export const TableNodeAlignMenu = ({ editor }: { editor: Editor | null }) => {
               render={
                 <Button
                   data-style="ghost"
-                  data-active-state={currentAlign === "left" ? "on" : "off"}
+                  data-active-state={isAligned("left") ? "on" : "off"}
                 />
               }
-              onClick={() => setTableAlign("left")}
+              onClick={() => setAlignment("left")}
             >
               <AlignLeftIcon className="tiptap-button-icon" />
-              <span className="tiptap-button-text">Gauche (Habillage)</span>
+              <span className="tiptap-button-text">Gauche</span>
             </MenuItem>
             <MenuItem
               render={
                 <Button
                   data-style="ghost"
-                  data-active-state={currentAlign === "center" ? "on" : "off"}
+                  data-active-state={isAligned("center") ? "on" : "off"}
                 />
               }
-              onClick={() => setTableAlign("center")}
+              onClick={() => setAlignment("center")}
             >
               <AlignCenterIcon className="tiptap-button-icon" />
-              <span className="tiptap-button-text">Centré</span>
+              <span className="tiptap-button-text">Centre</span>
             </MenuItem>
             <MenuItem
               render={
                 <Button
                   data-style="ghost"
-                  data-active-state={currentAlign === "right" ? "on" : "off"}
+                  data-active-state={isAligned("right") ? "on" : "off"}
                 />
               }
-              onClick={() => setTableAlign("right")}
+              onClick={() => setAlignment("right")}
             >
               <AlignRightIcon className="tiptap-button-icon" />
-              <span className="tiptap-button-text">Droite (Habillage)</span>
+              <span className="tiptap-button-text">Droite</span>
             </MenuItem>
           </MenuGroup>
         </ComboboxList>

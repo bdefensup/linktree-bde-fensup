@@ -19,6 +19,7 @@ import { selectCellsByCoords } from "@/components/tiptap-node/table-node/lib/tip
 
 // --- Icons ---
 import { MoreVerticalIcon } from "@/components/tiptap-icons/more-vertical-icon"
+import { Sigma } from "lucide-react"
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -42,6 +43,8 @@ import { useTableDeleteRowColumn } from "@/components/tiptap-node/table-node/ui/
 import { useTableSortRowColumn } from "@/components/tiptap-node/table-node/ui/table-sort-row-column-button"
 import { ColorMenu } from "@/components/tiptap-ui/color-menu"
 import { TableAlignMenu } from "@/components/tiptap-node/table-node/ui/table-alignment-menu"
+import { TableNodeAlignMenu } from "@/components/tiptap-node/table-node/ui/table-node-align-menu"
+import { MathEditCard } from "@/components/tiptap-ui/math-popover/math-edit-card"
 
 import { dragEnd } from "@/components/tiptap-node/table-node/extensions/table-handle"
 
@@ -74,6 +77,7 @@ interface TableActionItemProps {
   disabled?: boolean
   isActive?: boolean
   shortcutBadge?: React.ReactNode
+  preventClose?: boolean
 }
 
 const MENU_PLACEMENT_MAP: Record<
@@ -194,7 +198,7 @@ function useTableHandleMenu(
 /**
  * Hook to get filtered action items based on orientation
  */
-function useTableActionItems() {
+function useTableActionItems({ onMathClick }: { onMathClick: () => void }) {
   const { editor, index, orientation, tablePos } = useTableHandleContext()
 
   const deleteAction = useTableDeleteRowColumn({
@@ -346,6 +350,14 @@ function useTableActionItems() {
     [sortAscAction, sortDescAction]
   )
 
+  const mathAction = {
+    icon: Sigma,
+    label: "Equation",
+    onClick: onMathClick,
+    isAvailable: true,
+    preventClose: true,
+  }
+
   const getSortItems = useCallback(() => {
     const items: TableActionItemProps[] = []
 
@@ -462,6 +474,7 @@ function useTableActionItems() {
     addItems: getActionItems(),
     moveItems: getMoveItems(),
     sortItems: getSortItems(),
+    mathAction,
   }
 }
 
@@ -479,6 +492,7 @@ const TableActionItem = ({
   disabled = false,
   isActive = false,
   shortcutBadge,
+  preventClose,
 }: TableActionItemProps) => (
   <MenuItem
     render={
@@ -486,6 +500,7 @@ const TableActionItem = ({
     }
     onClick={onClick}
     disabled={disabled}
+    preventClose={preventClose}
   >
     <Icon className="tiptap-button-icon" />
     <span className="tiptap-button-text">{label}</span>
@@ -496,8 +511,8 @@ const TableActionItem = ({
 /**
  * Action group component containing add and delete actions
  */
-const TableActionGroup = () => {
-  const { index, orientation } = useTableHandleContext()
+const TableActionGroup = ({ onMathClick }: { onMathClick: () => void }) => {
+  const { index, orientation, editor } = useTableHandleContext()
   const {
     deleteAction,
     duplicateAction,
@@ -506,7 +521,8 @@ const TableActionGroup = () => {
     addItems,
     moveItems,
     sortItems,
-  } = useTableActionItems()
+    mathAction,
+  } = useTableActionItems({ onMathClick })
 
   const hasActions =
     deleteAction.isVisible ||
@@ -585,15 +601,19 @@ const TableActionGroup = () => {
       <>
         <MenuGroup>
           <ColorMenu />
+          <TableNodeAlignMenu editor={editor ?? null} />
           <TableAlignMenu index={index} orientation={orientation} />
-          {clearContentAction.isVisible && (
-            <TableActionItem
-              icon={clearContentAction.Icon}
-              label={clearContentAction.label}
-              disabled={!clearContentAction.canClearRowColumnContent}
-              onClick={clearContentAction.handleClear}
-            />
-          )}
+          <TableActionItem
+            icon={mathAction.icon}
+            label={mathAction.label}
+            onClick={mathAction.onClick}
+          />
+          <TableActionItem
+            icon={clearContentAction.Icon}
+            label={clearContentAction.label}
+            disabled={!clearContentAction.canClearRowColumnContent}
+            onClick={clearContentAction.handleClear}
+          />
         </MenuGroup>
         <Separator orientation="horizontal" />
       </>
@@ -628,6 +648,41 @@ const TableActionGroup = () => {
  */
 const TableActionMenu = () => {
   const { resetMenu } = useTableHandleMenu()
+  const { editor } = useTableHandleContext()
+  const [isMathOpen, setIsMathOpen] = useState(false)
+  const [formula, setFormula] = useState("")
+
+  const handleMathApply = () => {
+    if (editor && formula) {
+      editor.chain().focus().insertInlineMath({ latex: formula }).run()
+    }
+    setFormula("")
+    setIsMathOpen(false)
+    resetMenu()
+  }
+
+  if (isMathOpen) {
+    return (
+      <MenuContent
+        autoFocusOnShow
+        autoFocusOnHide={false}
+        modal
+        onClose={() => {
+          setIsMathOpen(false)
+          resetMenu()
+        }}
+      >
+        <div className="p-2">
+          <MathEditCard
+            formula={formula}
+            setFormula={setFormula}
+            onApply={handleMathApply}
+            onCancel={() => setIsMathOpen(false)}
+          />
+        </div>
+      </MenuContent>
+    )
+  }
 
   return (
     <MenuContent
@@ -638,7 +693,7 @@ const TableActionMenu = () => {
     >
       <Combobox style={SR_ONLY} />
       <ComboboxList style={{ minWidth: "15rem" }}>
-        <TableActionGroup />
+        <TableActionGroup onMathClick={() => setIsMathOpen(true)} />
       </ComboboxList>
     </MenuContent>
   )

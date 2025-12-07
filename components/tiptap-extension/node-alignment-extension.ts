@@ -66,7 +66,7 @@ export const NodeAlignment = Extension.create<NodeAlignmentOptions>({
 
   addOptions() {
     return {
-      types: ["paragraph", "heading", "blockquote", "tableCell", "tableHeader"],
+      types: ["paragraph", "heading", "blockquote", "tableCell", "tableHeader", "table"],
       useStyle: true,
       textAlignValues: ["left", "center", "right", "justify"],
       verticalAlignValues: ["top", "middle", "bottom"],
@@ -105,11 +105,15 @@ export const NodeAlignment = Extension.create<NodeAlignmentOptions>({
               if (!align || !this.options.textAlignValues.includes(align))
                 return {}
 
-              if (this.options.useStyle) {
-                return { style: `text-align: ${align}` }
-              } else {
-                return { "data-node-text-align": align }
+              const attrs: Record<string, string> = {
+                "data-node-text-align": align,
               }
+
+              if (this.options.useStyle) {
+                attrs.style = `text-align: ${align}`
+              }
+
+              return attrs
             },
           },
 
@@ -141,11 +145,15 @@ export const NodeAlignment = Extension.create<NodeAlignmentOptions>({
               if (!vAlign || !this.options.verticalAlignValues.includes(vAlign))
                 return {}
 
-              if (this.options.useStyle) {
-                return { style: `vertical-align: ${vAlign}` }
-              } else {
-                return { "data-node-vertical-align": vAlign }
+              const attrs: Record<string, string> = {
+                "data-node-vertical-align": vAlign,
               }
+
+              if (this.options.useStyle) {
+                attrs.style = `vertical-align: ${vAlign}`
+              }
+
+              return attrs
             },
           },
         },
