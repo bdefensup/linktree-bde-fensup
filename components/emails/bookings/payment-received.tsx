@@ -31,13 +31,13 @@ export const PaymentReceivedEmail = ({
         {/* Header with Logo */}
         <Section style={header}>
           <Img
-            src={`${baseUrl}/logo-full.png`}
-            width="80"
-            height="80"
-            alt="BDE FEN'SUP"
+            src="https://toazsavunhtlhepwhnoe.supabase.co/storage/v1/object/public/campaign-images/logo-full.png"
+            width="150"
+            height="auto"
+            alt="BDE FENELON"
             style={logo}
           />
-          <Heading style={brandName}>BDE FEN'SUP</Heading>
+          <Heading style={brandName}>BDE FENELON</Heading>
         </Section>
 
         <Section style={contentContainer}>
@@ -71,7 +71,7 @@ export const PaymentReceivedEmail = ({
           <Hr style={hr} />
 
           <Text style={footer}>
-            © {new Date().getFullYear()} BDE FEN'SUP - Bureau des Étudiants
+            © {new Date().getFullYear()} BDE FENELON - Bureau des Étudiants
             <br />
             <Link href="https://BDE-FENSUP.short.gy/Instagram" style={link}>
               Instagram

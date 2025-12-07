@@ -7,7 +7,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { render } from "@react-email/components";
-import { CampaignEmail } from "@/components/email/campaign-template";
+import { CampaignEmail } from "@/components/emails/campaigns/campaign-template";
 import * as React from "react";
 
 // --- Folders ---
@@ -516,7 +516,7 @@ export async function sendCampaign(id: string) {
 
   // Implement actual sending logic using Resend
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const from = process.env.EMAIL_FROM || "BDE Fensup <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM || "BDE FENELON <onboarding@resend.dev>";
 
   // Ensure content is a string
   const contentString = typeof campaign.content === 'string' 

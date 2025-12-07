@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { ConversationParticipant } from "@prisma/client";
 
 import { Resend } from "resend";
-import TicketConfirmationEmail from "@/components/emails/ticket-confirmation";
+import TicketConfirmationEmail from "@/components/emails/support/ticket-confirmation";
 
 export async function createTicket(subject: string, name: string, email: string) {
   if (!subject || !name || !email) {
@@ -75,7 +75,7 @@ export async function createTicket(subject: string, name: string, email: string)
 
     try {
       await resend.emails.send({
-        from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+        from: process.env.EMAIL_FROM || "BDE FENELON <onboarding@resend.dev>",
         to: email,
         subject: `Confirmation de votre ticket ${reference}`,
         react: TicketConfirmationEmail({

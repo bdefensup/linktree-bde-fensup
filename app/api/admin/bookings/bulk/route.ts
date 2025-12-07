@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import PaymentReceivedEmail from "@/components/emails/payment-received";
-import BookingCancelledEmail from "@/components/emails/booking-cancelled";
+import PaymentReceivedEmail from "@/components/emails/bookings/payment-received";
+import BookingCancelledEmail from "@/components/emails/bookings/booking-cancelled";
 
 export async function PATCH(req: Request) {
   try {
@@ -14,7 +14,7 @@ export async function PATCH(req: Request) {
 
     if (
       !session ||
-      (session.user.role !== "admin" && session.user.role !== "staff")
+      ((session.user as any).role !== "admin" && (session.user as any).role !== "staff")
     ) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
@@ -65,7 +65,7 @@ export async function PATCH(req: Request) {
     // Send emails
     if (process.env.RESEND_API_KEY) {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const from = process.env.EMAIL_FROM || "onboarding@resend.dev";
+      const from = process.env.EMAIL_FROM || "BDE FENELON <onboarding@resend.dev>";
 
       // Send emails in parallel but don't block response
       Promise.all(

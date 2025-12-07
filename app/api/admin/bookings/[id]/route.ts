@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
-import PaymentReceivedEmail from "@/components/emails/payment-received";
-import BookingCancelledEmail from "@/components/emails/booking-cancelled";
+import PaymentReceivedEmail from "@/components/emails/bookings/payment-received";
+import BookingCancelledEmail from "@/components/emails/bookings/booking-cancelled";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -33,7 +33,7 @@ export async function PATCH(
 
     // Send email based on status
     if (process.env.RESEND_API_KEY) {
-      const from = process.env.EMAIL_FROM || "onboarding@resend.dev";
+      const from = process.env.EMAIL_FROM || "BDE FENELON <onboarding@resend.dev>";
       let emailResult;
 
       if (status === "CONFIRMED") {

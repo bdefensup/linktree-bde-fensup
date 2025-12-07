@@ -12,64 +12,76 @@ import {
   Link,
 } from "@react-email/components";
 
-interface BookingCancelledEmailProps {
-  firstName: string;
-  eventName: string;
-  bookingId: string;
+interface TicketConfirmationProps {
+  name: string;
+  subject: string;
+  reference: string;
+  ticketLink: string;
 }
 
-export const BookingCancelledEmail = ({
-  firstName,
-  eventName,
-  bookingId,
-}: BookingCancelledEmailProps) => (
+export const TicketConfirmationEmail = ({
+  name,
+  subject,
+  reference,
+  ticketLink,
+}: TicketConfirmationProps) => (
   <Html>
     <Head />
-    <Preview>Mise à jour concernant votre réservation pour {eventName}</Preview>
+    <Preview>Votre ticket {reference} a bien été reçu</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header with Logo */}
         <Section style={header}>
           <Img
-            src={`${baseUrl}/logo-full.png`}
-            width="80"
-            height="80"
-            alt="BDE FEN'SUP"
+            src="https://toazsavunhtlhepwhnoe.supabase.co/storage/v1/object/public/campaign-images/logo-full.png"
+            width="150"
+            height="auto"
+            alt="BDE FENELON"
             style={logo}
           />
-          <Heading style={brandName}>BDE FEN'SUP</Heading>
+          <Heading style={brandName}>BDE FENELON</Heading>
         </Section>
 
         <Section style={contentContainer}>
-          <Heading style={h1}>Réservation Annulée</Heading>
+          <Heading style={h1}>Ticket Reçu ! 🎫</Heading>
 
+          <Text style={text}>Bonjour {name},</Text>
           <Text style={text}>
-            Bonjour <strong>{firstName}</strong>,
+            Nous avons bien reçu votre demande concernant "<strong>{subject}</strong>".
           </Text>
           <Text style={text}>
-            Nous vous informons que votre réservation pour l'événement suivant a été annulée ou
-            refusée :
+            Un membre de notre équipe va prendre connaissance de votre message et vous répondra dans
+            les plus brefs délais.
           </Text>
 
-          <Section style={eventCard}>
-            <Text style={eventNameStyle}>{eventName}</Text>
-            <Text style={bookingIdStyle}>Référence : {bookingId}</Text>
-          </Section>
-
-          <Section style={highlightSection}>
-            <Text style={highlightText}>❌ Statut : Annulé / Refusé</Text>
-            <Text style={highlightSubText}>
-              Si vous pensez qu'il s'agit d'une erreur ou si vous avez déjà effectué un paiement,
-              merci de nous contacter rapidement.
+          <Section style={infoBox}>
+            <Text style={infoText}>
+              <strong>Référence :</strong> {reference}
             </Text>
           </Section>
 
-          <Text style={text}>Nous restons à votre disposition pour toute question.</Text>
+          <Text style={text}>
+            Vous pouvez reprendre la discussion à tout moment en cliquant sur le bouton ci-dessous :
+          </Text>
+
+          <Section style={buttonContainer}>
+            <a style={button} href={ticketLink}>
+              Voir mon ticket
+            </a>
+          </Section>
+
+          <Text style={text}>
+            Si le bouton ne fonctionne pas, copiez et collez ce lien :
+            <br />
+            <Link href={ticketLink} style={{ ...link, textDecoration: "underline" }}>
+              {ticketLink}
+            </Link>
+          </Text>
 
           <Hr style={hr} />
 
           <Text style={footer}>
-            © {new Date().getFullYear()} BDE FEN'SUP - Bureau des Étudiants
+            © {new Date().getFullYear()} BDE FENELON - Bureau des Étudiants
             <br />
             <Link href="https://BDE-FENSUP.short.gy/Instagram" style={link}>
               Instagram
@@ -133,49 +145,36 @@ const text = {
   marginBottom: "16px",
 };
 
-const eventCard = {
+const infoBox = {
   backgroundColor: "#f1f5f9",
   borderRadius: "8px",
-  padding: "20px",
-  margin: "24px 0",
-  textAlign: "center" as const,
-  border: "1px solid #e2e8f0",
-};
-
-const eventNameStyle = {
-  fontSize: "20px",
-  fontWeight: "bold",
-  color: "#292758",
-  margin: "0 0 8px 0",
-};
-
-const bookingIdStyle = {
-  fontSize: "14px",
-  color: "#64748b",
-  margin: "0",
-  fontFamily: "monospace",
-};
-
-const highlightSection = {
-  backgroundColor: "#fef2f2", // Red 50
-  borderLeft: "4px solid #ef4444", // Red 500
   padding: "16px",
-  margin: "24px 0",
-  borderRadius: "4px",
+  marginBottom: "24px",
+  textAlign: "center" as const,
 };
 
-const highlightText = {
+const infoText = {
+  fontSize: "18px",
+  color: "#334155",
+  margin: "0",
+};
+
+const buttonContainer = {
+  textAlign: "center" as const,
+  margin: "32px 0",
+};
+
+const button = {
+  backgroundColor: "#f47231",
+  borderRadius: "50px",
+  color: "#fff",
   fontSize: "16px",
   fontWeight: "bold",
-  color: "#991b1b", // Red 800
-  margin: "0 0 8px 0",
-};
-
-const highlightSubText = {
-  fontSize: "15px",
-  color: "#991b1b",
-  margin: "0",
-  lineHeight: "24px",
+  textDecoration: "none",
+  textAlign: "center" as const,
+  display: "inline-block",
+  padding: "12px 32px",
+  boxShadow: "0 4px 6px -1px rgba(244, 114, 49, 0.2)",
 };
 
 const hr = {
@@ -202,4 +201,4 @@ const logo = {
   display: "block",
 };
 
-export default BookingCancelledEmail;
+export default TicketConfirmationEmail;

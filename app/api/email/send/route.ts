@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     const data = await resend.emails.send({
-      from: process.env.EMAIL_FROM || "Acme <onboarding@resend.dev>",
+      from: process.env.EMAIL_FROM || "BDE FENELON <onboarding@resend.dev>",
       to: [to],
       subject: subject,
       html: html,

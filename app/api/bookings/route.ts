@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Resend } from "resend";
-import BookingConfirmationEmail from "@/components/emails/booking-confirmation";
+import BookingConfirmationEmail from "@/components/emails/bookings/booking-confirmation";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     if (process.env.RESEND_API_KEY) {
       try {
         await resend.emails.send({
-          from: "BDE FEN'SUP <onboarding@resend.dev>", // Default Resend testing domain
+          from: "BDE FENELON <onboarding@resend.dev>", // Default Resend testing domain
           to: email,
           subject: `Confirmation de réservation - ${event.title}`,
           react: BookingConfirmationEmail({

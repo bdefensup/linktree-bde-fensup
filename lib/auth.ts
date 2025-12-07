@@ -4,8 +4,8 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";
 import { Resend } from "resend";
-import ResetPasswordEmail from "@/components/emails/reset-password";
-import VerifyEmail from "@/components/emails/verify-email";
+import ResetPasswordEmail from "@/components/emails/auth/reset-password";
+import VerifyEmail from "@/components/emails/auth/verify-email";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -27,7 +27,7 @@ export const auth = betterAuth({
       }
       try {
         await resend.emails.send({
-          from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+          from: process.env.EMAIL_FROM || "BDE FENELON <onboarding@resend.dev>",
           to: data.user.email,
           subject: "Réinitialisation de votre mot de passe",
           react: ResetPasswordEmail({
@@ -52,7 +52,7 @@ export const auth = betterAuth({
       }
       try {
         const { data, error } = await resend.emails.send({
-          from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+          from: process.env.EMAIL_FROM || "BDE FENELON <onboarding@resend.dev>",
           to: user.email,
           subject: "Vérifiez votre adresse email",
           react: VerifyEmail({

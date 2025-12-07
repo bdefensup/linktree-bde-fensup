@@ -10,63 +10,53 @@ import {
   Hr,
   Img,
   Link,
+  Button,
 } from "@react-email/components";
 
-interface VerifyEmailProps {
+interface ResetPasswordEmailProps {
   url: string;
   firstName?: string;
 }
 
-export const VerifyEmail = ({ url, firstName }: VerifyEmailProps) => (
+export const ResetPasswordEmail = ({ url, firstName }: ResetPasswordEmailProps) => (
   <Html>
     <Head />
-    <Preview>Vérifiez votre adresse email pour accéder au BDE FEN'SUP</Preview>
+    <Preview>Réinitialisation de votre mot de passe BDE FENELON</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header with Logo */}
         <Section style={header}>
           <Img
-            src={`${baseUrl}/logo-full.png`}
-            width="80"
-            height="80"
-            alt="BDE FEN'SUP"
+            src="https://toazsavunhtlhepwhnoe.supabase.co/storage/v1/object/public/campaign-images/logo-full.png"
+            width="150"
+            height="auto"
+            alt="BDE FENELON"
             style={logo}
           />
-          <Heading style={brandName}>BDE FEN'SUP</Heading>
+          <Heading style={brandName}>BDE FENELON</Heading>
         </Section>
 
         <Section style={contentContainer}>
-          <Heading style={h1}>Bienvenue ! 👋</Heading>
+          <Heading style={h1}>Mot de passe oublié ? 🔒</Heading>
 
           <Text style={text}>Bonjour {firstName ? <strong>{firstName}</strong> : "!"},</Text>
           <Text style={text}>
-            Merci de vous être inscrit. Pour activer votre compte et accéder à toutes les
-            fonctionnalités exclusives du BDE, veuillez vérifier votre adresse email en cliquant sur
-            le bouton ci-dessous.
+            Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte. Si
+            vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.
           </Text>
 
           <Section style={buttonContainer}>
-            <a style={button} href={url}>
-              Vérifier mon email
-            </a>
+            <Button style={button} href={url}>
+              Réinitialiser mon mot de passe
+            </Button>
           </Section>
 
-          <Text style={text}>
-            Si le bouton ne fonctionne pas, copiez et collez ce lien :
-            <br />
-            <a href={url} style={{ ...link, textDecoration: "underline" }}>
-              {url}
-            </a>
-          </Text>
-
-          <Text style={text}>
-            Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.
-          </Text>
+          <Text style={text}>Ce lien est valide pendant 1 heure.</Text>
 
           <Hr style={hr} />
 
           <Text style={footer}>
-            © {new Date().getFullYear()} BDE FEN'SUP - Bureau des Étudiants
+            © {new Date().getFullYear()} BDE FENELON - Bureau des Étudiants
             <br />
             <Link href="https://BDE-FENSUP.short.gy/Instagram" style={link}>
               Instagram
@@ -172,4 +162,4 @@ const logo = {
   display: "block",
 };
 
-export default VerifyEmail;
+export default ResetPasswordEmail;

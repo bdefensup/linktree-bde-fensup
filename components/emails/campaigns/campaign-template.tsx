@@ -55,7 +55,7 @@ export const CampaignEmail = ({ content, subject }: CampaignEmailProps) => {
                   src="https://toazsavunhtlhepwhnoe.supabase.co/storage/v1/object/public/campaign-images/logo-full.png"
                   width="150"
                   height="auto"
-                  alt="BDE Fénelon Sup"
+                  alt="BDE FENELON"
                   style={logo}
                 />
               </Column>
@@ -71,7 +71,7 @@ export const CampaignEmail = ({ content, subject }: CampaignEmailProps) => {
           <Section style={footer} className="footer">
             <Hr style={hr} />
             <Text style={footerText}>
-              Fénelon Sup, 9 Boulevard de Courcelles, 75008 Paris - 01 43 87 54 86 - fenelonsup@groupefenelon.org
+              BDE FENELON, 9 Boulevard de Courcelles, 75008 Paris - 01 43 87 54 86 - fenelonsup@groupefenelon.org
             </Text>
             <div style={socials}>
               <Link href="https://www.instagram.com/bde_fenelon" style={socialLink}>
