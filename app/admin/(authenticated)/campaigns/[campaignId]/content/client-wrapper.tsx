@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { AdvancedEditor } from "@/components/editor/advanced-editor";
 
 interface CampaignContentEditorProps {
   campaign: any;
@@ -169,7 +170,13 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
                 </Dialog>
               </div>
 
-              <div className="min-h-[500px] overflow-hidden rounded-xl border border-white/10"></div>
+              <div className="min-h-[500px] overflow-hidden rounded-xl border border-white/10">
+                <AdvancedEditor
+                  initialContent={content}
+                  onChange={setContent}
+                  className="border-0"
+                />
+              </div>
             </div>
           </div>
         </div>

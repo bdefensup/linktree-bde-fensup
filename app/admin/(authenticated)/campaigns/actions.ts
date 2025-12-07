@@ -5,6 +5,10 @@ import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { Resend } from "resend";
+import { render } from "@react-email/components";
+import { CampaignEmail } from "@/components/email/campaign-template";
+import * as React from "react";
 
 // --- Folders ---
 
@@ -510,22 +514,52 @@ export async function sendCampaign(id: string) {
     throw new Error("Campaign already sent");
   }
 
-  // TODO: Implement actual sending logic using campaign.recipients and campaign.content
-  console.log("Sending campaign:", {
-    id: campaign.id,
-    subject: campaign.subject,
-    recipients: campaign.recipients,
-  });
+  // Implement actual sending logic using Resend
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const from = process.env.EMAIL_FROM || "BDE Fensup <onboarding@resend.dev>";
 
-  // Simulate delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  // Ensure content is a string
+  const contentString = typeof campaign.content === 'string' 
+    ? campaign.content 
+    : JSON.stringify(campaign.content);
+
+  // Render the email template
+  const emailHtml = await render(
+    React.createElement(CampaignEmail, {
+      content: contentString,
+      subject: campaign.subject,
+    })
+  );
+
+  // Send emails (using Promise.all for now, consider batching for large lists)
+  // Assuming campaign.recipients is string[]
+  const recipients = campaign.recipients as string[];
+
+  if (recipients.length > 0) {
+    const results = await Promise.allSettled(
+      recipients.map((email) =>
+        resend.emails.send({
+          from,
+          to: email,
+          subject: campaign.subject,
+          html: emailHtml,
+        })
+      )
+    );
+
+    // Log results or handle errors if needed
+    const failed = results.filter((r) => r.status === "rejected");
+    if (failed.length > 0) {
+      console.error(`Failed to send ${failed.length} emails`, failed);
+    }
+  }
 
   await prisma.campaign.update({
     where: { id },
     data: {
       status: "SENT",
       sentAt: new Date(),
-      sentCount: campaign.recipients.length,
+      sentCount: recipients.length,
     },
   });
 
