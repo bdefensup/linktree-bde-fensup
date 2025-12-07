@@ -217,7 +217,7 @@ export function AdminSidebar() {
         // Merge mandatory users who don't have a conversation yet
         const mergedConversations = [...conversations];
 
-        mandatoryUsers.forEach((user: SearchResult) => {
+        mandatoryUsers.forEach((user) => {
           const hasConversation = conversations.some((c) =>
             c.participants.some((p) => p.userId === user.id)
           );
