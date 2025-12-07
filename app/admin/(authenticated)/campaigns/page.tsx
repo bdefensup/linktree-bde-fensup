@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Pencil, Trash2, Send } from "lucide-react";
+import { Plus, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { getCampaigns, deleteCampaign } from "@/app/admin/(authenticated)/campaigns/actions";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
