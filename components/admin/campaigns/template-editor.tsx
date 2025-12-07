@@ -30,15 +30,15 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
   const [content, setContent] = useState(
     typeof template.content === "string" ? template.content : JSON.stringify(template.content) // Tiptap expects HTML string or JSON
   );
-  // Note: RichTextEditor expects HTML string. If content is JSON, we might need to convert it or let Tiptap handle it if configured.
+  // Note: AdvancedEditor expects HTML string. If content is JSON, we might need to convert it or let Tiptap handle it if configured.
   // For simplicity, let's assume we store HTML string in the JSON field for now, or we rely on Tiptap's ability to parse.
-  // Actually, my RichTextEditor implementation expects a string (HTML).
-  // If `template.content` is a JSON object (Tiptap JSON), we need to convert it to HTML or modify RichTextEditor to accept JSON.
-  // But `RichTextEditor` uses `useEditor` with `content: value`. Tiptap handles JSON or HTML.
+  // Actually, my AdvancedEditor implementation expects a string (HTML).
+  // If `template.content` is a JSON object (Tiptap JSON), we need to convert it to HTML or modify AdvancedEditor to accept JSON.
+  // But `AdvancedEditor` uses `useEditor` with `content: value`. Tiptap handles JSON or HTML.
   // However, `onChange` returns HTML. So we are storing HTML string in the DB?
   // The schema says `content Json`. So we should probably store the JSON object.
-  // But `RichTextEditor` returns HTML string in `onChange`.
-  // Let's adjust `RichTextEditor` to return JSON or store HTML string in the JSON field (as a string value).
+  // But `AdvancedEditor` returns HTML string in `onChange`.
+  // Let's adjust `AdvancedEditor` to return JSON or store HTML string in the JSON field (as a string value).
   // Storing HTML string in a JSON field is fine: `content: "<div>...</div>"`.
 
   const [isSaving, setIsSaving] = useState(false);
@@ -48,7 +48,7 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
     setName(template.name);
     setSubject(template.subject);
     // Ensure content is a string for the editor if possible, or pass object if Tiptap handles it.
-    // My RichTextEditor props say `value: string`.
+    // My AdvancedEditor props say `value: string`.
     // If template.content is an object, I might need to convert it.
     // But wait, if I save it as HTML string, it will be a string.
     // If it's empty object `{}` (default), Tiptap might treat it as empty content.

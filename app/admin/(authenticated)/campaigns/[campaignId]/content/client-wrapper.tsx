@@ -39,7 +39,7 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
         subject,
         content: content, // Pass as string or JSON depending on what updateCampaign expects. Prisma Json type handles stringified JSON or object.
         // If content is string from Tiptap (HTML), we might want to store it as string or JSON structure.
-        // The RichTextEditor usually returns HTML string.
+        // The AdvancedEditor usually returns HTML string.
         // The Prisma model has `content Json?`.
         // If we pass a string, Prisma might treat it as a JSON string or just a string value.
         // Let's ensure we pass it in a way compatible with how we read it.
