@@ -179,5 +179,10 @@
   },
   "prisma": {
     "seed": "pnpx tsx prisma/seed.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher"
+    ]
   }
 }

@@ -104,10 +104,9 @@ export function useScrollToHash(config: UseScrollToHashConfig = {}) {
       return () => {
         provider.off?.("synced", syncHandler)
       }
+    } else {
+      handleScroll(500)
     }
-
-    handleScroll(500)
-    return undefined
   }, [editor, handleScroll])
 
   useEffect(() => {
