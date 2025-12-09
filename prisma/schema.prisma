@@ -123,6 +123,8 @@ model Booking {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
+  emailLogs EmailLog[]
+
   @@index([eventId])
   @@index([email])
   @@map("booking")
@@ -260,24 +262,159 @@ model Campaign {
   name      String
   subject   String?
   content   Json?    // Content from template or custom
+  attachments Json?  // Array of { url: string, name: string, size: number }
   
   status    String   @default("DRAFT") // DRAFT, SCHEDULED, SENT, ARCHIVED
   
   // Audience
   recipients String[] // Array of emails or tags/segments IDs
+  segmentId  String?
+  segment    Segment? @relation(fields: [segmentId], references: [id])
   
   // Stats
-  sentCount Int      @default(0)
-  openCount Int      @default(0)
-  clickCount Int     @default(0)
+  sentCount      Int      @default(0)
+  deliveredCount Int      @default(0)
+  openCount      Int      @default(0)
+  clickCount     Int      @default(0)
+  bounceCount    Int      @default(0)
+  complaintCount Int      @default(0)
   
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  logs      EmailLog[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sentAt    DateTime?
+  scheduledAt DateTime?
 
   @@map("campaign")
   @@index([userId])
+}
+
+model EmailLog {
+  id          String   @id @default(cuid())
+  campaignId  String?
+  campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  bookingId   String?
+  booking     Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  emailId     String   @unique // Resend Email ID
+  recipient   String
+  status      String   // sent, delivered, bounced, etc.
+  eventType   String   // sent, delivered, open, click, bounce, complaint
+  
+  ipAddress   String?
+  userAgent   String?
+  linkClicked String?  // For click events
+  
+  bounceType    String?  // Permanent, Transient, Undetermined
+  bounceSubType String?  // General, NoEmail, Suppressed, MailboxFull, etc.
+  bounceMessage String?  // Detailed error message
+  
+  createdAt   DateTime @default(now())
+
+  @@map("email_log")
+  @@index([campaignId])
+  @@index([emailId])
+  @@index([recipient])
+}
+
+model UnsubscribedRecipient {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@map("unsubscribed_recipient")
+}
+
+model InboxMessage {
+  id        String   @id @default(cuid())
+  emailId   String   @unique // Resend Email ID (re_...)
+  messageId String?  // RFC Message-ID (<...@...>)
+  from      String
+  to        String[]
+  subject   String
+  text      String?  @db.Text
+  html      String?  @db.Text
+  receivedAt DateTime
+  isRead    Boolean  @default(false)
+  isArchived Boolean @default(false)
+  
+  attachments Json? // Array of { filename, content_type, size, url? }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("inbox_message")
+  @@index([emailId])
+}
+
+
+
+
+model Contact {
+  id        String   @id @default(cuid())
+  resendId  String?  @unique // ID from Resend
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  unsubscribed Boolean @default(false)
+  
+  // Custom properties
+  properties Json?
+
+  topics    ContactTopic[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact")
+}
+
+model Segment {
+  id        String   @id @default(cuid())
+  resendId  String?  @unique
+  name      String
+  query     Json?    // Rules for dynamic segments
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaigns Campaign[]
+
+  @@map("segment")
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  resendId  String?  @unique
+  name      String
+  description String?
+  visibility String  @default("PUBLIC") // PUBLIC, PRIVATE
+  isDefault  Boolean @default(false)    // true = Opt-out, false = Opt-in
+  
+  contacts  ContactTopic[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("topic")
+}
+
+model ContactTopic {
+  id        String   @id @default(cuid())
+  contactId String
+  topicId   String
+  
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  topic     Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([contactId, topicId])
+  @@map("contact_topic")
 }

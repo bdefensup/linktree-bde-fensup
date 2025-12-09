@@ -45,6 +45,13 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Globe, History } from "lucide-react";
+import {
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -433,12 +440,50 @@ export function AdminSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={pathname === "/admin/campaigns"}>
-                    <Link href="/admin/campaigns">
-                      <Mail className="h-4 w-4" />
-                      <span>Campagnes</span>
-                    </Link>
-                  </SidebarMenuButton>
+                  <Accordion type="single" collapsible className="w-full" defaultValue="emailing">
+                    <AccordionItem value="emailing" className="border-none">
+                      <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2">
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-4 w-4" />
+                          <span>Emailing</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-0 pt-1">
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === "/admin/campaigns"}>
+                              <Link href="/admin/campaigns" className="pl-8">
+                                <span>Campagnes</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === "/admin/audience"}>
+                              <Link href="/admin/audience" className="pl-8">
+                                <span>Audience</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/domains"}>
+                              <Link href="/admin/settings/domains" className="pl-8">
+                                <Globe className="h-4 w-4 mr-2" />
+                                <span>Domaines</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                           <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/logs"}>
+                              <Link href="/admin/settings/logs" className="pl-8">
+                                <History className="h-4 w-4 mr-2" />
+                                <span>Logs</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={pathname === "/admin/messages"}>

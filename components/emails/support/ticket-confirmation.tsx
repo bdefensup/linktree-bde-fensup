@@ -127,7 +127,7 @@ const contentContainer = {
   backgroundColor: "#ffffff",
   borderRadius: "12px",
   padding: "40px",
-  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+  border: "1px solid #e2e8f0",
 };
 
 const h1 = {

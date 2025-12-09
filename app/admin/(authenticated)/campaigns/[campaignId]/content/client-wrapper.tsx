@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateCampaign } from "@/app/admin/(authenticated)/campaigns/actions";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Save, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, FileText, Loader2, Paperclip, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,13 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { AdvancedEditor } from "@/components/editor/advanced-editor";
+import { supabase } from "@/lib/supabase";
+
+interface Attachment {
+  url: string;
+  name: string;
+  size: number;
+}
 
 interface CampaignContentEditorProps {
   campaign: any;
@@ -28,22 +35,52 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
   const [content, setContent] = useState(
     typeof campaign.content === "string" ? campaign.content : (campaign.content ? JSON.stringify(campaign.content) : "")
   );
+  const [attachments, setAttachments] = useState<Attachment[]>((campaign.attachments as Attachment[]) || []);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const router = useRouter();
+
+  const handleUploadAttachment = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("campaign-attachments")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("campaign-attachments")
+        .getPublicUrl(filePath);
+
+      setAttachments([...attachments, { url: data.publicUrl, name: file.name, size: file.size }]);
+      toast.success("Fichier ajouté");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Erreur lors de l'upload (Vérifiez que le bucket 'campaign-attachments' existe)");
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      e.target.value = "";
+    }
+  };
 
   const handleSave = async (redirectUrl?: string) => {
     setIsSaving(true);
     try {
       await updateCampaign(campaign.id, {
         subject,
-        content: content, // Pass as string or JSON depending on what updateCampaign expects. Prisma Json type handles stringified JSON or object.
-        // If content is string from Tiptap (HTML), we might want to store it as string or JSON structure.
-        // The AdvancedEditor usually returns HTML string.
-        // The Prisma model has `content Json?`.
-        // If we pass a string, Prisma might treat it as a JSON string or just a string value.
-        // Let's ensure we pass it in a way compatible with how we read it.
-      });
+        content: content,
+        attachments: attachments,
+      } as any);
       toast.success("Sauvegardé");
       if (redirectUrl) {
         router.push(redirectUrl);
@@ -138,6 +175,53 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
                 onChange={(e) => setSubject(e.target.value)}
                 className="border-white/10 bg-white/5"
               />
+            </div>
+
+            <div className="grid gap-2 shrink-0">
+              <label className="text-sm font-medium">Pièces jointes</label>
+              <div className="flex flex-col gap-2">
+                {attachments.map((att, index) => (
+                  <div key={index} className="flex items-center justify-between rounded-md border border-white/10 bg-white/5 p-2 px-3">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <Paperclip className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span className="truncate text-sm">{att.name}</span>
+                      <span className="text-xs text-muted-foreground">({(att.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 hover:bg-red-500/10 hover:text-red-500"
+                      onClick={() => setAttachments(attachments.filter((_, i) => i !== index))}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    id="attachment-upload"
+                    className="hidden"
+                    onChange={handleUploadAttachment}
+                    disabled={isUploading}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-dashed border-white/20 bg-white/5 hover:bg-white/10"
+                    onClick={() => document.getElementById("attachment-upload")?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Paperclip className="mr-2 h-4 w-4" />
+                    )}
+                    Ajouter une pièce jointe
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-1 flex-col gap-2 min-h-0">

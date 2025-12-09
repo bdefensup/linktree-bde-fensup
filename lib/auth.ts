@@ -34,6 +34,10 @@ export const auth = betterAuth({
             url: data.url,
             firstName: data.user.name.split(" ")[0],
           }),
+          tags: [
+            { name: "category", value: "auth" },
+            { name: "action", value: "reset_password" },
+          ],
         });
       } catch (error) {
         console.error("Error sending reset email:", error);
@@ -59,6 +63,10 @@ export const auth = betterAuth({
             url,
             firstName: user.name.split(" ")[0],
           }),
+          tags: [
+            { name: "category", value: "auth" },
+            { name: "action", value: "verify_email" },
+          ],
         });
 
         if (error) {

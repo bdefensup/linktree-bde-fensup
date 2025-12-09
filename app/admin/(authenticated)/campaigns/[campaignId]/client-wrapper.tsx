@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mail, MousePointerClick, Eye } from "lucide-react";
+import { ArrowLeft, Mail, MousePointerClick, Eye, RefreshCw, CheckCircle, AlertTriangle, Ban } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { syncCampaignStats } from "@/app/admin/(authenticated)/campaigns/actions";
+import { toast } from "sonner";
 
 interface CampaignDashboardProps {
   campaign: any;
@@ -11,6 +14,7 @@ interface CampaignDashboardProps {
 
 export function CampaignDashboard({ campaign }: CampaignDashboardProps) {
   const router = useRouter();
+  const [isSyncing, setIsSyncing] = useState(false);
 
   return (
     <div className="flex h-screen flex-col bg-black p-4">
@@ -31,12 +35,32 @@ export function CampaignDashboard({ campaign }: CampaignDashboardProps) {
               <p className="text-muted-foreground text-sm">Rapport de campagne</p>
             </div>
           </div>
+          <Button
+            onClick={async () => {
+              setIsSyncing(true);
+              try {
+                await syncCampaignStats(campaign.id);
+                toast.success("Stats synchronisées !");
+                router.refresh();
+              } catch (error) {
+                toast.error("Erreur lors de la synchro");
+              } finally {
+                setIsSyncing(false);
+              }
+            }}
+            disabled={isSyncing}
+            variant="outline"
+            className="border-white/10 bg-white/5 hover:bg-white/10"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
+            Synchroniser
+          </Button>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8">
           <div className="mx-auto max-w-5xl space-y-8">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
               <Card className="border-white/10 bg-white/5">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Envoyés</CardTitle>
@@ -48,16 +72,31 @@ export function CampaignDashboard({ campaign }: CampaignDashboardProps) {
               </Card>
               <Card className="border-white/10 bg-white/5">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Délivrés</CardTitle>
+                  <CheckCircle className="text-muted-foreground h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{campaign.deliveredCount}</div>
+                  <p className="text-muted-foreground text-xs">
+                    {campaign.sentCount > 0
+                      ? Math.round((campaign.deliveredCount / campaign.sentCount) * 100)
+                      : 0}
+                    %
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Ouvertures</CardTitle>
                   <Eye className="text-muted-foreground h-4 w-4" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{campaign.openCount}</div>
                   <p className="text-muted-foreground text-xs">
-                    {campaign.sentCount > 0
-                      ? Math.round((campaign.openCount / campaign.sentCount) * 100)
+                    {campaign.deliveredCount > 0
+                      ? Math.round((campaign.openCount / campaign.deliveredCount) * 100)
                       : 0}
-                    % taux d'ouverture
+                    %
                   </p>
                 </CardContent>
               </Card>
@@ -72,7 +111,37 @@ export function CampaignDashboard({ campaign }: CampaignDashboardProps) {
                     {campaign.openCount > 0
                       ? Math.round((campaign.clickCount / campaign.openCount) * 100)
                       : 0}
-                    % taux de clic
+                    %
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Bounces</CardTitle>
+                  <AlertTriangle className="text-muted-foreground h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{campaign.bounceCount}</div>
+                  <p className="text-muted-foreground text-xs">
+                    {campaign.sentCount > 0
+                      ? Math.round((campaign.bounceCount / campaign.sentCount) * 100)
+                      : 0}
+                    %
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Plaintes</CardTitle>
+                  <Ban className="text-muted-foreground h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{campaign.complaintCount}</div>
+                  <p className="text-muted-foreground text-xs">
+                    {campaign.sentCount > 0
+                      ? Math.round((campaign.complaintCount / campaign.sentCount) * 100)
+                      : 0}
+                    %
                   </p>
                 </CardContent>
               </Card>

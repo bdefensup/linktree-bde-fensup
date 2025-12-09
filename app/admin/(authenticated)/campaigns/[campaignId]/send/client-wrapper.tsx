@@ -14,20 +14,27 @@ interface CampaignSendPageProps {
 }
 
 export function CampaignSendPage({ campaign }: CampaignSendPageProps) {
+  const [scheduledAt, setScheduledAt] = useState("");
   const [isSending, setIsSending] = useState(false);
   const router = useRouter();
+  const hasAttachments = Array.isArray(campaign.attachments) && campaign.attachments.length > 0;
 
   const handleSend = async () => {
-    if (!confirm("Êtes-vous sûr de vouloir envoyer cette campagne ?")) return;
+    const isScheduled = !!scheduledAt;
+    const confirmMessage = isScheduled 
+      ? `Êtes-vous sûr de vouloir planifier cette campagne pour le ${new Date(scheduledAt).toLocaleString()} ?`
+      : "Êtes-vous sûr de vouloir envoyer cette campagne maintenant ?";
+
+    if (!confirm(confirmMessage)) return;
 
     setIsSending(true);
     try {
-      await sendCampaign(campaign.id);
-      toast.success("Campagne envoyée avec succès !");
+      await sendCampaign(campaign.id, scheduledAt || undefined);
+      toast.success(isScheduled ? "Campagne planifiée !" : "Campagne envoyée avec succès !");
       router.push("/admin/campaigns");
     } catch (error) {
       console.error("Failed to send campaign:", error);
-      toast.error("Erreur lors de l'envoi");
+      toast.error("Erreur lors de l'envoi (Vérifiez les limitations)");
     } finally {
       setIsSending(false);
     }
@@ -54,23 +61,43 @@ export function CampaignSendPage({ campaign }: CampaignSendPageProps) {
               <p className="text-muted-foreground text-sm">Étape 4 : Validation & Envoi</p>
             </div>
           </div>
-          <Button
-            onClick={handleSend}
-            disabled={isSending || !isReady || campaign.status === "SENT"}
-            className="bg-white text-black hover:bg-white/90"
-          >
-            {isSending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Envoi en cours...
-              </>
+          <div className="flex items-center gap-4">
+            {hasAttachments ? (
+               <div className="text-xs text-yellow-500 flex items-center gap-1 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
+                 <AlertCircle className="h-3 w-3" />
+                 Planification impossible avec pièces jointes
+               </div>
             ) : (
-              <>
-                <Send className="mr-2 h-4 w-4" />
-                Envoyer la campagne
-              </>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Planifier :</span>
+                <input
+                  type="datetime-local"
+                  className="bg-white/5 border border-white/10 rounded-md px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20"
+                  value={scheduledAt}
+                  onChange={(e) => setScheduledAt(e.target.value)}
+                  min={new Date().toISOString().slice(0, 16)}
+                />
+              </div>
             )}
-          </Button>
+            
+            <Button
+              onClick={handleSend}
+              disabled={isSending || !isReady || campaign.status === "SENT"}
+              className="bg-white text-black hover:bg-white/90"
+            >
+              {isSending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Traitement...
+                </>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  {scheduledAt ? "Planifier l'envoi" : "Envoyer maintenant"}
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Content */}
@@ -147,6 +174,12 @@ export function CampaignSendPage({ campaign }: CampaignSendPageProps) {
                     <p className="text-muted-foreground text-sm">
                       {campaign.content ? "Contenu défini" : "Aucun contenu"}
                     </p>
+                    {hasAttachments && (
+                      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                         <AlertCircle className="h-3 w-3" />
+                         {campaign.attachments.length} pièce(s) jointe(s) (Planification désactivée)
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

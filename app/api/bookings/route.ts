@@ -111,6 +111,11 @@ export async function POST(request: Request) {
             eventName: event.title,
             bookingId: booking.id,
           }),
+          tags: [
+            { name: "category", value: "booking" },
+            { name: "action", value: "confirmation" },
+            { name: "eventId", value: event.id },
+          ],
         });
       } catch (emailError) {
         console.error("Error sending email:", emailError);

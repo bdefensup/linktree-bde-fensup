@@ -26,5 +26,9 @@ export default async function CampaignAudiencePage({ params }: PageProps) {
     notFound();
   }
 
-  return <CampaignAudienceEditor campaign={campaign} />;
+  const segments = await prisma.segment.findMany({
+    orderBy: { name: "asc" },
+  });
+
+  return <CampaignAudienceEditor campaign={campaign} segments={segments} />;
 }

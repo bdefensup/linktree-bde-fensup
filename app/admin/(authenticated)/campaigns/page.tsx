@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Plus, MoreVertical, Pencil, Trash2, BarChart2 } from "lucide-react";
 import { getCampaigns, deleteCampaign } from "@/app/admin/(authenticated)/campaigns/actions";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -150,8 +150,17 @@ export default function CampaignsListPage() {
                           onClick={() => router.push(`/admin/campaigns/${campaign.id}`)}
                           className="cursor-pointer hover:bg-white/10 focus:bg-white/10"
                         >
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Éditer
+                          {campaign.status === "SENT" ? (
+                            <>
+                              <BarChart2 className="mr-2 h-4 w-4" />
+                              Stats
+                            </>
+                          ) : (
+                            <>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Éditer
+                            </>
+                          )}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(campaign.id)}

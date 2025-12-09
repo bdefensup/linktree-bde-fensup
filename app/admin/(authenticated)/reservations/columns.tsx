@@ -43,7 +43,14 @@ const updateStatus = async (id: string, status: string) => {
 
     if (!response.ok) throw new Error("Failed to update status");
 
-    toast.success("Le statut de la réservation a été mis à jour avec succès.");
+    const data = await response.json();
+
+    if (data.emailSent === false && (status === "CONFIRMED" || status === "CANCELLED")) {
+      toast.warning(`Statut mis à jour, mais l'envoi de l'email a échoué: ${data.emailError || "Erreur inconnue"}`);
+    } else {
+      toast.success("Le statut de la réservation a été mis à jour avec succès.");
+    }
+    
     // We need to refresh the data. Since this is a client component,
     // we might need a way to trigger a refresh in the parent or use router.refresh()
     window.location.reload(); // Simple reload for now, or use router.refresh() if in a server component context

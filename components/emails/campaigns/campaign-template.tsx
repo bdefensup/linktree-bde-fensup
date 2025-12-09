@@ -17,9 +17,10 @@ import {
 interface CampaignEmailProps {
   content: string;
   subject: string;
+  unsubscribeUrl?: string;
 }
 
-export const CampaignEmail = ({ content, subject }: CampaignEmailProps) => {
+export const CampaignEmail = ({ content, subject, unsubscribeUrl }: CampaignEmailProps) => {
   return (
     <Html>
       <Head>
@@ -73,6 +74,13 @@ export const CampaignEmail = ({ content, subject }: CampaignEmailProps) => {
             <Text style={footerText}>
               BDE FENELON, 9 Boulevard de Courcelles, 75008 Paris - 01 43 87 54 86 - fenelonsup@groupefenelon.org
             </Text>
+            {unsubscribeUrl && (
+              <Text style={footerText}>
+                <Link href={unsubscribeUrl} style={{ color: "#8898aa", textDecoration: "underline" }}>
+                  Se désinscrire
+                </Link>
+              </Text>
+            )}
             <div style={socials}>
               <Link href="https://www.instagram.com/bde_fenelon" style={socialLink}>
                 <Img src="https://img.icons8.com/?size=100&id=nj0Uj45LGUYh&format=png&color=000000" width="24" height="24" alt="Instagram" style={socialIcon} />
@@ -109,7 +117,7 @@ const container = {
   marginBottom: "64px",
   maxWidth: "850px",
   borderRadius: "5px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+  border: "1px solid #e2e8f0",
 };
 
 const header = {
