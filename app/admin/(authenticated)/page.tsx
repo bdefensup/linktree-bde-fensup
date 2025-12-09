@@ -89,15 +89,15 @@ export default async function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 p-4 md:p-8 pt-6">
+    <div className="flex h-full flex-col space-y-8 bg-black p-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tableau de Bord</h1>
-          <p className="text-muted-foreground">Vue d'ensemble de l'activité du BDE.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Tableau de Bord</h1>
+          <p className="text-muted-foreground mt-2">Vue d'ensemble de l'activité du BDE.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild className="shadow-lg shadow-primary/20">
+          <Button asChild className="bg-white text-black hover:bg-white/90 shadow-lg shadow-white/5">
             <Link href="/admin/events/new">
               <Plus className="mr-2 h-4 w-4" />
               Créer un Événement
@@ -111,9 +111,9 @@ export default async function AdminDashboard() {
         {/* ROW 1 */}
 
         {/* 1. Quick Actions (Top Left) */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
+        <Card className="bg-[#1B1B1B]/50 backdrop-blur-xl border-white/10 shadow-sm hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Actions Rapides</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Actions Rapides</CardTitle>
             <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="space-y-2">
@@ -121,7 +121,7 @@ export default async function AdminDashboard() {
               <Button
                 variant="outline"
                 size="icon"
-                className="w-full h-10"
+                className="w-full h-10 bg-transparent border-white/10 text-white hover:bg-white/5"
                 asChild
                 title="Créer un événement"
               >
@@ -132,7 +132,7 @@ export default async function AdminDashboard() {
               <Button
                 variant="outline"
                 size="icon"
-                className="w-full h-10"
+                className="w-full h-10 bg-transparent border-white/10 text-white hover:bg-white/5"
                 asChild
                 title="Inviter un staff"
               >
@@ -143,7 +143,7 @@ export default async function AdminDashboard() {
               <Button
                 variant="outline"
                 size="icon"
-                className="w-full h-10"
+                className="w-full h-10 bg-transparent border-white/10 text-white hover:bg-white/5"
                 asChild
                 title="Gérer les billets"
               >
@@ -156,43 +156,43 @@ export default async function AdminDashboard() {
         </Card>
 
         {/* 2. Reservations (Top Middle-Left) */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
+        <Card className="bg-[#1B1B1B]/50 backdrop-blur-xl border-white/10 shadow-sm hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Réservations</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Réservations</CardTitle>
             <Ticket className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingBookings}</div>
+            <div className="text-2xl font-bold text-white">{pendingBookings}</div>
             <p className="text-xs text-muted-foreground">en attente ({totalBookings} total)</p>
           </CardContent>
         </Card>
 
         {/* 3. Members (Top Middle-Right) */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
+        <Card className="bg-[#1B1B1B]/50 backdrop-blur-xl border-white/10 shadow-sm hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Membres</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Membres</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalUsers}</div>
+            <div className="text-2xl font-bold text-white">{totalUsers}</div>
             <p className="text-xs text-muted-foreground">inscrits sur la plateforme</p>
           </CardContent>
         </Card>
 
         {/* 4. Events (Top Right) */}
-        <Card className="bg-card/50 backdrop-blur-xl border-border/50 shadow-sm hover:shadow-md transition-all duration-300">
+        <Card className="bg-[#1B1B1B]/50 backdrop-blur-xl border-white/10 shadow-sm hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Événements</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Événements</CardTitle>
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{upcomingEventsCount}</div>
+            <div className="text-2xl font-bold text-white">{upcomingEventsCount}</div>
             <p className="text-xs text-muted-foreground">à venir ({totalEvents} total)</p>
           </CardContent>
         </Card>
 
         {/* 5. Next Event (Left - Span 2 Cols, Row 2) */}
-        <Card className="col-span-1 md:col-span-2 relative overflow-hidden group border-border/50 shadow-md h-full min-h-[300px]">
+        <Card className="col-span-1 md:col-span-2 relative overflow-hidden group border-white/10 shadow-md h-full min-h-[300px] bg-[#1B1B1B]/50">
           {nextEvent?.image ? (
             <Image
               src={nextEvent.image}
@@ -201,13 +201,13 @@ export default async function AdminDashboard() {
               className="object-cover object-top z-10"
             />
           ) : (
-            <div className="absolute inset-0 z-0 bg-linear-to-br from-primary/20 via-card to-card min-h-[300px]" />
+            <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/20 via-[#1B1B1B] to-[#1B1B1B] min-h-[300px]" />
           )}
 
           <CardHeader className="absolute top-0 left-0 right-0 z-30 p-4 flex flex-row items-start justify-between">
             <div className="inline-flex">
-              <CardTitle className="flex items-center gap-2 text-white bg-black/60 backdrop-blur-md rounded-md px-3 py-1.5 text-sm">
-                <CalendarIcon className="w-4 h-4 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-white bg-black/60 backdrop-blur-md rounded-md px-3 py-1.5 text-sm border border-white/10">
+                <CalendarIcon className="w-4 h-4 text-white" />
                 Prochain Événement
               </CardTitle>
             </div>
@@ -216,7 +216,7 @@ export default async function AdminDashboard() {
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="h-8 w-8 bg-black/60 backdrop-blur-md text-white hover:bg-black/80 border-none"
+                  className="h-8 w-8 bg-black/60 backdrop-blur-md text-white hover:bg-black/80 border border-white/10"
                   asChild
                   title="Voir la page"
                 >
@@ -227,7 +227,7 @@ export default async function AdminDashboard() {
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="h-8 w-8 bg-black/60 backdrop-blur-md text-white hover:bg-black/80 border-none"
+                  className="h-8 w-8 bg-black/60 backdrop-blur-md text-white hover:bg-black/80 border border-white/10"
                   asChild
                   title="Gérer l'événement"
                 >
@@ -248,11 +248,11 @@ export default async function AdminDashboard() {
                   </h2>
                   <div className="flex flex-col gap-1.5 text-gray-100 text-sm font-medium drop-shadow-sm">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-primary shrink-0" />
+                      <MapPin className="w-4 h-4 text-white shrink-0" />
                       <span className="line-clamp-1">{nextEvent.location}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                      <CalendarIcon className="w-4 h-4 text-white shrink-0" />
                       <span className="capitalize">
                         {format(new Date(nextEvent.date), "EEE dd MMM • HH:mm", {
                           locale: fr,
@@ -265,7 +265,7 @@ export default async function AdminDashboard() {
                 <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                   <CalendarDays className="w-10 h-10 mb-2 opacity-50" />
                   <p className="text-sm">Aucun événement à venir.</p>
-                  <Button variant="link" asChild className="mt-1 h-auto p-0 text-primary">
+                  <Button variant="link" asChild className="mt-1 h-auto p-0 text-white">
                     <Link href="/admin/events/new">Créer un événement</Link>
                   </Button>
                 </div>
@@ -275,36 +275,36 @@ export default async function AdminDashboard() {
         </Card>
 
         {/* 6. Recent Activity (Right - Span 2 Cols, Row 2) */}
-        <Card className="col-span-1 md:col-span-2 bg-card/50 backdrop-blur-xl border-border/50 shadow-sm h-auto">
+        <Card className="col-span-1 md:col-span-2 bg-[#1B1B1B]/50 backdrop-blur-xl border-white/10 shadow-sm h-auto">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Activity className="w-5 h-5 text-white" />
               Activité Récente
             </CardTitle>
-            <CardDescription>Dernières réservations et inscriptions.</CardDescription>
+            <CardDescription className="text-muted-foreground">Dernières réservations et inscriptions.</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/50">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/10">
               {/* Column 1: Reservations */}
               <ScrollArea className="h-full">
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
-                    <Ticket className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-semibold">Dernières Réservations</h3>
+                    <Ticket className="w-4 h-4 text-white" />
+                    <h3 className="text-sm font-semibold text-white">Dernières Réservations</h3>
                   </div>
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[100px]">Nom</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="text-right">Statut</TableHead>
+                      <TableRow className="border-white/10 hover:bg-white/5">
+                        <TableHead className="w-[100px] text-muted-foreground">Nom</TableHead>
+                        <TableHead className="text-muted-foreground">Date</TableHead>
+                        <TableHead className="text-right text-muted-foreground">Statut</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {recentBookings.length > 0 ? (
                         recentBookings.map((booking) => (
-                          <TableRow key={booking.id}>
-                            <TableCell className="font-medium">
+                          <TableRow key={booking.id} className="border-white/10 hover:bg-white/5">
+                            <TableCell className="font-medium text-white">
                               <div className="flex flex-col">
                                 <span>
                                   {booking.firstName} {booking.lastName}
@@ -324,7 +324,7 @@ export default async function AdminDashboard() {
                                 {booking.status === "CONFIRMED" && (
                                   <Badge
                                     variant="outline"
-                                    className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border-green-200 dark:border-green-800 hover:bg-green-200 hover:border-green-300 dark:hover:bg-green-900/50 transition-colors duration-200 px-2 py-0.5 h-5 flex items-center"
+                                    className="bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/20 px-2 py-0.5 h-5 flex items-center"
                                   >
                                     Validé
                                   </Badge>
@@ -332,7 +332,7 @@ export default async function AdminDashboard() {
                                 {booking.status === "PENDING" && (
                                   <Badge
                                     variant="outline"
-                                    className="bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200 border-orange-200 dark:border-orange-800 hover:bg-orange-200 hover:border-orange-300 dark:hover:bg-orange-900/50 transition-colors duration-200 px-2 py-0.5 h-5 flex items-center"
+                                    className="bg-orange-500/10 text-orange-500 border-orange-500/20 hover:bg-orange-500/20 px-2 py-0.5 h-5 flex items-center"
                                   >
                                     En attente
                                   </Badge>
@@ -340,7 +340,7 @@ export default async function AdminDashboard() {
                                 {booking.status === "CANCELLED" && (
                                   <Badge
                                     variant="outline"
-                                    className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200 dark:border-red-800 hover:bg-red-200 hover:border-red-300 dark:hover:bg-red-900/50 transition-colors duration-200 px-2 py-0.5 h-5 flex items-center"
+                                    className="bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20 px-2 py-0.5 h-5 flex items-center"
                                   >
                                     Refusé
                                   </Badge>
@@ -350,7 +350,7 @@ export default async function AdminDashboard() {
                           </TableRow>
                         ))
                       ) : (
-                        <TableRow>
+                        <TableRow className="border-white/10 hover:bg-white/5">
                           <TableCell
                             colSpan={3}
                             className="text-center text-muted-foreground text-xs"
@@ -368,30 +368,30 @@ export default async function AdminDashboard() {
               <ScrollArea className="h-full">
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
-                    <Users className="w-4 h-4 text-primary" />
-                    <h3 className="text-sm font-semibold">Nouveaux Membres</h3>
+                    <Users className="w-4 h-4 text-white" />
+                    <h3 className="text-sm font-semibold text-white">Nouveaux Membres</h3>
                   </div>
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead>Nom</TableHead>
-                        <TableHead className="text-right">Rôle</TableHead>
+                      <TableRow className="border-white/10 hover:bg-white/5">
+                        <TableHead className="w-[50px] text-muted-foreground"></TableHead>
+                        <TableHead className="text-muted-foreground">Nom</TableHead>
+                        <TableHead className="text-right text-muted-foreground">Rôle</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {recentUsers.length > 0 ? (
                         recentUsers.map((user) => (
-                          <TableRow key={user.id}>
+                          <TableRow key={user.id} className="border-white/10 hover:bg-white/5">
                             <TableCell>
                               <Avatar className="h-6 w-6">
                                 <AvatarImage src={user.image || ""} />
-                                <AvatarFallback className="text-[10px]">
+                                <AvatarFallback className="text-[10px] text-black">
                                   {user.name?.charAt(0) || "U"}
                                 </AvatarFallback>
                               </Avatar>
                             </TableCell>
-                            <TableCell className="font-medium text-sm">
+                            <TableCell className="font-medium text-sm text-white">
                               <div className="flex flex-col">
                                 <span>{user.name}</span>
                                 <span className="text-[10px] text-muted-foreground">
@@ -406,7 +406,7 @@ export default async function AdminDashboard() {
                                 {user.role === "admin" && (
                                   <Badge
                                     variant="outline"
-                                    className="bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800 gap-1 hover:bg-orange-100 dark:hover:bg-orange-900/60 px-2 py-0.5 h-5 flex items-center"
+                                    className="bg-orange-500/10 text-orange-500 border-orange-500/20 gap-1 hover:bg-orange-500/20 px-2 py-0.5 h-5 flex items-center"
                                   >
                                     <ShieldAlert className="w-3 h-3" />
                                     Admin
@@ -415,7 +415,7 @@ export default async function AdminDashboard() {
                                 {user.role === "staff" && (
                                   <Badge
                                     variant="outline"
-                                    className="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800 gap-1 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2 py-0.5 h-5 flex items-center"
+                                    className="bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1 hover:bg-blue-500/20 px-2 py-0.5 h-5 flex items-center"
                                   >
                                     <Shield className="w-3 h-3" />
                                     Staff
@@ -424,7 +424,7 @@ export default async function AdminDashboard() {
                                 {(user.role === "adherent" || user.role === "user") && (
                                   <Badge
                                     variant="outline"
-                                    className="bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-800 gap-1 hover:bg-violet-100 dark:hover:bg-violet-900/60 px-2 py-0.5 h-5 flex items-center"
+                                    className="bg-violet-500/10 text-violet-500 border-violet-500/20 gap-1 hover:bg-violet-500/20 px-2 py-0.5 h-5 flex items-center"
                                   >
                                     <UserIcon className="w-3 h-3" />
                                     Adhérent
@@ -435,7 +435,7 @@ export default async function AdminDashboard() {
                           </TableRow>
                         ))
                       ) : (
-                        <TableRow>
+                        <TableRow className="border-white/10 hover:bg-white/5">
                           <TableCell
                             colSpan={3}
                             className="text-center text-muted-foreground text-xs"

@@ -188,19 +188,19 @@ export default function MessagesPage() {
 
   return (
     <TooltipProvider>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full bg-black">
         <>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b h-16">
+          <div className="flex items-center justify-between p-4 border-b border-white/10 h-16 bg-[#1B1B1B]/50 backdrop-blur-sm">
             <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 border border-border/50">
+              <Avatar className="h-9 w-9 border border-white/10">
                 <AvatarImage src={otherParticipant?.image || undefined} />
-                <AvatarFallback>
+                <AvatarFallback className="text-black bg-white">
                   {otherParticipant?.name?.slice(0, 2).toUpperCase() || "CH"}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="font-semibold text-sm">
+                <h2 className="font-semibold text-sm text-white">
                   {otherParticipant?.name || "Chargement..."}
                 </h2>
                 <p className="text-xs text-muted-foreground">
@@ -214,14 +214,14 @@ export default function MessagesPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-white/10"
                     onClick={!isMandatory ? handleTogglePin : undefined}
                     disabled={isMandatory}
                   >
                     <Pin
                       className={cn(
                         "h-4 w-4 transform rotate-45",
-                        (isPinned || isMandatory) && "text-primary fill-primary",
+                        (isPinned || isMandatory) && "text-white fill-white",
                         isMandatory && "text-red-500 fill-red-500"
                       )}
                     />
@@ -234,7 +234,7 @@ export default function MessagesPage() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-white/10">
                     <Phone className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -243,18 +243,18 @@ export default function MessagesPage() {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-white/10">
                     <Video className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Appel vidéo</TooltipContent>
               </Tooltip>
 
-              <Separator orientation="vertical" className="h-6 mx-1" />
+              <Separator orientation="vertical" className="h-6 mx-1 bg-white/10" />
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white hover:bg-white/10">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -264,11 +264,11 @@ export default function MessagesPage() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 min-h-0 overflow-hidden bg-muted/5">
+          <div className="flex-1 min-h-0 overflow-hidden bg-black">
             <ScrollArea className="h-full p-4">
               <div className="flex flex-col gap-4 max-w-3xl mx-auto">
                 {loading && messages.length === 0 ? (
-                  <div className="flex justify-center py-4">Chargement...</div>
+                  <div className="flex justify-center py-4 text-muted-foreground">Chargement...</div>
                 ) : messages.length > 0 ? (
                   messages.map((msg) => (
                     <div
@@ -278,9 +278,9 @@ export default function MessagesPage() {
                         msg.senderId === session?.user?.id ? "ml-auto flex-row-reverse" : ""
                       )}
                     >
-                      <Avatar className="h-8 w-8 mt-1 border border-border/50">
+                      <Avatar className="h-8 w-8 mt-1 border border-white/10">
                         <AvatarImage src={msg.sender?.image || undefined} />
-                        <AvatarFallback>
+                        <AvatarFallback className="text-black bg-white">
                           {msg.sender?.name?.slice(0, 2).toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
@@ -288,8 +288,8 @@ export default function MessagesPage() {
                         className={cn(
                           "rounded-2xl px-4 py-2 text-sm shadow-sm",
                           msg.senderId === session?.user?.id
-                            ? "bg-primary text-primary-foreground rounded-tr-none"
-                            : "bg-card border rounded-tl-none"
+                            ? "bg-white text-black rounded-tr-none"
+                            : "bg-[#1B1B1B] border border-white/10 text-white rounded-tl-none"
                         )}
                       >
                         <p>{msg.content}</p>
@@ -297,7 +297,7 @@ export default function MessagesPage() {
                           className={cn(
                             "flex items-center justify-end gap-1 mt-1 text-[10px]",
                             msg.senderId === session?.user?.id
-                              ? "text-primary-foreground/70"
+                              ? "text-black/70"
                               : "text-muted-foreground"
                           )}
                         >
@@ -327,7 +327,7 @@ export default function MessagesPage() {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t bg-background">
+          <div className="p-4 border-t border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm">
             <form onSubmit={handleSendMessage} className="flex items-end gap-2 max-w-3xl mx-auto">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -335,9 +335,9 @@ export default function MessagesPage() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-full"
+                    className="h-10 w-10 rounded-full text-muted-foreground hover:text-white hover:bg-white/10"
                   >
-                    <Paperclip className="h-5 w-5 text-muted-foreground" />
+                    <Paperclip className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Joindre un fichier</TooltipContent>
@@ -348,21 +348,21 @@ export default function MessagesPage() {
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder="Écrivez votre message..."
-                  className="pr-10 py-6 rounded-full bg-muted/30 border-muted-foreground/20 focus-visible:ring-1"
+                  className="pr-10 py-6 rounded-full bg-black/50 border-white/10 text-white focus-visible:ring-white/20 placeholder:text-muted-foreground"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1.5 h-8 w-8 rounded-full hover:bg-transparent"
+                  className="absolute right-2 top-1.5 h-8 w-8 rounded-full hover:bg-white/10 text-muted-foreground hover:text-white"
                 >
-                  <Smile className="h-5 w-5 text-muted-foreground" />
+                  <Smile className="h-5 w-5" />
                 </Button>
               </div>
               <Button
                 type="submit"
                 size="icon"
-                className="h-10 w-10 rounded-full"
+                className="h-10 w-10 rounded-full bg-white text-black hover:bg-white/90"
                 disabled={!messageInput.trim()}
               >
                 <Send className="h-5 w-5" />

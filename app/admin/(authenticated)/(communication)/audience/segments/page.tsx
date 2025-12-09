@@ -24,21 +24,21 @@ export default async function SegmentsPage() {
   });
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="flex h-full flex-col space-y-8 bg-black p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Segments</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Segments</h1>
         <Link href="/admin/audience/segments/new">
-          <Button className="gap-2">
+          <Button className="gap-2 bg-white text-black hover:bg-white/90">
             <Plus className="h-4 w-4" />
             Créer un segment
           </Button>
         </Link>
       </div>
 
-      <div className="rounded-md border border-white/10 bg-white/5">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm">
         <Table>
-          <TableHeader>
-            <TableRow className="border-white/10 hover:bg-white/5">
+          <TableHeader className="bg-white/5">
+            <TableRow className="border-white/5 hover:bg-transparent">
               <TableHead className="text-muted-foreground">Nom</TableHead>
               <TableHead className="text-muted-foreground">Critères</TableHead>
               <TableHead className="text-muted-foreground">Campagnes</TableHead>
@@ -55,7 +55,7 @@ export default async function SegmentsPage() {
               </TableRow>
             ) : (
               segments.map((segment) => (
-                <TableRow key={segment.id} className="border-white/10 hover:bg-white/5">
+                <TableRow key={segment.id} className="border-white/5 transition-colors hover:bg-white/5">
                   <TableCell className="font-medium text-white">
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-muted-foreground" />
@@ -63,7 +63,7 @@ export default async function SegmentsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    <code className="text-xs bg-black/20 px-1 py-0.5 rounded">
+                    <code className="text-xs bg-black/20 px-1 py-0.5 rounded text-white/70">
                       {JSON.stringify(segment.query)}
                     </code>
                   </TableCell>
@@ -74,7 +74,7 @@ export default async function SegmentsPage() {
                     {format(new Date(segment.createdAt), "d MMM yyyy", { locale: fr })}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" disabled>
+                    <Button variant="ghost" size="sm" disabled className="text-muted-foreground hover:text-white hover:bg-white/10">
                       Modifier
                     </Button>
                   </TableCell>

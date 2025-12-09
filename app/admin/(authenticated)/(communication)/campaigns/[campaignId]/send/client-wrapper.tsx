@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { sendCampaign } from "@/app/admin/(authenticated)/campaigns/actions";
+import { sendCampaign } from "../../actions";
 import { toast } from "sonner";
 import { ArrowLeft, Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

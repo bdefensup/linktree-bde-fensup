@@ -18,29 +18,29 @@ export default async function DomainDetailsPage({ params }: { params: Promise<{ 
       case "verified":
         return (
           <Badge className="bg-green-500/10 text-green-500 border-green-500/20 gap-1">
-            <CheckCircle className="h-3 w-3" /> Verified
+            <CheckCircle className="h-3 w-3" /> Vérifié
           </Badge>
         );
       case "failed":
       case "temporary_failure":
         return (
           <Badge variant="destructive" className="gap-1">
-            <AlertCircle className="h-3 w-3" /> Failed
+            <AlertCircle className="h-3 w-3" /> Échec
           </Badge>
         );
       default:
         return (
           <Badge variant="secondary" className="gap-1">
-            <Clock className="h-3 w-3" /> Pending
+            <Clock className="h-3 w-3" /> En attente
           </Badge>
         );
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-black p-8 min-h-full">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+        <Button variant="ghost" size="icon" asChild className="hover:bg-white/10">
           <Link href="/admin/settings/domains">
             <ArrowLeft className="h-4 w-4" />
           </Link>
@@ -51,7 +51,7 @@ export default async function DomainDetailsPage({ params }: { params: Promise<{ 
             {getStatusBadge(domain.status)}
           </h1>
           <p className="text-muted-foreground">
-            {domain.region} • Created on {new Date(domain.created_at).toLocaleDateString()}
+            {domain.region} • Créé le {new Date(domain.created_at).toLocaleDateString()}
           </p>
         </div>
         <div className="ml-auto">
@@ -60,11 +60,11 @@ export default async function DomainDetailsPage({ params }: { params: Promise<{ 
       </div>
 
       <div className="grid gap-6">
-        <Card className="bg-[#1B1B1B] border-white/10 text-white">
+        <Card className="bg-[#1B1B1B]/50 border-white/10 text-white backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>DNS Records</CardTitle>
-            <CardDescription>
-              Add these records to your DNS provider to verify your domain.
+            <CardTitle>Enregistrements DNS</CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Ajoutez ces enregistrements à votre fournisseur DNS pour vérifier votre domaine.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -72,25 +72,25 @@ export default async function DomainDetailsPage({ params }: { params: Promise<{ 
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-sm text-muted-foreground uppercase">
-                    {record.record} Record ({record.type})
+                    Enregistrement {record.record} ({record.type})
                   </span>
                   {record.status === "verified" ? (
-                    <Badge variant="outline" className="text-green-500 border-green-500/20">Verified</Badge>
+                    <Badge variant="outline" className="text-green-500 border-green-500/20 bg-green-500/10">Vérifié</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-yellow-500 border-yellow-500/20">Pending</Badge>
+                    <Badge variant="outline" className="text-yellow-500 border-yellow-500/20 bg-yellow-500/10">En attente</Badge>
                   )}
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">Name</label>
-                        <div className="flex items-center gap-2 p-2 rounded bg-black/50 border border-white/10 font-mono text-sm">
+                        <label className="text-xs text-muted-foreground">Nom</label>
+                        <div className="flex items-center gap-2 p-2 rounded bg-black/50 border border-white/10 font-mono text-sm text-white">
                             <span className="truncate">{record.name}</span>
                         </div>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-xs text-muted-foreground">Value</label>
-                        <div className="flex items-center gap-2 p-2 rounded bg-black/50 border border-white/10 font-mono text-sm">
+                        <label className="text-xs text-muted-foreground">Valeur</label>
+                        <div className="flex items-center gap-2 p-2 rounded bg-black/50 border border-white/10 font-mono text-sm text-white">
                             <span className="truncate">{record.value}</span>
                         </div>
                     </div>

@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
             onChange={(event) =>
               table.getColumn("title")?.setFilterValue(event.target.value)
             }
-            className="max-w-sm"
+            className="max-w-sm bg-[#1B1B1B]/50 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-white/20"
             suppressHydrationWarning
           />
           <DateRangePicker
@@ -86,14 +86,14 @@ export function DataTable<TData, TValue>({
           </Link>
         </Button>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-xl border border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-white/5">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-white/5 hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-muted-foreground">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -112,6 +112,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="border-white/5 transition-colors hover:bg-white/5"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -127,7 +128,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-muted-foreground"
                 >
                   Aucun événement trouvé.
                 </TableCell>

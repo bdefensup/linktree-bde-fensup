@@ -128,17 +128,17 @@ export function ConversationList() {
 
   if (loading) {
     return (
-      <div className="w-80 border-r bg-muted/10 flex flex-col">
-        <div className="p-4 border-b h-16 flex items-center">
-          <div className="h-6 w-24 bg-muted animate-pulse rounded" />
+      <div className="w-80 border-r border-white/10 bg-black flex flex-col">
+        <div className="p-4 border-b border-white/10 h-16 flex items-center">
+          <div className="h-6 w-24 bg-white/10 animate-pulse rounded" />
         </div>
         <div className="p-4 space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+              <div className="h-10 w-10 rounded-full bg-white/10 animate-pulse" />
               <div className="space-y-2 flex-1">
-                <div className="h-4 w-full bg-muted animate-pulse rounded" />
-                <div className="h-3 w-2/3 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-full bg-white/10 animate-pulse rounded" />
+                <div className="h-3 w-2/3 bg-white/10 animate-pulse rounded" />
               </div>
             </div>
           ))}
@@ -148,9 +148,9 @@ export function ConversationList() {
   }
 
   return (
-    <div className="w-80 max-w-full border-r bg-muted/10 flex flex-col h-full min-h-0">
-      <div className="p-4 border-b h-16 flex items-center justify-between">
-        <h2 className="font-semibold">Messages</h2>
+    <div className="w-80 max-w-full border-r border-white/10 bg-black flex flex-col h-full min-h-0">
+      <div className="p-4 border-b border-white/10 h-16 flex items-center justify-between bg-[#1B1B1B]/50 backdrop-blur-sm">
+        <h2 className="font-semibold text-white">Messages</h2>
       </div>
 
       <div className="p-4 pb-2">
@@ -223,19 +223,19 @@ export function ConversationList() {
                   President: {
                     icon: <Crown className="w-3 h-3" />,
                     className:
-                      "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800",
+                      "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
                     label: "Président",
                   },
                   Tresorier: {
                     icon: <Landmark className="w-3 h-3" />,
                     className:
-                      "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800",
+                      "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
                     label: "Trésorier",
                   },
                   Secretaire: {
                     icon: <PenLine className="w-3 h-3" />,
                     className:
-                      "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+                      "bg-blue-500/10 text-blue-500 border-blue-500/20",
                     label: "Secrétaire",
                   },
                 };
@@ -255,20 +255,20 @@ export function ConversationList() {
                     href={`/admin/messages?chatId=${conversation.id}`}
                     className={cn(
                       "group flex items-start gap-3 p-3 rounded-lg transition-all duration-200",
-                      "hover:bg-primary/5 border border-transparent hover:border-primary/10",
-                      isActive ? "bg-primary/10 border-primary/20" : ""
+                      "hover:bg-white/5 border border-transparent hover:border-white/10",
+                      isActive ? "bg-white/10 border-white/10" : ""
                     )}
                   >
-                    <Avatar className="h-10 w-10 border border-border/50">
+                    <Avatar className="h-10 w-10 border border-white/10">
                       <AvatarImage src={otherParticipant?.image || undefined} />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-white text-black">
                         {otherParticipant?.name?.slice(0, 2).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0 overflow-hidden">
                       <div className="flex items-center justify-between mb-0.5">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className="font-medium text-sm truncate" title={displayName}>
+                          <span className="font-medium text-sm truncate text-white" title={displayName}>
                             {truncatedName}
                           </span>
                           {isMandatory && position && positionConfig[position] && (

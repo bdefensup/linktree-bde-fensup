@@ -7,7 +7,7 @@ import {
   getTemplates,
   permanentDeleteTemplate,
   restoreTemplate,
-} from "@/app/admin/(authenticated)/campaigns/actions";
+} from "@/app/admin/(authenticated)/(communication)/campaigns/actions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {

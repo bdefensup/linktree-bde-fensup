@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createCampaign } from "@/app/admin/(authenticated)/campaigns/actions";
+import { createCampaign } from "../actions";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mail, MousePointerClick, Eye, RefreshCw, CheckCircle, AlertTriangle, Ban } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { syncCampaignStats } from "@/app/admin/(authenticated)/campaigns/actions";
+import { syncCampaignStats } from "../actions";
 import { toast } from "sonner";
 
 interface CampaignDashboardProps {

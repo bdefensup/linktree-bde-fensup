@@ -121,27 +121,58 @@ export default function EmailLogsPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "sent":
       case "delivered":
-      case "opened":
-      case "clicked":
         return (
           <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20 gap-1">
             <CheckCircle2 className="h-3 w-3" />
-            {status === "opened" ? "Ouvert" : status === "clicked" ? "Cliqué" : "Envoyé"}
+            Délivré
+          </Badge>
+        );
+      case "sent":
+        return (
+          <Badge className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border-blue-500/20 gap-1">
+            <CheckCircle2 className="h-3 w-3" />
+            Envoyé
+          </Badge>
+        );
+      case "opened":
+        return (
+          <Badge className="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 border-purple-500/20 gap-1">
+            <CheckCircle2 className="h-3 w-3" />
+            Ouvert
+          </Badge>
+        );
+      case "clicked":
+        return (
+          <Badge className="bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 border-orange-500/20 gap-1">
+            <CheckCircle2 className="h-3 w-3" />
+            Cliqué
           </Badge>
         );
       case "failed":
       case "bounced":
-      case "complained":
         return (
           <Badge variant="destructive" className="gap-1">
             <AlertCircle className="h-3 w-3" />
-            Échec
+            {status === "bounced" ? "Rejeté" : "Échec"}
+          </Badge>
+        );
+      case "complained":
+        return (
+          <Badge className="bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20 gap-1">
+            <AlertCircle className="h-3 w-3" />
+            Plainte
+          </Badge>
+        );
+      case "delivery_delayed":
+        return (
+          <Badge className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border-yellow-500/20 gap-1">
+            <AlertCircle className="h-3 w-3" />
+            Retardé
           </Badge>
         );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline" className="border-white/10 text-muted-foreground">{status}</Badge>;
     }
   };
 

@@ -33,7 +33,7 @@ export function DomainList({ domains }: DomainListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this domain?")) return;
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce domaine ?")) return;
     setDeletingId(id);
 
     try {
@@ -43,10 +43,10 @@ export function DomainList({ domains }: DomainListProps) {
 
       if (!res.ok) throw new Error("Failed to delete domain");
 
-      toast.success("Domain deleted");
+      toast.success("Domaine supprimé");
       router.refresh();
     } catch (error) {
-      toast.error("Error deleting domain");
+      toast.error("Erreur lors de la suppression du domaine");
     } finally {
       setDeletingId(null);
     }
@@ -57,47 +57,47 @@ export function DomainList({ domains }: DomainListProps) {
       case "verified":
         return (
           <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20 gap-1">
-            <CheckCircle className="h-3 w-3" /> Verified
+            <CheckCircle className="h-3 w-3" /> Vérifié
           </Badge>
         );
       case "failed":
       case "temporary_failure":
         return (
           <Badge variant="destructive" className="gap-1">
-            <AlertCircle className="h-3 w-3" /> Failed
+            <AlertCircle className="h-3 w-3" /> Échec
           </Badge>
         );
       default:
         return (
           <Badge variant="secondary" className="gap-1">
-            <Clock className="h-3 w-3" /> Pending
+            <Clock className="h-3 w-3" /> En attente
           </Badge>
         );
     }
   };
 
   return (
-    <div className="rounded-md border border-white/10">
+    <div className="rounded-xl border border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm overflow-hidden">
       <Table>
-        <TableHeader>
-          <TableRow className="border-white/10 hover:bg-white/5">
-            <TableHead className="text-muted-foreground">Name</TableHead>
-            <TableHead className="text-muted-foreground">Status</TableHead>
-            <TableHead className="text-muted-foreground">Region</TableHead>
-            <TableHead className="text-muted-foreground">Created At</TableHead>
+        <TableHeader className="bg-white/5">
+          <TableRow className="border-white/5 hover:bg-transparent">
+            <TableHead className="text-muted-foreground">Nom</TableHead>
+            <TableHead className="text-muted-foreground">Statut</TableHead>
+            <TableHead className="text-muted-foreground">Région</TableHead>
+            <TableHead className="text-muted-foreground">Créé le</TableHead>
             <TableHead className="text-right text-muted-foreground">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {domains.length === 0 ? (
-            <TableRow className="border-white/10 hover:bg-white/5">
+            <TableRow className="border-white/5 hover:bg-white/5">
               <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                No domains found. Add one to get started.
+                Aucun domaine trouvé. Ajoutez-en un pour commencer.
               </TableCell>
             </TableRow>
           ) : (
             domains.map((domain) => (
-              <TableRow key={domain.id} className="border-white/10 hover:bg-white/5">
+              <TableRow key={domain.id} className="border-white/5 hover:bg-white/5 transition-colors">
                 <TableCell className="font-medium text-white">{domain.name}</TableCell>
                 <TableCell>{getStatusBadge(domain.status)}</TableCell>
                 <TableCell className="text-muted-foreground uppercase">{domain.region}</TableCell>
@@ -106,7 +106,7 @@ export function DomainList({ domains }: DomainListProps) {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" asChild>
+                    <Button variant="ghost" size="icon" asChild className="hover:bg-white/10">
                       <Link href={`/admin/settings/domains/${domain.id}`}>
                         <ExternalLink className="h-4 w-4" />
                       </Link>

@@ -9,14 +9,14 @@ export default async function AudiencePage() {
   const topicCount = await prisma.topic.count(); 
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="flex h-full flex-col space-y-8 bg-black p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Audience</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Audience</h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Link href="/admin/audience/contacts">
-          <Card className="hover:bg-white/5 transition-colors cursor-pointer border-white/10 bg-white/5">
+          <Card className="hover:bg-white/10 transition-colors cursor-pointer border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Contacts</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -31,7 +31,7 @@ export default async function AudiencePage() {
         </Link>
 
         <Link href="/admin/audience/topics">
-          <Card className="hover:bg-white/5 transition-colors cursor-pointer border-white/10 bg-white/5">
+          <Card className="hover:bg-white/10 transition-colors cursor-pointer border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Topics</CardTitle>
               <Tag className="h-4 w-4 text-muted-foreground" />
@@ -46,7 +46,7 @@ export default async function AudiencePage() {
         </Link>
 
         <Link href="/admin/audience/segments">
-          <Card className="hover:bg-white/5 transition-colors cursor-pointer border-white/10 bg-white/5">
+          <Card className="hover:bg-white/10 transition-colors cursor-pointer border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Segments</CardTitle>
               <Filter className="h-4 w-4 text-muted-foreground" />

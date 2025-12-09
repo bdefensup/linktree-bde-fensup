@@ -47,18 +47,18 @@ export default async function ContactsPage({ searchParams }: PageProps) {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="flex h-full flex-col space-y-8 bg-black p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Contacts</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Contacts</h1>
         <div className="flex gap-2">
           <Link href="/admin/audience/contacts/import">
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 bg-transparent border-white/10 text-white hover:bg-white/5">
               <Upload className="h-4 w-4" />
               Importer
             </Button>
           </Link>
           <Link href="/admin/audience/contacts/new">
-            <Button className="gap-2">
+            <Button className="gap-2 bg-white text-black hover:bg-white/90">
               <Plus className="h-4 w-4" />
               Ajouter un contact
             </Button>
@@ -74,16 +74,16 @@ export default async function ContactsPage({ searchParams }: PageProps) {
               name="query"
               placeholder="Rechercher..."
               defaultValue={query}
-              className="pl-9 bg-white/5 border-white/10 text-white"
+              className="pl-9 bg-[#1B1B1B]/50 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-white/20"
             />
           </form>
         </div>
       </div>
 
-      <div className="rounded-md border border-white/10 bg-white/5">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm">
         <Table>
-          <TableHeader>
-            <TableRow className="border-white/10 hover:bg-white/5">
+          <TableHeader className="bg-white/5">
+            <TableRow className="border-white/5 hover:bg-transparent">
               <TableHead className="text-muted-foreground">Email</TableHead>
               <TableHead className="text-muted-foreground">Prénom</TableHead>
               <TableHead className="text-muted-foreground">Nom</TableHead>
@@ -101,7 +101,7 @@ export default async function ContactsPage({ searchParams }: PageProps) {
               </TableRow>
             ) : (
               contacts.map((contact) => (
-                <TableRow key={contact.id} className="border-white/10 hover:bg-white/5">
+                <TableRow key={contact.id} className="border-white/5 transition-colors hover:bg-white/5">
                   <TableCell className="font-medium text-white">{contact.email}</TableCell>
                   <TableCell className="text-muted-foreground">{contact.firstName || "-"}</TableCell>
                   <TableCell className="text-muted-foreground">{contact.lastName || "-"}</TableCell>
@@ -121,7 +121,7 @@ export default async function ContactsPage({ searchParams }: PageProps) {
                   </TableCell>
                   <TableCell className="text-right">
                     <Link href={`/admin/audience/contacts/${contact.id}`}>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" className="hover:bg-white/10 text-white">
                         Voir
                       </Button>
                     </Link>
@@ -141,6 +141,7 @@ export default async function ContactsPage({ searchParams }: PageProps) {
             size="sm"
             disabled={currentPage <= 1}
             asChild
+            className="border-white/10 bg-transparent text-white hover:bg-white/10 disabled:opacity-50"
           >
             <Link href={`?page=${currentPage - 1}&query=${query || ""}`}>Précédent</Link>
           </Button>
@@ -152,6 +153,7 @@ export default async function ContactsPage({ searchParams }: PageProps) {
             size="sm"
             disabled={currentPage >= totalPages}
             asChild
+            className="border-white/10 bg-transparent text-white hover:bg-white/10 disabled:opacity-50"
           >
             <Link href={`?page=${currentPage + 1}&query=${query || ""}`}>Suivant</Link>
           </Button>

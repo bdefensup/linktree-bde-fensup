@@ -221,7 +221,7 @@ export function DataTable({ data, userRole, currentUserEmail }: DataTableProps) 
               placeholder="Rechercher par nom ou email..."
               value={globalFilter ?? ""}
               onChange={(event) => setGlobalFilter(event.target.value)}
-              className="max-w-sm bg-background/50"
+              className="max-w-sm bg-[#1B1B1B]/50 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-white/20"
             />
             <Select
               value={(table.getColumn("role")?.getFilterValue() as string) ?? "ALL"}
@@ -324,14 +324,14 @@ export function DataTable({ data, userRole, currentUserEmail }: DataTableProps) 
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-xl border border-white/10 bg-[#1B1B1B]/50 backdrop-blur-sm overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-white/5">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-white/5 hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-muted-foreground">
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -344,7 +344,7 @@ export function DataTable({ data, userRole, currentUserEmail }: DataTableProps) 
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="border-white/5 transition-colors hover:bg-white/5">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -354,7 +354,7 @@ export function DataTable({ data, userRole, currentUserEmail }: DataTableProps) 
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
                   Aucun résultat.
                 </TableCell>
               </TableRow>

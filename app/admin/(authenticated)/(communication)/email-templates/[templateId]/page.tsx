@@ -5,11 +5,11 @@ import { headers } from "next/headers";
 import { ClientTemplateEditorWrapper } from "./client-wrapper";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ templateId: string }>;
 }
 
 export default async function EditTemplatePage({ params }: PageProps) {
-  const { id } = await params;
+  const { templateId } = await params;
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -19,7 +19,7 @@ export default async function EditTemplatePage({ params }: PageProps) {
   }
 
   const template = await prisma.emailTemplate.findUnique({
-    where: { id },
+    where: { id: templateId },
   });
 
   if (!template || template.userId !== session.user.id) {

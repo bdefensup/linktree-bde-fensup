@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AdvancedEditor } from "@/components/editor/advanced-editor";
-import { sendEmail, getTemplates } from "@/app/admin/(authenticated)/campaigns/actions";
+import { sendEmail, getTemplates } from "../actions";
 import { toast } from "sonner";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import {

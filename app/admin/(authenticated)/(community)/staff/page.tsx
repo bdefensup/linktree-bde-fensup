@@ -35,10 +35,10 @@ export default async function AdminStaffPage() {
   const userRole = session?.user?.role || "adherent";
 
   return (
-    <div className="container mx-auto py-10 space-y-8">
+    <div className="flex h-full flex-col space-y-8 bg-black p-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestion du Staff</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Gestion du Staff</h1>
           <p className="text-muted-foreground mt-2">
             Gérez les membres, leurs rôles et les accès à la plateforme.
           </p>

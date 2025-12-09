@@ -11,7 +11,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { moveTemplate } from "@/app/admin/(authenticated)/campaigns/actions";
+import { moveTemplate } from "../campaigns/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 

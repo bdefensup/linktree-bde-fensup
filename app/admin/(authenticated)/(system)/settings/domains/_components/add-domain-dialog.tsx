@@ -64,36 +64,36 @@ export function AddDomainDialog() {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
-          Add Domain
+          Ajouter un domaine
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-[#1B1B1B] border-white/10 text-white">
         <DialogHeader>
-          <DialogTitle>Add Domain</DialogTitle>
+          <DialogTitle>Ajouter un domaine</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Add a new domain to send emails from.
+            Ajoutez un nouveau domaine pour l'envoi d'e-mails.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Domain Name</Label>
+              <Label htmlFor="name" className="text-white">Nom de domaine</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="example.com"
-                className="bg-white/5 border-white/10 text-white"
+                placeholder="exemple.com"
+                className="bg-[#1B1B1B]/50 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-white/20"
                 required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="region">Region</Label>
+              <Label htmlFor="region" className="text-white">Région</Label>
               <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                <SelectTrigger className="bg-[#1B1B1B]/50 border-white/10 text-white focus:ring-white/20">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-[#1C1C1E] border-white/10 text-white">
                   <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
                   <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
                   <SelectItem value="sa-east-1">SA East (Sao Paulo)</SelectItem>
@@ -103,8 +103,8 @@ export function AddDomainDialog() {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Domain"}
+            <Button type="submit" disabled={loading} className="bg-white text-black hover:bg-white/90">
+              {loading ? "Ajout..." : "Ajouter"}
             </Button>
           </DialogFooter>
         </form>

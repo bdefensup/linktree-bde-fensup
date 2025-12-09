@@ -11,9 +11,9 @@ export default async function InboxPage() {
   });
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="flex h-full flex-col space-y-8 bg-black p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Boîte de réception</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Boîte de réception</h1>
         <div className="text-sm text-muted-foreground">
           {messages.length} message{messages.length > 1 ? "s" : ""}
         </div>
@@ -21,7 +21,7 @@ export default async function InboxPage() {
 
       <div className="grid gap-4">
         {messages.length === 0 ? (
-          <Card className="bg-white/5 border-white/10">
+          <Card className="bg-[#1B1B1B]/50 border-white/10 backdrop-blur-sm">
             <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Mail className="h-12 w-12 mb-4 opacity-50" />
               <p>Aucun message reçu pour le moment.</p>
@@ -30,7 +30,7 @@ export default async function InboxPage() {
         ) : (
           messages.map((msg) => (
             <Link key={msg.id} href={`/admin/inbox/${msg.id}`}>
-              <Card className="bg-white/5 border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <Card className="bg-[#1B1B1B]/50 border-white/10 hover:bg-white/5 transition-colors cursor-pointer backdrop-blur-sm">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4 overflow-hidden">
                     <div className={`h-2 w-2 rounded-full ${msg.isRead ? "bg-transparent" : "bg-blue-500"}`} />

@@ -43,7 +43,7 @@ import {
   deleteFolder,
   getFolders,
   updateFolder,
-} from "@/app/admin/(authenticated)/campaigns/actions";
+} from "@/app/admin/(authenticated)/(communication)/campaigns/actions";
 import { toast } from "sonner";
 import { useDroppable } from "@dnd-kit/core";
 
@@ -122,7 +122,7 @@ export function CampaignsSidebar({
 
   const loadUnsortedTemplates = async () => {
     try {
-      const { getTemplates } = await import("@/app/admin/(authenticated)/campaigns/actions");
+      const { getTemplates } = await import("@/app/admin/(authenticated)/(communication)/campaigns/actions");
       const data = await getTemplates(null);
       setUnsortedTemplates(data);
     } catch (error) {
@@ -427,7 +427,7 @@ export function CampaignsSidebar({
               const name = file.name.replace(".md", "");
 
               try {
-                const { importTemplate } = await import("@/app/admin/(authenticated)/campaigns/actions");
+                const { importTemplate } = await import("@/app/admin/(authenticated)/(communication)/campaigns/actions");
                 await importTemplate(
                   name,
                   text,
