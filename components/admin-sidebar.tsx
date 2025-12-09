@@ -18,6 +18,7 @@ import {
   PenLine,
   Mail,
   MessageCircle,
+  Settings,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { usePathname, useRouter } from "next/navigation";
@@ -413,70 +414,48 @@ export function AdminSidebar() {
             </SidebarMenu>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel>Gestion</SidebarGroupLabel>
+            <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={pathname === item.url}>
-                      <Link href={item.url}>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-
-          <SidebarGroup>
-            <SidebarGroupLabel>
-              Messagerie
-              <SidebarGroupAction title="Nouvelle discussion" onClick={() => setIsSearchOpen(true)}>
-                <Plus /> <span className="sr-only">Nouvelle discussion</span>
-              </SidebarGroupAction>
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
+                {/* COMMUNICATION */}
                 <SidebarMenuItem>
-                  <Accordion type="single" collapsible className="w-full" defaultValue="emailing">
-                    <AccordionItem value="emailing" className="border-none">
-                      <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2">
+                  <Accordion type="single" collapsible className="w-full" defaultValue={
+                    ["/admin/campaigns", "/admin/audience", "/admin/messages", "/admin/email-templates"].some(path => pathname.startsWith(path)) ? "communication" : ""
+                  }>
+                    <AccordionItem value="communication" className="border-none">
+                      <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 group">
                         <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4" />
-                          <span>Emailing</span>
+                          <MessageCircle className="h-4 w-4" />
+                          <span>Communication</span>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent className="pb-0 pt-1">
                         <SidebarMenu>
                           <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname === "/admin/campaigns"}>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/messages")}>
+                              <Link href="/admin/messages" className="pl-8">
+                                <span>Messagerie</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/campaigns")}>
                               <Link href="/admin/campaigns" className="pl-8">
                                 <span>Campagnes</span>
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                           <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname === "/admin/audience"}>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/audience")}>
                               <Link href="/admin/audience" className="pl-8">
                                 <span>Audience</span>
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
                           <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/domains"}>
-                              <Link href="/admin/settings/domains" className="pl-8">
-                                <Globe className="h-4 w-4 mr-2" />
-                                <span>Domaines</span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                           <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/logs"}>
-                              <Link href="/admin/settings/logs" className="pl-8">
-                                <History className="h-4 w-4 mr-2" />
-                                <span>Logs</span>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/email-templates")}>
+                              <Link href="/admin/email-templates" className="pl-8">
+                                <span>Modèles</span>
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
@@ -485,15 +464,161 @@ export function AdminSidebar() {
                     </AccordionItem>
                   </Accordion>
                 </SidebarMenuItem>
+
+                {/* ÉVÉNEMENTS */}
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={pathname === "/admin/messages"}>
-                    <Link href="/admin/messages">
-                      <MessageCircle className="h-4 w-4" />
-                      <span>Messagerie</span>
-                    </Link>
-                  </SidebarMenuButton>
+                  <Accordion type="single" collapsible className="w-full" defaultValue={
+                    ["/admin/events", "/admin/reservations"].some(path => pathname.startsWith(path)) ? "events" : ""
+                  }>
+                    <AccordionItem value="events" className="border-none">
+                      <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 group">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <span>Événements</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-0 pt-1">
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/events")}>
+                              <Link href="/admin/events" className="pl-8">
+                                <span>Liste Événements</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/reservations")}>
+                              <Link href="/admin/reservations" className="pl-8">
+                                <span>Réservations</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </SidebarMenuItem>
+
+                {/* COMMUNAUTÉ */}
+                <SidebarMenuItem>
+                  <Accordion type="single" collapsible className="w-full" defaultValue={
+                    ["/admin/members", "/admin/staff"].some(path => pathname.startsWith(path)) ? "community" : ""
+                  }>
+                    <AccordionItem value="community" className="border-none">
+                      <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 group">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          <span>Communauté</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-0 pt-1">
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/members")}>
+                              <Link href="/admin/members" className="pl-8">
+                                <span>Adhérents</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/staff")}>
+                              <Link href="/admin/staff" className="pl-8">
+                                <span>Staff</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </SidebarMenuItem>
+
+                {/* SUPPORT */}
+                <SidebarMenuItem>
+                  <Accordion type="single" collapsible className="w-full" defaultValue={
+                    ["/admin/tickets", "/admin/inbox"].some(path => pathname.startsWith(path)) ? "support" : ""
+                  }>
+                    <AccordionItem value="support" className="border-none">
+                      <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 group">
+                        <div className="flex items-center gap-2">
+                          <MessageSquare className="h-4 w-4" />
+                          <span>Support</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-0 pt-1">
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/tickets")}>
+                              <Link href="/admin/tickets" className="pl-8">
+                                <span>Tickets</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/inbox")}>
+                              <Link href="/admin/inbox" className="pl-8">
+                                <span>Inbox</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </SidebarMenuItem>
+
+                {/* SYSTÈME */}
+                <SidebarMenuItem>
+                  <Accordion type="single" collapsible className="w-full" defaultValue={
+                    ["/admin/settings"].some(path => pathname.startsWith(path)) ? "system" : ""
+                  }>
+                    <AccordionItem value="system" className="border-none">
+                      <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 group">
+                        <div className="flex items-center gap-2">
+                          <Settings className="h-4 w-4" />
+                          <span>Système</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-0 pt-1">
+                        <SidebarMenu>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/logs"}>
+                              <Link href="/admin/settings/logs" className="pl-8">
+                                <span>Logs Email</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/domains"}>
+                              <Link href="/admin/settings/domains" className="pl-8">
+                                <span>Domaines</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                           <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings"}>
+                              <Link href="/admin/settings" className="pl-8">
+                                <span>Paramètres</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        </SidebarMenu>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </SidebarMenuItem>
+
               </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel>
+              Discussions
+              <SidebarGroupAction title="Nouvelle discussion" onClick={() => setIsSearchOpen(true)}>
+                <Plus /> <span className="sr-only">Nouvelle discussion</span>
+              </SidebarGroupAction>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
               <ScrollArea className="h-[280px]">
                 <SidebarMenu>
                   {/* Conversations List */}
