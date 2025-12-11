@@ -4,7 +4,7 @@ import {
   Calendar,
   ChevronDown,
   LogOut,
-  Ticket,
+
   User,
   Users,
   KeyRound,
@@ -16,9 +16,9 @@ import {
   Crown,
   Landmark,
   PenLine,
-  Mail,
   MessageCircle,
   Settings,
+  Mail,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { usePathname, useRouter } from "next/navigation";
@@ -51,7 +51,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Globe, History } from "lucide-react";
+
 import {
   CommandDialog,
   CommandEmpty,
@@ -76,33 +76,7 @@ import {
 } from "@/app/messaging";
 
 // Menu items.
-const items = [
-  {
-    title: "Staff",
-    url: "/admin/staff",
-    icon: Users,
-  },
-  {
-    title: "Adhérents",
-    url: "/admin/members",
-    icon: User,
-  },
-  {
-    title: "Événements",
-    url: "/admin/events",
-    icon: Calendar,
-  },
-  {
-    title: "Réservations",
-    url: "/admin/reservations",
-    icon: Ticket,
-  },
-  {
-    title: "Tickets Support",
-    url: "/admin/tickets",
-    icon: MessageSquare,
-  },
-];
+
 
 interface Conversation {
   id: string;
@@ -441,7 +415,7 @@ export function AdminSidebar() {
                           <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/campaigns")}>
                               <Link href="/admin/campaigns" className="pl-8">
-                                <span>Campagnes</span>
+                                <span>Emailing</span>
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
@@ -567,10 +541,12 @@ export function AdminSidebar() {
                   </Accordion>
                 </SidebarMenuItem>
 
+
+
                 {/* SYSTÈME */}
                 <SidebarMenuItem>
                   <Accordion type="single" collapsible className="w-full" defaultValue={
-                    ["/admin/settings"].some(path => pathname.startsWith(path)) ? "system" : ""
+                    pathname === "/admin/settings" ? "system" : ""
                   }>
                     <AccordionItem value="system" className="border-none">
                       <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 group">
@@ -581,26 +557,58 @@ export function AdminSidebar() {
                       </AccordionTrigger>
                       <AccordionContent className="pb-0 pt-1">
                         <SidebarMenu>
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/logs"}>
-                              <Link href="/admin/settings/logs" className="pl-8">
-                                <span>Logs Email</span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname === "/admin/settings/domains"}>
-                              <Link href="/admin/settings/domains" className="pl-8">
-                                <span>Domaines</span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
                            <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive={pathname === "/admin/settings"}>
                               <Link href="/admin/settings" className="pl-8">
                                 <span>Paramètres</span>
                               </Link>
                             </SidebarMenuButton>
+                          </SidebarMenuItem>
+
+                          {/* Nested Resend Accordion */}
+                          <SidebarMenuItem>
+                            <Accordion type="single" collapsible className="w-full">
+                              <AccordionItem value="resend" className="border-none">
+                                <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md pl-8 pr-2 group">
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4" />
+                                    <span>Resend</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-0 pt-1">
+                                  <SidebarMenu>
+                                    <SidebarMenuItem>
+                                      <SidebarMenuButton asChild isActive={pathname === "/admin/settings/logs"}>
+                                        <Link href="/admin/settings/logs" className="pl-16">
+                                          <span>Logs Email</span>
+                                        </Link>
+                                      </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                    <SidebarMenuItem>
+                                      <SidebarMenuButton asChild isActive={pathname === "/admin/settings/domains"}>
+                                        <Link href="/admin/settings/domains" className="pl-16">
+                                          <span>Domaines</span>
+                                        </Link>
+                                      </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                    <SidebarMenuItem>
+                                      <SidebarMenuButton asChild isActive={pathname === "/admin/settings/api-keys"}>
+                                        <Link href="/admin/settings/api-keys" className="pl-16">
+                                          <span>Clés API</span>
+                                        </Link>
+                                      </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                    <SidebarMenuItem>
+                                      <SidebarMenuButton asChild isActive={pathname === "/admin/settings/webhooks"}>
+                                        <Link href="/admin/settings/webhooks" className="pl-16">
+                                          <span>Webhooks</span>
+                                        </Link>
+                                      </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                  </SidebarMenu>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
                           </SidebarMenuItem>
                         </SidebarMenu>
                       </AccordionContent>

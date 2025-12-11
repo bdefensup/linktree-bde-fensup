@@ -123,28 +123,28 @@ export default function EmailLogsPage() {
     switch (status) {
       case "delivered":
         return (
-          <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20 gap-1">
+          <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border-emerald-500/30 gap-1 transition-colors duration-200">
             <CheckCircle2 className="h-3 w-3" />
             Délivré
           </Badge>
         );
       case "sent":
         return (
-          <Badge className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border-blue-500/20 gap-1">
+          <Badge className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border-blue-500/30 gap-1 transition-colors duration-200">
             <CheckCircle2 className="h-3 w-3" />
             Envoyé
           </Badge>
         );
       case "opened":
         return (
-          <Badge className="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 border-purple-500/20 gap-1">
+          <Badge className="bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 border-violet-500/30 gap-1 transition-colors duration-200">
             <CheckCircle2 className="h-3 w-3" />
             Ouvert
           </Badge>
         );
       case "clicked":
         return (
-          <Badge className="bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 border-orange-500/20 gap-1">
+          <Badge className="bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 border-orange-500/30 gap-1 transition-colors duration-200">
             <CheckCircle2 className="h-3 w-3" />
             Cliqué
           </Badge>
@@ -152,21 +152,21 @@ export default function EmailLogsPage() {
       case "failed":
       case "bounced":
         return (
-          <Badge variant="destructive" className="gap-1">
+          <Badge className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border-red-500/30 gap-1 transition-colors duration-200">
             <AlertCircle className="h-3 w-3" />
             {status === "bounced" ? "Rejeté" : "Échec"}
           </Badge>
         );
       case "complained":
         return (
-          <Badge className="bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20 gap-1">
+          <Badge className="bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 border-pink-500/30 gap-1 transition-colors duration-200">
             <AlertCircle className="h-3 w-3" />
             Plainte
           </Badge>
         );
       case "delivery_delayed":
         return (
-          <Badge className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 border-yellow-500/20 gap-1">
+          <Badge className="bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border-amber-500/30 gap-1 transition-colors duration-200">
             <AlertCircle className="h-3 w-3" />
             Retardé
           </Badge>

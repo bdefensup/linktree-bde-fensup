@@ -6,15 +6,30 @@ import { uploadFile } from "@/lib/upload-file";
 
 // Resend Webhook Event Types
 type ResendEvent = {
-  type: "email.sent" | "email.delivered" | "email.bounced" | "email.complained" | "email.opened" | "email.clicked" | "email.delivery_delayed" | "email.received";
+  type: 
+    | "email.sent" 
+    | "email.delivered" 
+    | "email.bounced" 
+    | "email.complained" 
+    | "email.opened" 
+    | "email.clicked" 
+    | "email.delivery_delayed" 
+    | "email.received"
+    | "email.failed"
+    | "contact.created"
+    | "contact.updated"
+    | "contact.deleted"
+    | "domain.created"
+    | "domain.updated"
+    | "domain.deleted";
   created_at: string;
   data: {
     created_at: string;
-    email_id: string;
+    email_id?: string; // Optional for contact/domain events
     message_id?: string; // RFC Message-ID
-    from: string;
-    to: string[];
-    subject: string;
+    from?: string;
+    to?: string[];
+    subject?: string;
     tags?: { name: string; value: string }[];
     
     // Specific fields depending on event
@@ -28,7 +43,15 @@ type ResendEvent = {
         subType: string;
         type: string;
     };
+    failed?: {
+        reason: string;
+    };
     attachments?: any[]; // For email.received
+    
+    // Contact/Domain events have different data structures, but we might not process them deeply here yet
+    id?: string; // For contact/domain
+    name?: string; // For domain
+    status?: string; // For domain
   };
 };
 
@@ -52,8 +75,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Get the body
-    const payload = await req.json();
-    const body = JSON.stringify(payload);
+    // Get the raw body - essential for signature verification
+    const body = await req.text();
 
     // Create a new Svix instance with your secret.
     const wh = new Webhook(WEBHOOK_SECRET);
@@ -75,6 +98,9 @@ export async function POST(req: NextRequest) {
     // Handle "email.received" separately
     if (evt.type === "email.received") {
         try {
+          // Ensure email_id exists for email events
+          if (!evt.data.email_id) throw new Error("No email_id in email.received event");
+
           const resend = new Resend(process.env.RESEND_API_KEY);
           const { data: emailData, error: emailError } = await (resend as any).emails.receiving.get(evt.data.email_id);
 
@@ -142,7 +168,7 @@ export async function POST(req: NextRequest) {
                 emailId: evt.data.email_id,
                 messageId: evt.data.message_id,
                 from: evt.data.from,
-                to: evt.data.to,
+                to: evt.data.to || [],
                 subject: evt.data.subject,
                 text: emailData.text,
                 html: emailData.html,
@@ -162,7 +188,7 @@ export async function POST(req: NextRequest) {
                   subject: `Fwd: ${evt.data.subject}`,
                   html: `
                     <p><strong>De:</strong> ${evt.data.from}</p>
-                    <p><strong>À:</strong> ${evt.data.to.join(", ")}</p>
+                    <p><strong>À:</strong> ${(evt.data.to || []).join(", ")}</p>
                     <p><strong>Sujet:</strong> ${evt.data.subject}</p>
                     <hr />
                     ${emailData.html || `<pre>${emailData.text}</pre>`}
@@ -181,23 +207,39 @@ export async function POST(req: NextRequest) {
         
         return NextResponse.json({ success: true }, { status: 200 });
     }
+
+    // Ignore non-email events for now (Contact/Domain)
+    if (evt.type.startsWith("contact.") || evt.type.startsWith("domain.")) {
+        return NextResponse.json({ message: "Event ignored" }, { status: 200 });
+    }
     
     // For other events, we look for campaignId
     const campaignIdTag = evt.data.tags?.find(t => t.name === "campaignId");
-    
-    if (!campaignIdTag) {
-      // Event not related to a campaign we track via tags
-      return NextResponse.json({ message: "Ignored (no campaignId)" }, { status: 200 });
+    const campaignId = campaignIdTag?.value;
+    const emailId = evt.data.email_id;
+    const recipient = evt.data.to?.[0] || "unknown"; 
+
+    if (!emailId) {
+        return NextResponse.json({ message: "Ignored (no email_id)" }, { status: 200 });
     }
 
-    const campaignId = campaignIdTag.value;
-    const emailId = evt.data.email_id;
-    const recipient = evt.data.to[0]; 
-
     // 1. Log the event
+    // Idempotency check: prevent duplicate logs
+    const existingLog = await prisma.emailLog.findFirst({
+      where: {
+        emailId,
+        eventType: evt.type,
+        createdAt: new Date(evt.created_at),
+      },
+    });
+
+    if (existingLog) {
+      return NextResponse.json({ message: "Duplicate event ignored" }, { status: 200 });
+    }
+
     await prisma.emailLog.create({
       data: {
-        campaignId,
+        campaignId: campaignId || null,
         emailId,
         recipient,
         eventType: evt.type,
@@ -207,7 +249,7 @@ export async function POST(req: NextRequest) {
         linkClicked: evt.data.click?.link,
         bounceType: evt.data.bounce?.type,
         bounceSubType: evt.data.bounce?.subType,
-        bounceMessage: evt.data.bounce?.message,
+        bounceMessage: evt.data.bounce?.message || evt.data.failed?.reason,
         createdAt: new Date(evt.created_at),
       },
     });
@@ -236,9 +278,13 @@ export async function POST(req: NextRequest) {
       case "email.delivery_delayed":
         // We could log this or have a specific counter, but for now just logging the event is enough
         break;
+      case "email.failed":
+        // Treat failed as bounced for stats or just ignore if no specific counter
+        updateData.bounceCount = { increment: 1 }; // Increment bounce count for failures too? Or maybe just log it.
+        break;
     }
 
-    if (Object.keys(updateData).length > 0) {
+    if (campaignId && Object.keys(updateData).length > 0) {
       await prisma.campaign.update({
         where: { id: campaignId },
         data: updateData,

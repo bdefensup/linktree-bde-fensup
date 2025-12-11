@@ -201,7 +201,7 @@ export default async function AdminDashboard() {
               className="object-cover object-top z-10"
             />
           ) : (
-            <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/20 via-[#1B1B1B] to-[#1B1B1B] min-h-[300px]" />
+            <div className="absolute inset-0 z-0 bg-linear-to-br from-primary/20 via-[#1B1B1B] to-[#1B1B1B] min-h-[300px]" />
           )}
 
           <CardHeader className="absolute top-0 left-0 right-0 z-30 p-4 flex flex-row items-start justify-between">

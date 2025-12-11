@@ -301,7 +301,7 @@ model EmailLog {
   bookingId   String?
   booking     Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
 
-  emailId     String   @unique // Resend Email ID
+  emailId     String   // Resend Email ID
   recipient   String
   status      String   // sent, delivered, bounced, etc.
   eventType   String   // sent, delivered, open, click, bounce, complaint
@@ -352,9 +352,6 @@ model InboxMessage {
   @@map("inbox_message")
   @@index([emailId])
 }
-
-
-
 
 model Contact {
   id        String   @id @default(cuid())
