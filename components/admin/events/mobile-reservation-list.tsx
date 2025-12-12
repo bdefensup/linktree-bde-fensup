@@ -67,7 +67,7 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
               placeholder="Rechercher..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-transparent border-none h-11 text-base text-white placeholder:text-white/30 focus-visible:ring-0 rounded-none"
+              className="pl-12 bg-transparent border-none h-11 text-base text-white placeholder:text-white/30 focus-visible:ring-0 rounded-none"
             />
             {searchQuery && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-white/40 bg-white/5 px-2 py-0.5 rounded-full">
