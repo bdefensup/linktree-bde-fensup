@@ -15,7 +15,7 @@ type Booking = {
   lastName: string;
   email: string;
   phone: string;
-  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "CHECKED_IN" | "CHECKED_OUT";
+  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "CHECKED_IN" | "CHECKED_OUT" | "NO_SHOW";
   createdAt: string;
   event: {
     title: string;
@@ -78,9 +78,11 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
       case "CANCELLED":
         return <Badge className="bg-red-500/15 text-red-500 border-red-500/20 hover:bg-red-500/25"><XCircle className="w-3 h-3 mr-1" /> Refusé</Badge>;
       case "CHECKED_IN":
-        return <Badge className="bg-blue-500/15 text-blue-500 border-blue-500/20 hover:bg-blue-500/25"><LogIn className="w-3 h-3 mr-1" /> Check-in</Badge>;
+        return <Badge className="bg-blue-500/15 text-blue-500 border-blue-500/20 hover:bg-blue-500/25"><LogIn className="w-3 h-3 mr-1" /> Présent</Badge>;
       case "CHECKED_OUT":
-        return <Badge className="bg-indigo-500/15 text-indigo-500 border-indigo-500/20 hover:bg-indigo-500/25"><LogOut className="w-3 h-3 mr-1" /> Check-out</Badge>;
+        return <Badge className="bg-indigo-500/15 text-indigo-500 border-indigo-500/20 hover:bg-indigo-500/25"><LogOut className="w-3 h-3 mr-1" /> Parti</Badge>;
+      case "NO_SHOW":
+        return <Badge className="bg-gray-500/15 text-gray-500 border-gray-500/20 hover:bg-gray-500/25"><XCircle className="w-3 h-3 mr-1" /> No Show</Badge>;
       default:
         return <Badge className="bg-orange-500/15 text-orange-500 border-orange-500/20 hover:bg-orange-500/25"><Clock className="w-3 h-3 mr-1" /> En attente</Badge>;
     }
@@ -160,7 +162,7 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
                       Refuser
                     </Button>
                   </>
-                ) : booking.status === "CONFIRMED" ? (
+                ) : booking.status === "CONFIRMED" || booking.status === "NO_SHOW" ? (
                   <>
                     <Button 
                       onClick={() => updateStatus(booking.id, "CHECKED_IN")}
@@ -168,24 +170,46 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
                       className="flex-1 h-10 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20"
                     >
                       {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4 mr-2" />}
-                      Check-in
+                      Show
                     </Button>
-                    <a 
-                      href={`tel:${booking.phone}`} 
-                      className="h-10 w-10 flex items-center justify-center rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white transition-colors border border-white/5 active:bg-white/10"
-                    >
-                      <Phone className="h-4 w-4" />
-                    </a>
+                    {booking.status !== "NO_SHOW" && (
+                      <Button 
+                        onClick={() => updateStatus(booking.id, "NO_SHOW")}
+                        disabled={processingId === booking.id}
+                        className="flex-1 h-10 rounded-xl bg-gray-500/10 hover:bg-gray-500/20 text-gray-500 border border-gray-500/20"
+                      >
+                        {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
+                        No Show
+                      </Button>
+                    )}
+                    {booking.phone && (
+                      <a 
+                        href={`tel:${booking.phone}`} 
+                        className="h-10 w-10 flex items-center justify-center rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white transition-colors border border-white/5 active:bg-white/10"
+                      >
+                        <Phone className="h-4 w-4" />
+                      </a>
+                    )}
                   </>
                 ) : booking.status === "CHECKED_IN" ? (
-                  <Button 
-                    onClick={() => updateStatus(booking.id, "CHECKED_OUT")}
-                    disabled={processingId === booking.id}
-                    className="flex-1 h-10 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 border border-indigo-500/20"
-                  >
-                    {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4 mr-2" />}
-                    Check-out
-                  </Button>
+                  <>
+                    <Button 
+                      onClick={() => updateStatus(booking.id, "NO_SHOW")}
+                      disabled={processingId === booking.id}
+                      className="flex-1 h-10 rounded-xl bg-gray-500/10 hover:bg-gray-500/20 text-gray-500 border border-gray-500/20"
+                    >
+                      {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle className="h-4 w-4 mr-2" />}
+                      No Show
+                    </Button>
+                    {booking.phone && (
+                      <a 
+                        href={`tel:${booking.phone}`} 
+                        className="h-10 w-10 flex items-center justify-center rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white transition-colors border border-white/5 active:bg-white/10"
+                      >
+                        <Phone className="h-4 w-4" />
+                      </a>
+                    )}
+                  </>
                 ) : (
                   <>
                     <a 

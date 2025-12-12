@@ -153,6 +153,7 @@ enum BookingStatus {
   CANCELLED
   CHECKED_IN
   CHECKED_OUT
+  NO_SHOW
 }
 
 model Conversation {
