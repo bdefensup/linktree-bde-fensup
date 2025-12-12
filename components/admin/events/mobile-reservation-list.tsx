@@ -160,6 +160,32 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
                       Refuser
                     </Button>
                   </>
+                ) : booking.status === "CONFIRMED" ? (
+                  <>
+                    <Button 
+                      onClick={() => updateStatus(booking.id, "CHECKED_IN")}
+                      disabled={processingId === booking.id}
+                      className="flex-1 h-10 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/20"
+                    >
+                      {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogIn className="h-4 w-4 mr-2" />}
+                      Check-in
+                    </Button>
+                    <a 
+                      href={`tel:${booking.phone}`} 
+                      className="h-10 w-10 flex items-center justify-center rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white transition-colors border border-white/5 active:bg-white/10"
+                    >
+                      <Phone className="h-4 w-4" />
+                    </a>
+                  </>
+                ) : booking.status === "CHECKED_IN" ? (
+                  <Button 
+                    onClick={() => updateStatus(booking.id, "CHECKED_OUT")}
+                    disabled={processingId === booking.id}
+                    className="flex-1 h-10 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 border border-indigo-500/20"
+                  >
+                    {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4 mr-2" />}
+                    Check-out
+                  </Button>
                 ) : (
                   <>
                     <a 
