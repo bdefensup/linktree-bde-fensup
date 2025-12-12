@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({
   const isBulkActionsVisible = selectedRows.length > 0;
 
   const handleBulkStatusChange = async (
-    status: "CONFIRMED" | "PENDING" | "CANCELLED"
+    status: "CONFIRMED" | "PENDING" | "CANCELLED" | "CHECKED_IN" | "CHECKED_OUT"
   ) => {
     const bookingIds = selectedRows.map(
       (row) => (row.original as { id: string }).id
@@ -225,6 +225,28 @@ export function DataTable<TData, TValue>({
                   className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border-red-200 dark:border-red-800 hover:bg-red-200 hover:border-red-300 dark:hover:bg-red-900/50 transition-colors duration-200"
                 >
                   Refusé
+                </Badge>
+              </SelectItem>
+              <SelectItem
+                value="CHECKED_IN"
+                className="cursor-pointer focus:bg-black/10 dark:focus:bg-white/10"
+              >
+                <Badge
+                  variant="outline"
+                  className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border-blue-200 dark:border-blue-800 hover:bg-blue-200 hover:border-blue-300 dark:hover:bg-blue-900/50 transition-colors duration-200"
+                >
+                  Check-in
+                </Badge>
+              </SelectItem>
+              <SelectItem
+                value="CHECKED_OUT"
+                className="cursor-pointer focus:bg-black/10 dark:focus:bg-white/10"
+              >
+                <Badge
+                  variant="outline"
+                  className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-200 hover:border-indigo-300 dark:hover:bg-indigo-900/50 transition-colors duration-200"
+                >
+                  Check-out
                 </Badge>
               </SelectItem>
             </SelectContent>

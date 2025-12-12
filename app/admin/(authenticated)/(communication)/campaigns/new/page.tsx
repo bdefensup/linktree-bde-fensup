@@ -1,25 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { createCampaign } from "../actions";
+import { createCampaign, getEventsForCampaign } from "../actions";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function NewCampaignPage() {
   const [name, setName] = useState("");
+  const [eventId, setEventId] = useState("");
+  const [events, setEvents] = useState<{ id: string; title: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  const loadEvents = async () => {
+    try {
+      const data = await getEventsForCampaign();
+      setEvents(data);
+    } catch (error) {
+      console.error("Failed to load events:", error);
+      toast.error("Erreur lors du chargement des événements");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || !eventId) return;
 
     setIsLoading(true);
     try {
-      const campaign = await createCampaign(name);
+      const campaign = await createCampaign(name, eventId);
       toast.success("Brouillon créé");
       // Redirect to Step 2: Content
       router.push(`/admin/campaigns/${campaign.id}/content`);
@@ -46,35 +69,64 @@ export default function NewCampaignPage() {
             </Button>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Nouvelle campagne</h1>
-              <p className="text-muted-foreground text-sm">Étape 1 : Nommez votre campagne</p>
+              <p className="text-muted-foreground text-sm">Étape 1 : Informations de base</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label
-                htmlFor="name"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Nom de la campagne
-              </label>
-              <Input
-                id="name"
-                placeholder="Ex: Newsletter de rentrée"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="text-foreground placeholder:text-muted-foreground/50 border-white/10 bg-white/5 focus-visible:ring-white/20"
-                autoFocus
-              />
-              <p className="text-muted-foreground text-xs">
-                Ce nom est interne et ne sera pas visible par vos destinataires.
-              </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label
+                  htmlFor="name"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Nom de la campagne
+                </label>
+                <Input
+                  id="name"
+                  placeholder="Ex: Newsletter de rentrée"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="text-foreground placeholder:text-muted-foreground/50 border-white/10 bg-white/5 focus-visible:ring-white/20"
+                  autoFocus
+                />
+                <p className="text-muted-foreground text-xs">
+                  Ce nom est interne et ne sera pas visible par vos destinataires.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Événement associé
+                </label>
+                <Select value={eventId} onValueChange={setEventId}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-white/20">
+                    <SelectValue placeholder="Sélectionner un événement" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1C1C1E] border-white/10 text-white">
+                    {events.map((event) => (
+                      <SelectItem 
+                        key={event.id} 
+                        value={event.id}
+                        className="focus:bg-white/10 focus:text-white cursor-pointer"
+                      >
+                        {event.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-muted-foreground text-xs">
+                  La campagne sera liée à cet événement pour le ciblage et les statistiques.
+                </p>
+              </div>
             </div>
 
             <Button
               type="submit"
               className="w-full bg-white text-black hover:bg-white/90"
-              disabled={isLoading || !name.trim()}
+              disabled={isLoading || !name.trim() || !eventId}
             >
               {isLoading ? (
                 <>

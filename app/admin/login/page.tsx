@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,15 +16,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2, Lock, Fingerprint } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPasswordLogin, setShowPasswordLogin] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -32,6 +34,12 @@ export default function AdminLoginPage() {
       router.push("/admin");
     }
   }, [session, router]);
+
+  useEffect(() => {
+    if (searchParams.get("method") === "password") {
+      setShowPasswordLogin(true);
+    }
+  }, [searchParams]);
 
   if (
     session &&
@@ -108,6 +116,24 @@ export default function AdminLoginPage() {
     }
   };
 
+  const handlePasskeyLogin = async () => {
+    setLoading(true);
+    try {
+      const { error } = await signIn.passkey();
+      if (error) {
+        toast.error("Erreur Passkey: " + error.message);
+        setLoading(false);
+      } else {
+        // Success is handled by redirect or callback
+        router.push("/admin");
+      }
+    } catch (error) {
+      console.error("Passkey login error:", error);
+      toast.error("Échec de la connexion par Passkey.");
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
       {/* Background Effects */}
@@ -141,73 +167,135 @@ export default function AdminLoginPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <form
-            onSubmit={handleLogin}
-            className="space-y-4"
-            suppressHydrationWarning
-          >
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@bdefensup.fr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="bg-background/50"
-                suppressHydrationWarning
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-muted-foreground hover:text-primary hover:underline"
-                >
-                  Mot de passe oublié ?
-                </Link>
+          {!showPasswordLogin ? (
+            <div className="space-y-6 py-4">
+              <div className="text-center space-y-2">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Fingerprint className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground">Connexion Sécurisée</h3>
+                <p className="text-sm text-muted-foreground">
+                  Utilisez FaceID ou TouchID pour accéder à l'administration.
+                </p>
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-background/50"
-                suppressHydrationWarning
-              />
+              
+              <Button
+                type="button"
+                size="lg"
+                className="w-full font-bold shadow-lg shadow-primary/20 h-12 text-md"
+                onClick={handlePasskeyLogin}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Authentification...
+                  </>
+                ) : (
+                  <>
+                    <Fingerprint className="mr-2 h-5 w-5" />
+                    S'identifier avec Passkey
+                  </>
+                )}
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border/50" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Ou</span>
+                </div>
+              </div>
+
+              <Button
+                variant="ghost"
+                className="w-full text-muted-foreground hover:text-primary"
+                onClick={() => setShowPasswordLogin(true)}
+              >
+                Utiliser un mot de passe
+              </Button>
             </div>
-            <Button
-              type="submit"
-              className="w-full font-bold shadow-lg shadow-primary/20"
-              disabled={loading}
+          ) : (
+            <form
+              onSubmit={handleLogin}
+              className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500"
+              suppressHydrationWarning
             >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Connexion...
-                </>
-              ) : (
-                <>
-                  <Lock className="mr-2 h-4 w-4" />
-                  Se connecter
-                </>
-              )}
-            </Button>
-          </form>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@bdefensup.fr"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-background/50"
+                  suppressHydrationWarning
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-muted-foreground hover:text-primary hover:underline"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-background/50"
+                  suppressHydrationWarning
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full font-bold shadow-lg shadow-primary/20"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connexion...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="mr-2 h-4 w-4" />
+                    Se connecter
+                  </>
+                )}
+              </Button>
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border/50" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Ou</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full border-primary/20 hover:bg-primary/5"
+                onClick={handlePasskeyLogin}
+                disabled={loading}
+              >
+                <Fingerprint className="mr-2 h-4 w-4" />
+                Connexion avec Passkey
+              </Button>
+            </form>
+          )}
         </CardContent>
         <CardFooter className="justify-center border-t border-border/50 pt-4 flex-col gap-2">
-          <p className="text-sm text-muted-foreground text-center">
-            Pas encore de compte ?{" "}
-            <Link
-              href="/admin/signup"
-              className="text-primary hover:underline font-medium"
-            >
-              S'inscrire
-            </Link>
-          </p>
           <p className="text-xs text-muted-foreground text-center">
             Accès réservé aux membres du bureau.
           </p>

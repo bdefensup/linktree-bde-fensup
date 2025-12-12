@@ -116,47 +116,60 @@ export function TemplateEditor({ template, onBack, onUpdate }: TemplateEditorPro
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-5xl mx-auto p-8 space-y-8">
-            <div className="grid gap-6 p-6">
-              <div className="grid gap-2">
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  placeholder="Nom du template"
-                  className="h-14 text-3xl font-bold border-none shadow-none px-0 focus-visible:ring-0 bg-transparent placeholder:text-muted-foreground/50"
-                />
+        <div className="flex-1 overflow-hidden">
+          <div className="max-w-5xl mx-auto p-8 space-y-8 flex flex-col h-full">
+            <div className="flex flex-col md:flex-row gap-6 p-6 items-start border-b border-white/5 bg-white/2 shrink-0">
+              <div className="flex-1 w-full space-y-2">
+                <label htmlFor="name" className="text-xs font-medium text-muted-foreground uppercase tracking-wider pl-1">
+                  Nom du template
+                </label>
+                <div className="relative group">
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setHasChanges(true);
+                    }}
+                    placeholder="Nom du template"
+                    className="h-12 text-lg font-semibold bg-transparent border-transparent hover:bg-white/5 focus-visible:bg-white/5 focus-visible:ring-0 focus-visible:border-white/10 transition-all px-3 rounded-lg"
+                  />
+                  <div className="absolute inset-0 border border-white/5 rounded-lg pointer-events-none group-hover:border-white/10 transition-colors" />
+                </div>
               </div>
 
-              <div className="grid gap-2">
-                <Input
-                  id="subject"
-                  value={subject}
-                  onChange={(e) => {
-                    setSubject(e.target.value);
-                    setHasChanges(true);
-                  }}
-                  placeholder="Objet de l'email"
-                  className="h-10 text-xl font-medium border-none shadow-none px-0 focus-visible:ring-0 bg-transparent text-muted-foreground placeholder:text-muted-foreground/50"
-                />
+              <div className="flex-2 w-full space-y-2">
+                <label htmlFor="subject" className="text-xs font-medium text-muted-foreground uppercase tracking-wider pl-1">
+                  Objet de l'email
+                </label>
+                <div className="relative group">
+                  <Input
+                    id="subject"
+                    value={subject}
+                    onChange={(e) => {
+                      setSubject(e.target.value);
+                      setHasChanges(true);
+                    }}
+                    placeholder="Objet de l'email"
+                    className="h-12 text-lg font-medium bg-transparent border-transparent hover:bg-white/5 focus-visible:bg-white/5 focus-visible:ring-0 focus-visible:border-white/10 transition-all px-3 rounded-lg"
+                  />
+                  <div className="absolute inset-0 border border-white/5 rounded-lg pointer-events-none group-hover:border-white/10 transition-colors" />
+                </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between px-1">
+            <div className="flex-1 flex flex-col space-y-4 min-h-0">
+              <div className="flex items-center justify-between px-1 shrink-0">
                 <h3 className="text-lg font-semibold text-muted-foreground">Contenu</h3>
               </div>
-              <div className="border rounded-xl overflow-hidden shadow-sm bg-card min-h-[500px]">
+              <div className="flex-1 border rounded-xl overflow-hidden shadow-sm bg-card">
                 <AdvancedEditor
                   initialContent={content}
                   onChange={(newContent: string) => {
                     setContent(newContent);
                     setHasChanges(true);
                   }}
+                  className="h-full border-none rounded-none"
                 />
               </div>
             </div>

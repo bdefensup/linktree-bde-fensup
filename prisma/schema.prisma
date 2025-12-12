@@ -29,6 +29,8 @@ model User {
   templateFolders TemplateFolder[]
   emailTemplates  EmailTemplate[]
   campaigns       Campaign[]
+  emailLogs       EmailLog[]
+  passkeys        Passkey[]
 
   @@map("user")
 }
@@ -125,8 +127,12 @@ model Booking {
 
   emailLogs EmailLog[]
 
+  sourceCampaignId String?
+  sourceCampaign   Campaign? @relation("CampaignBookings", fields: [sourceCampaignId], references: [id], onDelete: SetNull)
+
   @@index([eventId])
   @@index([email])
+  @@index([sourceCampaignId])
   @@map("booking")
 }
 
@@ -145,6 +151,8 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  CHECKED_IN
+  CHECKED_OUT
 }
 
 model Conversation {
@@ -283,6 +291,7 @@ model Campaign {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   logs      EmailLog[]
+  bookings  Booking[] @relation("CampaignBookings")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -314,12 +323,16 @@ model EmailLog {
   bounceSubType String?  // General, NoEmail, Suppressed, MailboxFull, etc.
   bounceMessage String?  // Detailed error message
   
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   createdAt   DateTime @default(now())
 
   @@map("email_log")
   @@index([campaignId])
   @@index([emailId])
   @@index([recipient])
+  @@index([userId])
 }
 
 model UnsubscribedRecipient {
@@ -414,4 +427,21 @@ model ContactTopic {
 
   @@unique([contactId, topicId])
   @@map("contact_topic")
+}
+
+model Passkey {
+  id                    String   @id @default(cuid())
+  name                  String?
+  publicKey             String
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialID          String
+  counter               Int
+  deviceType            String
+  backedUp              Boolean
+  transports            String?
+  createdAt             DateTime? @default(now())
+  
+  @@map("passkey")
+  @@index([userId])
 }

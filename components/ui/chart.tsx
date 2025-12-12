@@ -125,12 +125,6 @@ function ChartTooltipContent({
     indicator?: "line" | "dot" | "dashed"
     nameKey?: string
     labelKey?: string
-    payload?: any[]
-    label?: any
-    labelFormatter?: (label: any, payload: any[]) => React.ReactNode
-    labelClassName?: string
-    formatter?: (value: any, name: any, item: any, index: number, payload: any) => React.ReactNode
-    color?: string
   }) {
   const { config } = useChart()
 
@@ -179,7 +173,7 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "border-border/50 bg-background grid min-w-32 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+        "border-border bg-background flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs shadow-sm",
         className
       )}
     >
@@ -187,7 +181,7 @@ function ChartTooltipContent({
       <div className="grid gap-1.5">
         {payload
           .filter((item) => item.type !== "none")
-          .map((item, index) => {
+          .map((item: any, index: number) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
             const indicatorColor = color || item.payload.fill || item.color
@@ -210,7 +204,7 @@ function ChartTooltipContent({
                       !hideIndicator && (
                         <div
                           className={cn(
-                            "shrink-0 rounded-[2px] border bg-(--color-bg)",
+                            "shrink-0 rounded-[2px] border-border bg-(--color-bg)",
                             {
                               "h-2.5 w-2.5": indicator === "dot",
                               "w-1": indicator === "line",
@@ -265,10 +259,9 @@ function ChartLegendContent({
   verticalAlign = "bottom",
   nameKey,
 }: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "verticalAlign"> & {
+  Partial<Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign">> & {
     hideIcon?: boolean
     nameKey?: string
-    payload?: any[]
   }) {
   const { config } = useChart()
 
@@ -286,7 +279,7 @@ function ChartLegendContent({
     >
       {payload
         .filter((item) => item.type !== "none")
-        .map((item) => {
+        .map((item: any) => {
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
 

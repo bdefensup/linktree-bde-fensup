@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { CampaignSendPage } from "./client-wrapper";
+import { getCampaignAudience } from "../../actions";
 
 interface PageProps {
   params: Promise<{ campaignId: string }>;
@@ -26,5 +27,14 @@ export default async function CampaignSendRoute({ params }: PageProps) {
     notFound();
   }
 
-  return <CampaignSendPage campaign={campaign} />;
+  // Calculate dynamic audience if segment is used
+  const recipients = await getCampaignAudience(campaignId);
+  
+  // Create a campaign object with the calculated recipients for the UI
+  const campaignWithAudience = {
+    ...campaign,
+    recipients: recipients,
+  };
+
+  return <CampaignSendPage campaign={campaignWithAudience} />;
 }

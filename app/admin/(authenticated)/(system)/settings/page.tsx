@@ -8,6 +8,8 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PasskeySettings } from "@/components/admin/settings/passkey-settings";
+import { ShieldCheck } from "lucide-react";
 
 export default function SettingsPage() {
   const resendLinks = [
@@ -73,6 +75,19 @@ export default function SettingsPage() {
               </Card>
             </Link>
           ))}
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 text-xl font-semibold text-white">
+          <div className="p-2 rounded-lg bg-white/10">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <h2>Sécurité</h2>
+        </div>
+        
+        <div className="grid gap-6 md:grid-cols-1">
+          <PasskeySettings />
         </div>
       </div>
     </div>

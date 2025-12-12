@@ -394,7 +394,7 @@ export function AdminSidebar() {
                 {/* COMMUNICATION */}
                 <SidebarMenuItem>
                   <Accordion type="single" collapsible className="w-full" defaultValue={
-                    ["/admin/campaigns", "/admin/audience", "/admin/messages", "/admin/email-templates"].some(path => pathname.startsWith(path)) ? "communication" : ""
+                    ["/admin/campaigns", "/admin/email-templates", "/admin/stats"].some(path => pathname.startsWith(path)) ? "communication" : ""
                   }>
                     <AccordionItem value="communication" className="border-none">
                       <AccordionTrigger className="py-2 hover:no-underline hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md px-2 group">
@@ -406,23 +406,9 @@ export function AdminSidebar() {
                       <AccordionContent className="pb-0 pt-1">
                         <SidebarMenu>
                           <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/messages")}>
-                              <Link href="/admin/messages" className="pl-8">
-                                <span>Messagerie</span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                          <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/campaigns")}>
                               <Link href="/admin/campaigns" className="pl-8">
-                                <span>Emailing</span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                          <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/audience")}>
-                              <Link href="/admin/audience" className="pl-8">
-                                <span>Audience</span>
+                                <span>Campagnes</span>
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
@@ -430,6 +416,13 @@ export function AdminSidebar() {
                             <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/email-templates")}>
                               <Link href="/admin/email-templates" className="pl-8">
                                 <span>Modèles</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/stats")}>
+                              <Link href="/admin/statistics" className="pl-8">
+                                <span>Stats</span>
                               </Link>
                             </SidebarMenuButton>
                           </SidebarMenuItem>
@@ -557,7 +550,7 @@ export function AdminSidebar() {
                       </AccordionTrigger>
                       <AccordionContent className="pb-0 pt-1">
                         <SidebarMenu>
-                           <SidebarMenuItem>
+                          <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive={pathname === "/admin/settings"}>
                               <Link href="/admin/settings" className="pl-8">
                                 <span>Paramètres</span>
@@ -629,6 +622,18 @@ export function AdminSidebar() {
             <SidebarGroupContent>
               <ScrollArea className="h-[280px]">
                 <SidebarMenu>
+                  {/* Messagerie Link (Moved here) */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname.startsWith("/admin/messages") && !pathname.includes("chatId")}>
+                      <Link href="/admin/messages" className="flex items-center gap-3 w-full">
+                         <div className="h-8 w-8 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                           <MessageSquare className="h-4 w-4" />
+                         </div>
+                         <span className="font-semibold">Messagerie Générale</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  
                   {/* Conversations List */}
                   {session?.user &&
                     conversations

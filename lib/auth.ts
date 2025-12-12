@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth";
 
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";
+import { passkey } from "@better-auth/passkey";
 import { Resend } from "resend";
 import ResetPasswordEmail from "@/components/emails/auth/reset-password";
 import VerifyEmail from "@/components/emails/auth/verify-email";
@@ -15,8 +16,8 @@ export const auth = betterAuth({
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : process.env.NEXT_PUBLIC_APP_URL || "https://www.bdefenelon.org",
-  trustedOrigins: ["https://www.bdefenelon.org", "https://bdefenelon.org", "http://localhost:3000"],
-  plugins: [admin()],
+  trustedOrigins: ["https://www.bdefenelon.org", "https://bdefenelon.org", "http://localhost:3000", "http://192.168.1.152:3000"],
+  plugins: [admin(), passkey()],
   emailAndPassword: {
     enabled: true,
     async sendResetPassword(data) {

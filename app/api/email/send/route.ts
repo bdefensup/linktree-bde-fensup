@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { to, subject, html } = body;
 
@@ -20,6 +30,9 @@ export async function POST(req: Request) {
       to: [to],
       subject: subject,
       html: html,
+      tags: [
+        { name: "userId", value: session.user.id },
+      ],
     });
 
     if (data.error) {

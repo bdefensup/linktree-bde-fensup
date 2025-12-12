@@ -7,7 +7,6 @@ import { sendCampaign } from "../../actions";
 import { toast } from "sonner";
 import { ArrowLeft, Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 interface CampaignSendPageProps {
   campaign: any;
@@ -40,7 +39,7 @@ export function CampaignSendPage({ campaign }: CampaignSendPageProps) {
     }
   };
 
-  const isReady = campaign.subject && campaign.recipients.length > 0;
+  const isReady = campaign.subject;
 
   return (
     <div className="flex h-screen flex-col bg-black p-4">
@@ -51,14 +50,14 @@ export function CampaignSendPage({ campaign }: CampaignSendPageProps) {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.push(`/admin/campaigns/${campaign.id}/audience`)}
+              onClick={() => router.push(`/admin/campaigns/${campaign.id}/content`)}
               className="rounded-full hover:bg-white/10"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
               <h1 className="text-xl font-bold tracking-tight">{campaign.name}</h1>
-              <p className="text-muted-foreground text-sm">Étape 4 : Validation & Envoi</p>
+              <p className="text-muted-foreground text-sm">Étape 3 : Validation & Envoi</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -124,42 +123,7 @@ export function CampaignSendPage({ campaign }: CampaignSendPageProps) {
                   </div>
                 </div>
 
-                <Separator className="bg-white/10" />
 
-                <div className="flex items-start gap-4">
-                  <div className="mt-1">
-                    {campaign.recipients.length > 0 ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <AlertCircle className="h-5 w-5 text-yellow-500" />
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Audience</h3>
-                    <p className="text-muted-foreground text-sm">
-                      {campaign.recipients.length} destinataire(s)
-                    </p>
-                    {campaign.recipients.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {campaign.recipients.slice(0, 5).map((email: string) => (
-                          <span
-                            key={email}
-                            className="rounded-full bg-white/10 px-2 py-0.5 text-xs"
-                          >
-                            {email}
-                          </span>
-                        ))}
-                        {campaign.recipients.length > 5 && (
-                          <span className="text-muted-foreground text-xs">
-                            +{campaign.recipients.length - 5} autres
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <Separator className="bg-white/10" />
 
                 <div className="flex items-start gap-4">
                   <div className="mt-1">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useEditor, EditorContent, EditorContext } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Color } from "@tiptap/extension-color";
@@ -232,6 +233,17 @@ export function AdvancedEditor({
     },
     immediatelyRender: false,
   });
+
+  // Sync content when initialContent changes (e.g. loading a template)
+  useEffect(() => {
+    if (editor && initialContent !== undefined && editor.getHTML() !== initialContent) {
+      // Only update if content is different to avoid cursor jumps or loops
+      // We compare HTML to avoid unnecessary updates, but be careful with formatting differences
+      // A safer check might be just checking if it's a "load" action, but here we rely on prop change.
+      // To be safe, we can just set it if they differ significantly or if we assume this prop only changes on load.
+      editor.commands.setContent(initialContent);
+    }
+  }, [editor, initialContent]);
 
   // Ensure katex is available globally for the extension
   if (typeof window !== "undefined") {

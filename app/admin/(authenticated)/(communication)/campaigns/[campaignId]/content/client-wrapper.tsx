@@ -154,7 +154,7 @@ export function CampaignContentEditor({ campaign, templates }: CampaignContentEd
               Sauvegarder
             </Button>
             <Button
-              onClick={() => handleSave(`/admin/campaigns/${campaign.id}/audience`)}
+              onClick={() => handleSave(`/admin/campaigns/${campaign.id}/send`)}
               disabled={isSaving}
               className="bg-white text-black hover:bg-white/90"
             >

@@ -214,8 +214,29 @@ export async function POST(req: NextRequest) {
     }
     
     // For other events, we look for campaignId
-    const campaignIdTag = evt.data.tags?.find(t => t.name === "campaignId");
+    // For other events, we look for campaignId
+    const tags = evt.data.tags || [];
+    const campaignIdTag = tags.find(t => t.name.toLowerCase() === "campaignid");
     const campaignId = campaignIdTag?.value;
+    
+    if (!campaignId) {
+      console.warn("No campaignId tag found in webhook event", { type: evt.type, email_id: evt.data.email_id, tags: evt.data.tags });
+    }
+    
+    const userIdTag = evt.data.tags?.find(t => t.name === "userId");
+    let userId = userIdTag?.value;
+
+    // If no userId tag, try to find it via campaign
+    if (!userId && campaignId) {
+      const campaign = await prisma.campaign.findUnique({
+        where: { id: campaignId },
+        select: { userId: true },
+      });
+      if (campaign) {
+        userId = campaign.userId;
+      }
+    }
+
     const emailId = evt.data.email_id;
     const recipient = evt.data.to?.[0] || "unknown"; 
 
@@ -240,6 +261,7 @@ export async function POST(req: NextRequest) {
     await prisma.emailLog.create({
       data: {
         campaignId: campaignId || null,
+        userId: userId || null,
         emailId,
         recipient,
         eventType: evt.type,
@@ -251,7 +273,7 @@ export async function POST(req: NextRequest) {
         bounceSubType: evt.data.bounce?.subType,
         bounceMessage: evt.data.bounce?.message || evt.data.failed?.reason,
         createdAt: new Date(evt.created_at),
-      },
+      } as any,
     });
 
     // 2. Update Campaign Counters

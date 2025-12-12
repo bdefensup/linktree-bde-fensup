@@ -22,10 +22,11 @@ export default function proxy(request: NextRequest) {
   const userAgent = request.headers.get("user-agent") || "";
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
   const isRestrictionPage = pathname === "/admin-mobile-restriction";
+  const hasBypassCookie = request.cookies.get("admin_mobile_bypass")?.value === "true";
 
   if (isAdminRoute && !isRestrictionPage) {
-    // Block mobile access to admin routes
-    if (isMobile) {
+    // Block mobile access to admin routes (unless bypassed)
+    if (isMobile && !hasBypassCookie) {
       return NextResponse.redirect(new URL("/admin-mobile-restriction", request.url));
     }
 
