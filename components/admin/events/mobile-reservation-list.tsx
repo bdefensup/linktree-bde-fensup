@@ -58,14 +58,14 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
   return (
     <div className="space-y-4 pb-20">
       {/* Search Bar - Sticky Top */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-md pb-4 pt-2">
+      <div className="sticky top-0 z-10 bg-black pb-4 pt-2 border-b border-white/10">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Rechercher (nom, email, tel...)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-muted/50 border-white/10 h-12 text-base rounded-xl focus-visible:ring-primary/50"
+            className="pl-9 bg-[#1C1C1E] border-white/10 h-12 text-base rounded-xl focus-visible:ring-primary/50 text-white placeholder:text-muted-foreground"
           />
         </div>
         <div className="mt-2 text-xs text-muted-foreground px-1">
@@ -74,7 +74,7 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
       </div>
 
       {/* List */}
-      <div className="space-y-3">
+      <div className="space-y-3 bg-black min-h-screen">
         {filteredBookings.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <User className="h-12 w-12 mx-auto mb-3 opacity-20" />
