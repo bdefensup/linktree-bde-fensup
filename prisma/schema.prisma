@@ -441,6 +441,7 @@ model Passkey {
   backedUp              Boolean
   transports            String?
   createdAt             DateTime? @default(now())
+  aaguid                String?
   
   @@map("passkey")
   @@index([userId])
