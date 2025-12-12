@@ -74,7 +74,7 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
       </div>
 
       {/* List */}
-      <div className="space-y-3 bg-black min-h-screen">
+      <div className="space-y-3 bg-black">
         {filteredBookings.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <User className="h-12 w-12 mx-auto mb-3 opacity-20" />
