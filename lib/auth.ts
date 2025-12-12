@@ -17,7 +17,13 @@ export const auth = betterAuth({
       ? "http://localhost:3000"
       : process.env.NEXT_PUBLIC_APP_URL || "https://www.bdefenelon.org",
   trustedOrigins: ["https://www.bdefenelon.org", "https://bdefenelon.org", "http://localhost:3000", "http://192.168.1.152:3000"],
-  plugins: [admin(), passkey()],
+  plugins: [
+    admin(), 
+    passkey({
+      rpID: process.env.NODE_ENV === "development" ? "localhost" : "bdefenelon.org",
+      origin: process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://www.bdefenelon.org",
+    })
+  ],
   emailAndPassword: {
     enabled: true,
     async sendResetPassword(data) {
