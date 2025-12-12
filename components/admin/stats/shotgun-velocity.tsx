@@ -25,7 +25,7 @@ interface ShotgunVelocityChartProps {
   label: string;
 }
 
-export function ShotgunVelocityChart({ data, date, onDateChange, range, onRangeChange, label }: ShotgunVelocityChartProps) {
+export function ShotgunVelocityChart({ data, date, onDateChange, onRangeChange, label }: ShotgunVelocityChartProps) {
   // Trouver l'index ou le label où l'email a été envoyé pour placer la ReferenceLine
   const emailSentTime = data.find(d => d.annotation)?.time;
 
