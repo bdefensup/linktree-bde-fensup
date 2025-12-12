@@ -3,10 +3,11 @@
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Phone, Mail, Calendar, User, CheckCircle2, XCircle, Clock, LogIn, LogOut } from "lucide-react";
+import { Search, Phone, Mail, Calendar, User, CheckCircle2, XCircle, Clock, LogIn, LogOut, Check, X, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 type Booking = {
   id: string;
@@ -28,6 +29,7 @@ interface MobileReservationListProps {
 
 export function MobileReservationList({ bookings }: MobileReservationListProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   const filteredBookings = useMemo(() => {
     if (!searchQuery) return bookings;
@@ -39,6 +41,35 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
       booking.phone.toLowerCase().includes(lowerQuery)
     );
   }, [bookings, searchQuery]);
+
+  const updateStatus = async (id: string, status: string) => {
+    setProcessingId(id);
+    try {
+      const response = await fetch(`/api/admin/bookings/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update status");
+
+      const data = await response.json();
+
+      if (data.emailSent === false && (status === "CONFIRMED" || status === "CANCELLED")) {
+        toast.warning(`Statut mis à jour, mais l'envoi de l'email a échoué: ${data.emailError || "Erreur inconnue"}`);
+      } else {
+        toast.success("Statut mis à jour avec succès.");
+      }
+      
+      window.location.reload();
+    } catch {
+      toast.error("Impossible de mettre à jour le statut.");
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -109,23 +140,46 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
               </div>
 
               {/* Actions Row */}
-              <div className="flex items-center gap-3 mt-5">
-                <a 
-                  href={`mailto:${booking.email}`} 
-                  className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white text-xs font-medium transition-colors border border-white/5 active:bg-white/10"
-                >
-                  <Mail className="h-3.5 w-3.5" />
-                  Email
-                </a>
-                
-                {booking.phone && (
-                  <a 
-                    href={`tel:${booking.phone}`} 
-                    className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white text-xs font-medium transition-colors border border-white/5 active:bg-white/10"
-                  >
-                    <Phone className="h-3.5 w-3.5" />
-                    Appeler
-                  </a>
+              <div className="flex items-center gap-2 mt-5">
+                {booking.status === "PENDING" ? (
+                  <>
+                    <Button 
+                      onClick={() => updateStatus(booking.id, "CONFIRMED")}
+                      disabled={processingId === booking.id}
+                      className="flex-1 h-10 rounded-xl bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500/20"
+                    >
+                      {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4 mr-2" />}
+                      Valider
+                    </Button>
+                    <Button 
+                      onClick={() => updateStatus(booking.id, "CANCELLED")}
+                      disabled={processingId === booking.id}
+                      className="flex-1 h-10 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20"
+                    >
+                      {processingId === booking.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4 mr-2" />}
+                      Refuser
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <a 
+                      href={`mailto:${booking.email}`} 
+                      className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white text-xs font-medium transition-colors border border-white/5 active:bg-white/10"
+                    >
+                      <Mail className="h-3.5 w-3.5" />
+                      Email
+                    </a>
+                    
+                    {booking.phone && (
+                      <a 
+                        href={`tel:${booking.phone}`} 
+                        className="flex-1 flex items-center justify-center gap-2 h-10 rounded-xl bg-[#1C1C1E] hover:bg-[#252525] text-white/80 hover:text-white text-xs font-medium transition-colors border border-white/5 active:bg-white/10"
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                        Appeler
+                      </a>
+                    )}
+                  </>
                 )}
               </div>
               
