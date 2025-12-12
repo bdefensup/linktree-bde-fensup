@@ -56,69 +56,88 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
   };
 
   return (
-    <div className="space-y-4 pb-20">
-      {/* Search Bar - Sticky Top */}
-      <div className="sticky top-0 z-10 bg-black px-4 pb-4 pt-4 border-b border-white/10">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher (nom, email, tel...)"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-[#1C1C1E] border-white/10 h-12 text-base rounded-xl focus-visible:ring-primary/50 text-white placeholder:text-muted-foreground"
-          />
-        </div>
-        <div className="mt-2 text-xs text-muted-foreground px-1">
-          {filteredBookings.length} résultat{filteredBookings.length > 1 ? "s" : ""} trouvé{filteredBookings.length > 1 ? "s" : ""}
+    <div className="space-y-6 pb-24">
+      {/* Search Bar - Floating Glass */}
+      <div className="sticky top-0 z-20 px-4 pt-4 pb-2">
+        <div className="relative group">
+          <div className="absolute inset-0 bg-white/5 rounded-3xl blur-xl transition-opacity opacity-0 group-focus-within:opacity-100" />
+          <div className="relative bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 group-focus-within:bg-black/80 group-focus-within:border-white/20 group-focus-within:ring-1 group-focus-within:ring-white/20">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-white transition-colors" />
+            <Input
+              placeholder="Rechercher..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 bg-transparent border-none h-14 text-lg text-white placeholder:text-white/30 focus-visible:ring-0 rounded-none"
+            />
+            {searchQuery && (
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-white/40 bg-white/5 px-2 py-1 rounded-full">
+                {filteredBookings.length}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* List */}
-      <div className="space-y-3 bg-black px-4">
+      <div className="space-y-3 px-4">
         {filteredBookings.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <User className="h-12 w-12 mx-auto mb-3 opacity-20" />
-            <p>Aucune réservation trouvée.</p>
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <div className="h-20 w-20 rounded-full bg-white/5 flex items-center justify-center animate-pulse">
+              <User className="h-10 w-10 text-white/20" />
+            </div>
+            <p className="text-white/40 font-medium">Aucune réservation trouvée</p>
           </div>
         ) : (
           filteredBookings.map((booking) => (
             <div
               key={booking.id}
-              className="bg-[#1C1C1E] rounded-2xl p-4 border border-white/5 active:scale-[0.98] transition-transform duration-200"
+              className="group relative bg-[#161618] hover:bg-[#1C1C1E] rounded-3xl p-5 border border-white/5 active:scale-[0.98] transition-all duration-300 shadow-lg shadow-black/20"
             >
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="font-semibold text-lg text-white leading-tight">
-                    {booking.firstName} {booking.lastName}
+              <div className="flex justify-between items-start mb-4">
+                <div className="space-y-1">
+                  <h3 className="font-bold text-xl text-white tracking-tight leading-none">
+                    {booking.firstName} <span className="text-white/60">{booking.lastName}</span>
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5">
-                    <Calendar className="h-3 w-3" />
-                    {booking.event.title}
-                  </p>
+                  <div className="flex items-center gap-2 text-sm font-medium text-white/40">
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span className="truncate max-w-[180px]">{booking.event.title}</span>
+                  </div>
                 </div>
-                {getStatusBadge(booking.status)}
+                <div className="scale-90 origin-top-right">
+                  {getStatusBadge(booking.status)}
+                </div>
               </div>
 
-              <div className="space-y-2 mt-4 pt-3 border-t border-white/5">
-                <a href={`mailto:${booking.email}`} className="flex items-center gap-3 text-sm text-gray-300 hover:text-white transition-colors p-2 -mx-2 rounded-lg hover:bg-white/5">
-                  <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center">
-                    <Mail className="h-4 w-4" />
-                  </div>
-                  <span className="truncate">{booking.email}</span>
+              {/* Actions Row */}
+              <div className="flex items-center gap-3 mt-5">
+                <a 
+                  href={`mailto:${booking.email}`} 
+                  className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/90 text-sm font-medium transition-colors border border-white/5 active:bg-white/15"
+                >
+                  <Mail className="h-4 w-4" />
+                  Email
                 </a>
                 
                 {booking.phone && (
-                  <a href={`tel:${booking.phone}`} className="flex items-center gap-3 text-sm text-gray-300 hover:text-white transition-colors p-2 -mx-2 rounded-lg hover:bg-white/5">
-                    <div className="h-8 w-8 rounded-full bg-white/5 flex items-center justify-center">
-                      <Phone className="h-4 w-4" />
-                    </div>
-                    <span>{booking.phone}</span>
+                  <a 
+                    href={`tel:${booking.phone}`} 
+                    className="flex-1 flex items-center justify-center gap-2 h-12 rounded-2xl bg-white/5 hover:bg-white/10 text-white/90 text-sm font-medium transition-colors border border-white/5 active:bg-white/15"
+                  >
+                    <Phone className="h-4 w-4" />
+                    Appeler
                   </a>
                 )}
               </div>
               
-              <div className="mt-3 text-[10px] text-right text-muted-foreground/50 font-mono">
-                {format(new Date(booking.createdAt), "dd MMM yyyy • HH:mm", { locale: fr })}
+              <div className="absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-white/5 flex justify-between items-center text-[11px] font-medium text-white/20 uppercase tracking-wider">
+                <span>Réservé le</span>
+                <span className="font-mono text-white/30">
+                  {format(new Date(booking.createdAt), "dd MMM • HH:mm", { locale: fr })}
+                </span>
               </div>
             </div>
           ))
