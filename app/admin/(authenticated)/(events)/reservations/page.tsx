@@ -36,12 +36,9 @@ export default async function AdminReservationsPage() {
   const bookings = await getBookings();
 
   return (
-    <div className="flex min-h-full flex-col space-y-8 bg-black p-4 md:p-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-          <span className="hidden md:inline">Gestion des Réservations</span>
-          <span className="md:hidden">Réservations</span>
-        </h1>
+    <div className="flex min-h-full flex-col bg-black md:space-y-8 md:p-8">
+      <div className="hidden md:flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight text-white">Gestion des Réservations</h1>
       </div>
       
       {/* Desktop View */}
@@ -50,7 +47,7 @@ export default async function AdminReservationsPage() {
       </div>
 
       {/* Mobile View */}
-      <div className="md:hidden">
+      <div className="md:hidden h-full">
         <MobileReservationList bookings={bookings} />
       </div>
     </div>

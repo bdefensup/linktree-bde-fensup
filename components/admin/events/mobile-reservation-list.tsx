@@ -58,7 +58,7 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
   return (
     <div className="space-y-4 pb-20">
       {/* Search Bar - Sticky Top */}
-      <div className="sticky top-0 z-10 bg-black pb-4 pt-2 border-b border-white/10">
+      <div className="sticky top-0 z-10 bg-black px-4 pb-4 pt-4 border-b border-white/10">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -74,7 +74,7 @@ export function MobileReservationList({ bookings }: MobileReservationListProps) 
       </div>
 
       {/* List */}
-      <div className="space-y-3 bg-black">
+      <div className="space-y-3 bg-black px-4">
         {filteredBookings.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <User className="h-12 w-12 mx-auto mb-3 opacity-20" />
