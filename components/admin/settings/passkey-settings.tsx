@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Fingerprint, Trash2, Loader2, Plus } from "lucide-react";
@@ -22,6 +22,7 @@ interface Passkey {
 }
 
 export function PasskeySettings() {
+  const { data: session } = useSession();
   const [passkeys, setPasskeys] = useState<Passkey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -48,8 +49,12 @@ export function PasskeySettings() {
   async function handleRegisterPasskey() {
     setIsRegistering(true);
     try {
+      const passkeyName = session?.user?.name 
+        ? `${session.user.name} (${new Date().toLocaleDateString()})`
+        : `Passkey (${new Date().toLocaleDateString()})`;
+
       const { error } = await authClient.passkey.addPasskey({
-        name: `Passkey (${new Date().toLocaleDateString()})`,
+        name: passkeyName,
       });
       
       if (error) {
